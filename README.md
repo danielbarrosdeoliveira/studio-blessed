@@ -38,4 +38,4 @@ No Forks, No Pull Requests be accepted or merged into this repository.
 Please respect our decision and follow the guidelines. If you would like to discuss any features or suggestions, feel free to open an issue.
 
 ### 📄 License
-This project is licensed under the MIT License - see the [LICENSE](https://opensource.org/license/mit) file for details.
+This project is licensed under a custom license. You may use, modify, and distribute the software **only in modified form**. Redistribution of the original version is not permitted. Please refer to the [LICENSE](./LICENSE) file for full terms and conditions.
