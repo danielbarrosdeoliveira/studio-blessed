@@ -1,0 +1,39 @@
+[data-animation] {
+  opacity: 0;
+  transition: .5s;
+}
+
+[data-animation="left"] {
+  transform: translate3d(-50px, 0px, 0px);
+}
+
+[data-animation="right"] {
+  transform: translate3d(50px, 0px, 0px);
+}
+
+[data-animation].animate {
+  opacity: 1;
+  transform: translate3d(0px, 0px, 0px);
+}
+
+// Aplica a animação de zoom quando o elemento recebe a classe animate
+
+[data-animation="zoom"].animate {
+  animation: zoomIn 1s ease-in-out forwards;
+}
+
+@keyframes zoomIn {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

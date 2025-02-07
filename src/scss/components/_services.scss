@@ -1,0 +1,106 @@
+.services {
+  background: $color-gray;
+  color: $color-white;
+  padding-block: 64px;
+
+  &__content {
+    @include container;
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  &__title {
+    @include font-cursiva($h5);
+    text-align: center;
+    padding-bottom: 64px;
+  }
+
+  &__card {
+    margin: 0 auto;
+    width: 100%;
+    max-width: 300px;
+    min-height: 436px;
+    background-color: $color-secondary-light;
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+    transition: box-shadow 0.3s;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 1px, rgba(0, 0, 0, 0.25) 0px 4px 5px;
+
+    &:hover {
+      box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 5px, rgba(0, 0, 0, 0.6) 0px 4px 5px;
+    }
+
+    p {
+      line-height: 1.4;
+      text-align: left
+    }
+  }
+
+  &__subtitle {
+    @include font-sans($bold, $base, $normal);
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  &__list {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+
+    p {
+      font-weight: 300;
+    }
+
+    ul {
+      margin-top: 16px;
+    }
+
+    @media screen and (min-width: 576px) and (max-width: 1080px) {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      justify-content: space-around;
+    }
+
+    @media screen and (min-width: 300px) and (max-width: 575.9px) {
+      flex-direction: column;
+    }
+  }
+
+  &__procedure {
+
+    &_wrapper {
+      margin-top: 24px;
+    }
+
+    &__title {
+      @include font-sans($bold, $sm, $italic);
+    }
+
+    &__list {
+      text-align: left;
+
+      li {
+        @include font-sans($regular, $sm, $normal);
+        font-weight: 300;
+      }
+    }
+  }
+
+  &__call-to-action {
+    @include font-sans($bold, $xs, $normal);
+    color: $color-white;
+    border: 2px solid $color-secondary;
+    padding: 16px;
+    transition: .3s;
+    margin: 64px auto 0 auto;
+    max-width: 172px;
+    text-transform: uppercase;
+
+    &:hover {
+      color: $color-black;
+      background-color: $color-secondary;
+      border-radius: 8px;
+    }
+  }
+}

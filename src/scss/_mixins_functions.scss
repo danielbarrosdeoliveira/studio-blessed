@@ -1,0 +1,58 @@
+$container-xx-large: 1400px;
+$container-x-large: 1200px;
+$container-large: 992px;
+$container-medium: 768px;
+$container-small: 576px;
+$container-x-small: 375px;
+
+@mixin container {
+  display: flex;
+  max-width: $container-xx-large;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0px 40px;
+
+  @media screen and (min-width: 1200px) and (max-width: 1399.9px) {
+    max-width: $container-x-large;
+    padding: 0px 32px;
+  }
+
+  @media screen and (min-width: 992px) and (max-width: 1199.9px) {
+    max-width: $container-large;
+    padding: 0px 16px;
+  }
+
+  @media screen and (min-width: 768px) and (max-width: 991.9px) {
+    max-width: $container-medium;
+    padding: 0px 24px;
+  }
+
+  @media screen and (min-width: 576px) and (max-width: 767.9px) {
+    max-width: $container-small;
+    padding: 0px 18px;
+  }
+
+  @media screen and (max-width: 575.9px) {
+    max-width: $container-x-small;
+    padding: 0px 16px;
+    flex-direction: column;
+  }
+}
+
+@function rem($pixel, $context: 16) {
+  @return calc($pixel / $context)+rem;
+}
+
+@mixin font-cursiva($size) {
+  font-family: $font-cursive;
+  font-weight: 400;
+  font-size: rem($size);
+  font-style: normal;
+}
+
+@mixin font-sans($weight, $size, $style) {
+  font-family: $font-sans;
+  font-weight: $weight;
+  font-size: rem($size);
+  font-style: $style;
+}

@@ -1,0 +1,10 @@
+@import "variables";
+@import "mixins_functions";
+@import "animations";
+
+@import "global";
+@import "./components/header";
+@import "./components/about";
+@import "./components/services";
+@import "./components/footer";
+@import "./components/flutuant_button";

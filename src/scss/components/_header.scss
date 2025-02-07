@@ -1,0 +1,152 @@
+.header {
+  height: 100vh;
+  background-image: url("../../assets/images/presentation.png");
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  color: $color-white;
+
+  &__nav {
+    z-index: 1;
+    position: fixed;
+    display: flex;
+    top: 0;
+    left: 0;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 48px;
+    transition: background-color .5s ease-in-out;
+
+    &.scrolled {
+      background-color: $color-black;
+    }
+
+    a {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      text-decoration: none;
+      color: $color-white;
+
+      em {
+        @include font-sans($regular, $lg, $normal);
+      }
+
+      @media screen and (min-width: 2160px) {
+        @include font-sans($bold, $lg, $normal);
+
+        em {
+          @include font-sans($regular, $lg, $normal);
+        }
+      }
+    }
+
+    img {
+      max-width: 64px;
+    }
+
+    @media screen and (min-width: 300px) and (max-width: 768px) {
+      padding-inline: 24px;
+      padding-top: 16px;
+      flex-direction: column;
+    }
+
+  }
+
+  &__list {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    @media screen and (min-width: 300px) and (max-width: 480px) {
+      margin-top: 16px;
+    }
+
+    @media screen and (min-width: 480px) and (max-width: 767.9px) {
+      margin-top: 24px;
+    }
+  }
+
+  &__link {
+    @include font-sans($bold, $sm, $normal);
+    text-transform: uppercase;
+    padding-left: 16px;
+    transition: color 0.3s;
+    color: $color-white;
+
+    &:hover {
+      color: $color-secondary;
+    }
+
+    @media screen and (min-width: 300px) and (max-width: 479.9px) {
+      @include font-sans($bold, $sm, $normal);
+      padding-inline: 8px;
+    }
+
+    position: relative;
+  }
+
+  &__call-to-action {
+    @include font-sans($bold, $sm, $normal);
+    color: $color-white;
+    border: 2px solid $color-primary;
+    padding: 16px;
+    transition: .3s;
+    margin-left: 8px;
+    text-transform: uppercase;
+
+    &:hover {
+      background-color: $color-primary;
+      border-radius: 8px;
+    }
+
+    @media screen and (min-width: 300px) and (max-width: 520px) {
+      @include font-sans($bold, $sm, $normal);
+      position: absolute;
+      left: 50%;
+      margin-left: -88px;
+      right: 50%;
+      top: 148px;
+      width: 192px;
+      height: auto;
+    }
+  }
+
+  &__presentation {
+    display: flex;
+    height: 80%;
+    flex-direction: column;
+    justify-content: center;
+    gap: 32px;
+    margin-left: 48px;
+  }
+
+  &__welcome {
+    margin-top: 72px;
+    color: $color-white;
+
+    @include font-sans($light, $h6, $normal);
+
+    @media screen and (min-width: 2160px) {
+      @include font-sans($light, 40, $normal);
+    }
+  }
+
+  &__title {
+    @include font-cursiva($h2);
+
+    @media screen and (min-width: 300px) and (max-width: 768px) {
+      @include font-cursiva($h4);
+    }
+  }
+
+  &__slogan {
+    @include font-sans($light, $lg, $italic);
+
+    @media screen and (min-width: 2160px) {
+      @include font-sans($light, 40, $normal);
+    }
+  }
+}
