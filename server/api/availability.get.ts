@@ -25,6 +25,8 @@ export default defineEventHandler(async (event) => {
 
   await requireProfessionalAccess(event, parsed.data.professionalId)
 
+  setResponseHeader(event, 'Cache-Control', 'no-store')
+
   return getAvailabilityForDay({
     ...parsed.data,
     origin: 'staff'
