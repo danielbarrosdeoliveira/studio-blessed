@@ -55,7 +55,7 @@
 
 ## 5. Funcionalidades do MVP
 
-- **Cliente:** catálogo público de serviços → profissionais que executam →
+- **Cliente:** catálogo público de serviços → profissional responsável →
   horários disponíveis → informa nome + WhatsApp → confirma.
 - **Profissional:** vê a própria agenda, gerencia seus serviços, cria bloqueios,
   cancela os próprios agendamentos e marca concluído/no-show; vê o faturamento próprio.
@@ -68,8 +68,9 @@
 - **Composição:** 1 agendamento = **1 serviço + 1 profissional + 1 horário**.
   Multi-serviço = repetir o fluxo. Combos são serviços próprios (nome + duração maior).
 - **Serviço:** pertence a **uma profissional** (`nome`, `durationMin`, `bufferMin`,
-  `price`). O catálogo público **agrega por nome** e o **preço pode variar por
-  profissional**.
+  `price`). O nome é **único entre os serviços ativos do salão**, sem diferenciar
+  maiúsculas nem espaços nas pontas. O catálogo lista cada serviço **uma vez** com
+  a profissional responsável; serviços inativos permanecem apenas no histórico.
 - **Granularidade:** inícios de horário a cada **15 minutos** dentro da jornada.
 - **Antecedência:**
   - Cliente: mínimo de **3 dias**.

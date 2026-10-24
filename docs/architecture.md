@@ -74,6 +74,8 @@ fonte de agenda (`agendaProvider`):
   `agendaProvider` (`google`|`internal`).
 - **OAuthAccount / Token:** `professionalId`, `refreshToken`, `scope`, `expiresAt`.
 - **Service:** `professionalId`, `name`, `durationMin`, `bufferMin`, `price`.
+  O `name` é único entre os serviços ativos (sem diferenciar maiúsculas/espaços);
+  cada serviço tem uma profissional responsável e aparece uma vez no catálogo.
 - **WorkingHours:** `professionalId`, `weekday`, `startTime`, `endTime`
   (múltiplos intervalos por dia — cobre almoço).
 - **TimeBlock:** `professionalId`, `startsAt`, `endsAt`, `reason`,

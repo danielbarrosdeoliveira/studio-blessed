@@ -114,14 +114,14 @@ try {
       },
       {
         professionalId: ana.id,
-        name: 'Corte feminino',
+        name: 'Corte masculino',
         durationMin: 45,
         bufferMin: 0,
         priceCents: 15000
       },
       {
         professionalId: ana.id,
-        name: 'Escova',
+        name: 'Escova masculina',
         durationMin: 30,
         bufferMin: 0,
         priceCents: 9000
@@ -156,8 +156,8 @@ try {
     services: {
       mariaCorte: serviceId(maria.id, 'Corte feminino'),
       mariaEscova: serviceId(maria.id, 'Escova'),
-      anaCorte: serviceId(ana.id, 'Corte feminino'),
-      anaEscova: serviceId(ana.id, 'Escova')
+      anaCorte: serviceId(ana.id, 'Corte masculino'),
+      anaEscova: serviceId(ana.id, 'Escova masculina')
     }
   }, null, 2))
 

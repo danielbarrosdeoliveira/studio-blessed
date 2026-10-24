@@ -18,8 +18,8 @@ interface PublicGroup {
 
 /**
  * Catálogo público (sem autenticação).
- * Agrega serviços ativos pelo nome: mesmo nome em profissionais diferentes
- * vira uma única entrada, com o preço de cada profissional.
+ * Cada serviço ativo tem uma única profissional responsável; a agregação por
+ * nome mantém o formato da vitrine e evita entradas duplicadas.
  */
 export default defineEventHandler(async () => {
   const rows = await db

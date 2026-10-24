@@ -15,6 +15,13 @@
       "when": 1792811369572,
       "tag": "0001_graceful_tiger_shark",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792862418621,
+      "tag": "0002_groovy_sphinx",
+      "breakpoints": true
     }
   ]
 }

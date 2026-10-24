@@ -19,6 +19,10 @@
 - [x] Rodar a validação final: `pnpm lint`, `pnpm typecheck`, `pnpm build`, `pnpm test:coverage`
 - [x] Commitar, abrir PR em inglês e fazer merge commit
 
+## Regras de negócio
+
+- [x] Nome de serviço único entre os serviços ativos e uma profissional responsável por serviço
+
 ## Próximos épicos
 
 - [x] E5 — Bloqueios de horário

@@ -87,9 +87,9 @@ Execução local em 2026-10-24, com os fluxos atuais:
 | Suíte | Testes | Linhas | Branches |
 | --- | ---: | ---: | ---: |
 | Unitário | 48 | 98,26% | 92,10% |
-| Integração de API | 18 | 95,81% | 78,20% |
+| Integração de API | 18 | 95,32% | 78,42% |
 | Integração de UI | 16 | 93,13% | 92,20% |
-| E2E (SSR/API) | 4 | 87,80% | 42,72% |
+| E2E (SSR/API) | 4 | 87,37% | 41,28% |
 
 A cobertura E2E mede os módulos de servidor/SSR carregados durante os fluxos.
 Os asserts do Playwright validam o comportamento no browser; a instrumentação

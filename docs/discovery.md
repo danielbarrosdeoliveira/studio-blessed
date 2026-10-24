@@ -41,8 +41,10 @@ financeiro de repasse nem comissão.
 - **Professional:** `name`, `email`, `role` (admin/partner), `agendaProvider`
   (`google` | `internal`), tokens OAuth (quando Google).
 - **Service:** pertence a **uma profissional** → `name`, `durationMin`, `bufferMin`,
-  `price`. O catálogo público **agrega por nome** e o **preço pode variar por
-  profissional**. Combos são serviços próprios com nome e duração maior.
+  `price`. O nome é **único entre os serviços ativos** (sem diferenciar
+  maiúsculas/espaços); o catálogo lista cada serviço uma vez com a profissional
+  responsável. Serviços inativos preservam o histórico. Combos são serviços
+  próprios com nome e duração maior.
 - **WorkingHours:** por profissional, por dia da semana, com intervalos (almoço/folgas).
 - **Appointment:** `client`, `professional`, `service`, `startsAt`, `endsAt`,
   `status` (`scheduled` | `completed` | `cancelled` | `no_show`), `origin`
@@ -53,12 +55,11 @@ financeiro de repasse nem comissão.
 
 ## 5. Fluxo de agendamento (cliente)
 
-1. Abre o **Catálogo de Serviços** (agregado por nome).
+1. Abre o **Catálogo de Serviços**.
 2. Escolhe um **serviço**.
-3. O sistema mostra as **profissionais que executam** aquele serviço.
-4. Escolhe a profissional → vê os **horários disponíveis**.
-5. Informa **nome + WhatsApp** → confirma.
-6. Tela de sucesso. **Nenhuma mensagem é enviada** no MVP.
+3. O sistema mostra a **profissional responsável** e os **horários disponíveis**.
+4. Informa **nome + WhatsApp** → confirma.
+5. Tela de sucesso. **Nenhuma mensagem é enviada** no MVP.
 
 **Um agendamento = 1 serviço + 1 profissional + 1 horário.** Para mais de um
 serviço, a cliente repete o fluxo (decisão de simplificação do MVP).
@@ -137,13 +138,11 @@ suporte a outros idiomas.
 
 ## 10. Pontos ainda em aberto (backlog de discovery)
 
-1. **Agregação de serviços por nome:** regra de matching (sensível a
-   maiúsculas/acentos?) quando o mesmo serviço existe em profissionais diferentes.
-2. **Admin agendando para uma profissional sem Google conectado:** confirma que
+1. **Admin agendando para uma profissional sem Google conectado:** confirma que
    cai na agenda interna?
-3. **LGPD:** texto de consentimento ao informar nome/telefone e política de
+2. **LGPD:** texto de consentimento ao informar nome/telefone e política de
    retenção (dados vão para a agenda Google da profissional).
-4. **Semana:** semanas de calendário ou ISO? Início no domingo ou segunda?
+3. **Semana:** semanas de calendário ou ISO? Início no domingo ou segunda?
 
 ## 11. Contradições resolvidas
 
@@ -157,3 +156,6 @@ suporte a outros idiomas.
   (soma dos preços de serviços concluídos), quebrado por profissional.
 - **Bloqueio sobre agendamento existente** → exige **confirmação explícita**;
   o bloqueio é salvo e o agendamento permanece `scheduled`.
+- **Agregação de serviços por nome** → regra definida: o nome é **único entre os
+  serviços ativos** (sem diferenciar maiúsculas/espaços) e cada serviço tem **uma
+  profissional responsável**. Não há o mesmo serviço em profissionais diferentes.
