@@ -11,7 +11,7 @@
 | E1 | Fundação & Autenticação | P0 |
 | E2 | Profissionais & Jornada | P0 |
 | E3 | Serviços | P0 |
-| E4 | Integração Google Calendar | P0 |
+| E4 | Integração Google Calendar | P2 (fase final do MVP) |
 | E5 | Bloqueios de Horário | P1 |
 | E6 | Motor de Disponibilidade | P0 |
 | E7 | Agendamento Público (Cliente) | P0 |

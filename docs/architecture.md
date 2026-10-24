@@ -4,9 +4,10 @@
 
 ## 1. Stack Tecnológica Core
 
-- **Framework:** Nuxt 3 (SSR full-stack).
+- **Framework:** Nuxt 4 (SSR full-stack, estrutura `app/`).
+- **Template base:** Nuxt UI Dashboard (`ui/dashboard`) — sidebar, command palette, dark mode, charts e tabelas.
 - **UI & Dashboard:** Nuxt UI Dashboard + Tailwind CSS.
-- **Gerenciador de Pacotes:** **Yarn** (obrigatório).
+- **Gerenciador de Pacotes:** **pnpm** (store global, links simbólicos).
 - **Banco de Dados:** PostgreSQL (Oracle Cloud Infrastructure — OCI).
 - **Autenticação:** Better Auth com **Google OAuth** ou **e-mail/senha**.
 - **Idioma / Fuso:** pt-BR, `America/Sao_Paulo`. **Sem PWA**.
@@ -22,6 +23,10 @@
 - **Validação:** schemas (ex.: Zod) na fronteira das rotas de API.
 
 ## 3. Agenda Híbrida (Google + Interna)
+
+> **Fase 1:** implementar **somente o provider `internal`**. O provider `google`
+> e toda a integração OAuth/Calendar ficam para a **fase final do MVP**. O código
+> deve ser preparado com a abstração de provider, mas sem chamadas reais ao Google.
 
 O sistema **não possui um calendário único próprio**. Cada profissional tem uma
 fonte de agenda (`agendaProvider`):

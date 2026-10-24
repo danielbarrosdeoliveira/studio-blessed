@@ -18,8 +18,8 @@ financeiro de repasse nem comissão.
 
 | Item | Decisão |
 | --- | --- |
-| Frontend / Backend | Nuxt 3 (SSR) + Nuxt UI Dashboard + Tailwind CSS |
-| Gerenciador de pacotes | **Yarn** (fonte da verdade — corrige `spec.md`, que dizia pnpm) |
+| Frontend / Backend | Nuxt 4 (SSR, estrutura `app/`) + Nuxt UI Dashboard (`ui/dashboard`) + Tailwind CSS |
+| Gerenciador de pacotes | **pnpm** (decidido após setup; store global + links) |
 | Banco de dados | PostgreSQL (OCI) |
 | Autenticação | Better Auth — **Google OAuth** ou **e-mail/senha** |
 | Interface | **Web responsivo, pt-BR** — ~~PWA~~ (removido do MVP) |
@@ -63,11 +63,15 @@ financeiro de repasse nem comissão.
 **Um agendamento = 1 serviço + 1 profissional + 1 horário.** Para mais de um
 serviço, a cliente repete o fluxo (decisão de simplificação do MVP).
 
-## 6. Motor de disponibilidade (híbrido)
+## 6. Motor de disponibilidade
+
+> **Faseamento do MVP:** a **Fase 1** usa **apenas a agenda interna** (`internal`).
+> O Google Calendar entra na **fase final do MVP**. A abstração de provider já
+> existe no código, mas sem chamadas reais ao Google nesta fase.
 
 - **Duas fontes por profissional:**
   - `google` → agenda `primary` da profissional é o banco de agendamentos.
-  - `internal` → agenda interna no Postgres (fallback para quem não usa Google).
+  - `internal` → agenda interna no Postgres (fonte usada na Fase 1).
 - **Fonte da verdade:** Google Calendar quando conectado; caso contrário, a
   agenda interna.
 - **Disponibilidade =** `WorkingHours` − `bloqueios` − `eventos busy`.
@@ -145,7 +149,7 @@ suporte a outros idiomas.
 
 ## 11. Contradições resolvidas
 
-- `architecture.md` (Yarn) × `spec.md` (pnpm) → **Yarn**.
+- `architecture.md` (Yarn) × `spec.md` (pnpm) → **pnpm** (decisão final pós-setup).
 - `spec.md`: "Profissional: comissão por valor fixo" → **modelo de parceria com
   mensalidade fixa**; sem comissão.
 - "Sem notificações" × "enviar mensagem de confirmação" → **sem envio no MVP**
