@@ -121,7 +121,8 @@ export const service = pgTable('service', {
   updatedAt: updatedAt()
 }, t => [
   index('service_professional_idx').on(t.professionalId),
-  index('service_name_idx').on(t.name)
+  index('service_name_idx').on(t.name),
+  uniqueIndex('service_professional_name_unique').on(t.professionalId, t.name)
 ])
 
 /** Jornada: `weekday` 0 = domingo … 6 = sábado. Minutos desde 00:00. */

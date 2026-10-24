@@ -18,3 +18,29 @@ export interface WorkingHour {
   endMinute: number
   createdAt: string
 }
+
+export interface Service {
+  id: string
+  professionalId: string
+  professionalName: string
+  name: string
+  durationMin: number
+  bufferMin: number
+  priceCents: number
+  active: boolean
+  createdAt: string
+}
+
+export interface PublicServiceProfessional {
+  id: string
+  name: string
+  durationMin: number
+  bufferMin: number
+  priceCents: number
+}
+
+export interface PublicServiceGroup {
+  name: string
+  minPriceCents: number
+  professionals: PublicServiceProfessional[]
+}

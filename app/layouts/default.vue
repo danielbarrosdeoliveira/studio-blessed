@@ -15,6 +15,15 @@ const links = computed<NavigationMenuItem[][]>(() => {
     }
   }]
 
+  items.push({
+    label: 'Serviços',
+    icon: 'i-lucide-scissors',
+    to: '/servicos',
+    onSelect: () => {
+      open.value = false
+    }
+  })
+
   if (isAdmin.value) {
     items.push({
       label: 'Profissionais',
