@@ -58,6 +58,9 @@ fonte de agenda (`agendaProvider`):
   (Google ou interno) − serviço (`durationMin` + `bufferMin`).
 - **Saída:** lista de horários de início a cada **15 minutos** dentro da jornada.
 - **Antecedência:** cliente exige **3 dias**; staff pode hoje/amanhã e encaixes.
+- **Bloqueios:** pontuais ou semanais (`recurrence = 'weekly'`). Se um bloqueio
+  sobrepõe agendamento `scheduled`, a API responde `409` com os conflitos e só
+  grava após `confirmConflict: true`; o agendamento permanece `scheduled`.
 - **Concorrência:** sem lock. A disponibilidade é **revalidada imediatamente antes
   de gravar**; se o slot ocupou, o cliente escolhe outro.
   - ⚠️ O `freebusy` do Google é eventualmente consistente — aceitamos o risco
@@ -73,7 +76,8 @@ fonte de agenda (`agendaProvider`):
 - **Service:** `professionalId`, `name`, `durationMin`, `bufferMin`, `price`.
 - **WorkingHours:** `professionalId`, `weekday`, `startTime`, `endTime`
   (múltiplos intervalos por dia — cobre almoço).
-- **TimeBlock:** `professionalId`, `startsAt`, `endsAt`, `reason`, `recurrence`.
+- **TimeBlock:** `professionalId`, `startsAt`, `endsAt`, `reason`,
+  `recurrence` (`weekly` | null).
 - **Appointment:** `clientId`, `professionalId`, `serviceId`, `startsAt`, `endsAt`,
   `status` (`scheduled`|`completed`|`cancelled`|`no_show`),
   `origin` (`client`|`staff`), `externalEventId`.

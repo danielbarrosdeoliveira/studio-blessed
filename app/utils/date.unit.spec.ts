@@ -4,8 +4,10 @@ import {
   formatInstantLong,
   formatInstantTime,
   formatIsoDateLong,
+  instantOfLocalDateTime,
   isoDateOfInstant,
-  todayInTimeZone
+  todayInTimeZone,
+  weekdayOfIsoDate
 } from './date'
 
 afterEach(() => {
@@ -20,6 +22,16 @@ describe('datas do app', () => {
 
   it('formata a data longa em pt-BR', () => {
     expect(formatIsoDateLong('2026-10-31')).toBe('Sábado, 31 de outubro')
+  })
+
+  it('converte data e hora locais para ISO UTC', () => {
+    expect(instantOfLocalDateTime('2026-10-31', '09:00')).toBe('2026-10-31T12:00:00.000Z')
+    expect(instantOfLocalDateTime('2026-10-31', '13:30')).toBe('2026-10-31T16:30:00.000Z')
+  })
+
+  it('retorna o dia da semana em pt-BR', () => {
+    expect(weekdayOfIsoDate('2026-10-31')).toBe('sábado')
+    expect(weekdayOfIsoDate('2026-11-02')).toBe('segunda-feira')
   })
 
   it('resolve a data local de um instante no fuso de São Paulo', () => {

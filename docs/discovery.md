@@ -141,11 +141,9 @@ suporte a outros idiomas.
    maiúsculas/acentos?) quando o mesmo serviço existe em profissionais diferentes.
 2. **Admin agendando para uma profissional sem Google conectado:** confirma que
    cai na agenda interna?
-3. **Bloqueio de horário:** pode sobrepor um agendamento já existente? Qual o
-   comportamento esperado?
-4. **LGPD:** texto de consentimento ao informar nome/telefone e política de
+3. **LGPD:** texto de consentimento ao informar nome/telefone e política de
    retenção (dados vão para a agenda Google da profissional).
-5. **Semana:** semanas de calendário ou ISO? Início no domingo ou segunda?
+4. **Semana:** semanas de calendário ou ISO? Início no domingo ou segunda?
 
 ## 11. Contradições resolvidas
 
@@ -157,3 +155,5 @@ suporte a outros idiomas.
 - PWA (ambos os docs) → **web responsivo, sem PWA**.
 - "Comissão/repasse" × métrica "faturamento" → faturamento = **movimento**
   (soma dos preços de serviços concluídos), quebrado por profissional.
+- **Bloqueio sobre agendamento existente** → exige **confirmação explícita**;
+  o bloqueio é salvo e o agendamento permanece `scheduled`.

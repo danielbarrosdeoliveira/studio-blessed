@@ -81,7 +81,9 @@
   gravar**; se ocupou, o cliente escolhe outro horário.
 - **Notificações:** **nenhuma** no MVP (só tela de sucesso). Automação futura
   (WAAS/WAHA + N8N) fica pós-MVP.
-- **Bloqueios:** admin e a própria profissional podem criar; suportam **recorrência**.
+- **Bloqueios:** admin e a própria profissional podem criar/remover bloqueios
+  pontuais ou semanais. Podem sobrepor agendamento `scheduled` somente com
+  **confirmação explícita**; o agendamento não é cancelado.
 - **Status do agendamento:** `scheduled` → `completed` | `cancelled` | `no_show`.
   O admin pode corrigir o status a qualquer momento.
 
