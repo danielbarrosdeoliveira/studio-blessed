@@ -244,7 +244,7 @@ function bookAnother() {
             </div>
           </template>
 
-          <PublicAvailabilityPicker
+          <AvailabilityPicker
             :key="pickerKey"
             v-model="selectedSlot"
             :professional-id="selection.professional.id"

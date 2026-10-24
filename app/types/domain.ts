@@ -96,3 +96,31 @@ export interface PublicAppointmentsResponse {
   cancellation: PublicCancellationPolicy
   appointments: PublicAppointment[]
 }
+
+export interface StaffAppointment {
+  id: string
+  startsAt: string
+  endsAt: string
+  status: AppointmentStatus
+  origin: AppointmentOrigin
+  serviceId: string
+  professionalId: string
+  serviceName: string
+  professionalName: string
+  durationMin: number
+  priceCents: number
+  clientName: string
+  clientPhone: string
+  notes: string | null
+}
+
+export interface StaffAgendaResponse {
+  date: string
+  timezone: string
+  professionalId: string | null
+  appointments: StaffAppointment[]
+}
+
+export interface StaffAppointmentResponse {
+  appointment: StaffAppointment
+}

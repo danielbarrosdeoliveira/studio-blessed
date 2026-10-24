@@ -32,6 +32,25 @@ export function formatIsoDateLong(date: string): string {
   }).format(parsed))
 }
 
+/** Data local (`YYYY-MM-DD`) de um instante ISO. */
+export function isoDateOfInstant(iso: string | Date): string {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: APP_TIME_ZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).format(typeof iso === 'string' ? new Date(iso) : iso)
+}
+
+/** Ex.: `09:00`. */
+export function formatInstantTime(iso: string): string {
+  return new Intl.DateTimeFormat('pt-BR', {
+    timeZone: APP_TIME_ZONE,
+    hour: '2-digit',
+    minute: '2-digit'
+  }).format(new Date(iso))
+}
+
 /** Ex.: `Sábado, 31 de outubro às 09:00`. */
 export function formatInstantLong(iso: string): string {
   return capitalize(new Intl.DateTimeFormat('pt-BR', {
