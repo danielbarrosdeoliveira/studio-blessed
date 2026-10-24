@@ -9,6 +9,8 @@ import type {
   Service,
   StaffAgendaResponse,
   StaffAppointmentResponse,
+  TimeBlock,
+  TimeBlockResponse,
   WorkingHour
 } from '../../../app/types/domain'
 import {
@@ -724,5 +726,290 @@ describe('gestão de profissionais e serviços', () => {
     expect(errorStatus(crossSave)).toBe(403)
     expect(saved).toHaveLength(1)
     expect(read).toHaveLength(1)
+  })
+})
+
+describe('bloqueios de horário', () => {
+  it('cria bloqueio pontual, lista e devolve o horário ao remover', async () => {
+    const admin = await getSession(TEST_USERS.admin.email)
+    const date = addDays(todayIso(), 20)
+    const route = `/api/professionals/${seed.users.ana.id}/blocks`
+    const query = {
+      professionalId: seed.users.ana.id,
+      serviceId: seed.services.anaCorte,
+      date
+    }
+    const startsAt = instantAt(date, '12:00')
+    const endsAt = instantAt(date, '13:00')
+
+    const before = await $fetch<PublicAvailability>('/api/availability', {
+      headers: authHeaders(admin.cookie),
+      query
+    })
+
+    const created = await $fetch<TimeBlockResponse>(route, {
+      method: 'POST',
+      headers: authHeaders(admin.cookie),
+      body: { startsAt, endsAt, reason: 'Almoço' }
+    })
+
+    expect(created.block.recurrence).toBeNull()
+    expect(created.conflicts).toEqual([])
+
+    const after = await $fetch<PublicAvailability>('/api/availability', {
+      headers: authHeaders(admin.cookie),
+      query
+    })
+
+    expect(before.slots.some(slot => slot.startsAt === startsAt)).toBe(true)
+    expect(after.slots.some(slot => slot.startsAt === startsAt)).toBe(false)
+    expect(after.slots.some(slot => slot.startsAt === instantAt(date, '11:00'))).toBe(true)
+
+    const list = await $fetch<TimeBlock[]>(route, {
+      headers: authHeaders(admin.cookie)
+    })
+
+    expect(list).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: created.block.id, reason: 'Almoço' })
+    ]))
+
+    const removed = await $fetch<{ id: string }>(`${route}/${created.block.id}`, {
+      method: 'DELETE',
+      headers: authHeaders(admin.cookie)
+    })
+    const reopened = await $fetch<PublicAvailability>('/api/availability', {
+      headers: authHeaders(admin.cookie),
+      query
+    })
+
+    expect(removed.id).toBe(created.block.id)
+    expect(reopened.slots.some(slot => slot.startsAt === startsAt)).toBe(true)
+  })
+
+  it('aplica bloqueio semanal em todas as ocorrências e valida recorrência', async () => {
+    const admin = await getSession(TEST_USERS.admin.email)
+    const date = addDays(todayIso(), 30)
+    const nextWeek = addDays(date, 7)
+    const previousWeek = addDays(date, -7)
+    const otherDay = addDays(date, 1)
+    const route = `/api/professionals/${seed.users.ana.id}/blocks`
+    const startsAt = instantAt(date, '12:00')
+    const endsAt = instantAt(date, '13:00')
+
+    const created = await $fetch<TimeBlockResponse>(route, {
+      method: 'POST',
+      headers: authHeaders(admin.cookie),
+      body: { startsAt, endsAt, reason: 'Almoço semanal', recurrence: 'weekly' }
+    })
+
+    expect(created.block.recurrence).toBe('weekly')
+
+    const sameWeek = await $fetch<PublicAvailability>('/api/availability', {
+      headers: authHeaders(admin.cookie),
+      query: {
+        professionalId: seed.users.ana.id,
+        serviceId: seed.services.anaCorte,
+        date
+      }
+    })
+    const followingWeek = await $fetch<PublicAvailability>('/api/availability', {
+      headers: authHeaders(admin.cookie),
+      query: {
+        professionalId: seed.users.ana.id,
+        serviceId: seed.services.anaCorte,
+        date: nextWeek
+      }
+    })
+    const otherWeekday = await $fetch<PublicAvailability>('/api/availability', {
+      headers: authHeaders(admin.cookie),
+      query: {
+        professionalId: seed.users.ana.id,
+        serviceId: seed.services.anaCorte,
+        date: otherDay
+      }
+    })
+    const beforeStart = await $fetch<PublicAvailability>('/api/availability', {
+      headers: authHeaders(admin.cookie),
+      query: {
+        professionalId: seed.users.ana.id,
+        serviceId: seed.services.anaCorte,
+        date: previousWeek
+      }
+    })
+
+    expect(sameWeek.slots.some(slot => slot.startsAt === startsAt)).toBe(false)
+    expect(followingWeek.slots.some(slot => slot.startsAt === instantAt(nextWeek, '12:00'))).toBe(false)
+    expect(otherWeekday.slots.some(slot => slot.startsAt === instantAt(otherDay, '12:00'))).toBe(true)
+    expect(beforeStart.slots.some(slot => slot.startsAt === instantAt(previousWeek, '12:00'))).toBe(true)
+
+    const crossDay = await $fetch(route, {
+      method: 'POST',
+      headers: authHeaders(admin.cookie),
+      body: {
+        startsAt: instantAt(date, '23:00'),
+        endsAt: instantAt(addDays(date, 1), '01:00'),
+        recurrence: 'weekly'
+      }
+    }).catch(error => error)
+    const invalidRecurrence = await $fetch(route, {
+      method: 'POST',
+      headers: authHeaders(admin.cookie),
+      body: {
+        startsAt: instantAt(addDays(date, 2), '12:00'),
+        endsAt: instantAt(addDays(date, 2), '13:00'),
+        recurrence: 'daily'
+      }
+    }).catch(error => error)
+    const inverted = await $fetch(route, {
+      method: 'POST',
+      headers: authHeaders(admin.cookie),
+      body: {
+        startsAt: instantAt(addDays(date, 3), '13:00'),
+        endsAt: instantAt(addDays(date, 3), '12:00')
+      }
+    }).catch(error => error)
+
+    expect(errorStatus(crossDay)).toBe(400)
+    expect(errorStatus(invalidRecurrence)).toBe(400)
+    expect(errorStatus(inverted)).toBe(400)
+  })
+
+  it('avisa sobre agendamento existente sem cancelá-lo', async () => {
+    const admin = await getSession(TEST_USERS.admin.email)
+    const date = addDays(todayIso(), 40)
+    const route = `/api/professionals/${seed.users.ana.id}/blocks`
+    const appointment = await createStaffAppointment(admin.cookie, {
+      professionalId: seed.users.ana.id,
+      serviceId: seed.services.anaCorte,
+      startsAt: instantAt(date, '10:00'),
+      clientName: 'Cliente Bloqueio',
+      clientPhone: '11999990040'
+    })
+
+    const conflict = await $fetch(route, {
+      method: 'POST',
+      headers: authHeaders(admin.cookie),
+      body: {
+        startsAt: instantAt(date, '09:45'),
+        endsAt: instantAt(date, '10:15'),
+        reason: 'Compromisso'
+      }
+    }).catch(error => error)
+
+    expect(errorStatus(conflict)).toBe(409)
+
+    const payload = (conflict as {
+      data?: {
+        conflicts?: Array<{ id: string, clientName: string }>
+        data?: { conflicts?: Array<{ id: string, clientName: string }> }
+      }
+    }).data
+    const conflicts = payload?.data?.conflicts ?? payload?.conflicts
+
+    expect(conflicts).toEqual([
+      expect.objectContaining({
+        id: appointment.appointment.id,
+        clientName: 'Cliente Bloqueio'
+      })
+    ])
+
+    const beforeConfirmation = await $fetch<StaffAgendaResponse>('/api/appointments', {
+      headers: authHeaders(admin.cookie),
+      query: { date, professionalId: seed.users.ana.id }
+    })
+
+    expect(beforeConfirmation.appointments).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        id: appointment.appointment.id,
+        status: 'scheduled'
+      })
+    ]))
+
+    const confirmed = await $fetch<TimeBlockResponse>(route, {
+      method: 'POST',
+      headers: authHeaders(admin.cookie),
+      body: {
+        startsAt: instantAt(date, '09:45'),
+        endsAt: instantAt(date, '10:15'),
+        reason: 'Compromisso',
+        confirmConflict: true
+      }
+    })
+
+    const afterConfirmation = await $fetch<StaffAgendaResponse>('/api/appointments', {
+      headers: authHeaders(admin.cookie),
+      query: { date, professionalId: seed.users.ana.id }
+    })
+
+    expect(confirmed.conflicts).toHaveLength(1)
+    expect(afterConfirmation.appointments).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        id: appointment.appointment.id,
+        status: 'scheduled'
+      })
+    ]))
+  })
+
+  it('aplica o escopo de acesso e valida os dados do bloqueio', async () => {
+    const admin = await getSession(TEST_USERS.admin.email)
+    const maria = await getSession(TEST_USERS.maria.email)
+    const date = addDays(todayIso(), 50)
+    const anaRoute = `/api/professionals/${seed.users.ana.id}/blocks`
+    const mariaRoute = `/api/professionals/${seed.users.maria.id}/blocks`
+
+    const unauthenticated = await $fetch(anaRoute).catch(error => error)
+    const mariaReadsAna = await $fetch(anaRoute, {
+      headers: authHeaders(maria.cookie)
+    }).catch(error => error)
+    const mariaWritesAna = await $fetch(anaRoute, {
+      method: 'POST',
+      headers: authHeaders(maria.cookie),
+      body: {
+        startsAt: instantAt(date, '15:00'),
+        endsAt: instantAt(date, '16:00')
+      }
+    }).catch(error => error)
+
+    expect(errorStatus(unauthenticated)).toBe(401)
+    expect(errorStatus(mariaReadsAna)).toBe(403)
+    expect(errorStatus(mariaWritesAna)).toBe(403)
+
+    const anaBlock = await $fetch<TimeBlockResponse>(anaRoute, {
+      method: 'POST',
+      headers: authHeaders(admin.cookie),
+      body: {
+        startsAt: instantAt(date, '15:00'),
+        endsAt: instantAt(date, '16:00')
+      }
+    })
+    const mariaDeletesAna = await $fetch(`${anaRoute}/${anaBlock.block.id}`, {
+      method: 'DELETE',
+      headers: authHeaders(maria.cookie)
+    }).catch(error => error)
+
+    expect(errorStatus(mariaDeletesAna)).toBe(403)
+
+    const ownBlock = await $fetch<TimeBlockResponse>(mariaRoute, {
+      method: 'POST',
+      headers: authHeaders(maria.cookie),
+      body: {
+        startsAt: instantAt(addDays(date, 1), '15:00'),
+        endsAt: instantAt(addDays(date, 1), '16:00')
+      }
+    })
+    const notFound = await $fetch(`${mariaRoute}/00000000-0000-0000-0000-000000000000`, {
+      method: 'DELETE',
+      headers: authHeaders(maria.cookie)
+    }).catch(error => error)
+
+    expect(ownBlock.block.professionalId).toBe(seed.users.maria.id)
+    expect(errorStatus(notFound)).toBe(404)
+
+    const removed = await $fetch<{ id: string }>(`${anaRoute}/${anaBlock.block.id}`, {
+      method: 'DELETE',
+      headers: authHeaders(admin.cookie)
+    })
+
+    expect(removed.id).toBe(anaBlock.block.id)
   })
 })

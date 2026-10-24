@@ -86,10 +86,10 @@ Execução local em 2026-10-24, com os fluxos atuais:
 
 | Suíte | Testes | Linhas | Branches |
 | --- | ---: | ---: | ---: |
-| Unitário | 43 | 95,55% | 94,82% |
-| Integração de API | 14 | 96,71% | 80,00% |
+| Unitário | 48 | 98,26% | 92,10% |
+| Integração de API | 18 | 95,81% | 78,20% |
 | Integração de UI | 16 | 93,13% | 92,20% |
-| E2E (SSR/API) | 3 | 90,29% | 44,15% |
+| E2E (SSR/API) | 4 | 87,80% | 42,72% |
 
 A cobertura E2E mede os módulos de servidor/SSR carregados durante os fluxos.
 Os asserts do Playwright validam o comportamento no browser; a instrumentação
@@ -102,10 +102,10 @@ do bundle cliente é uma evolução futura, não um requisito para o gate atual.
 | Cliente agenda e cancela | `tests/e2e/public-booking.spec.ts` | Catálogo, escolha de serviço/data/horário, nome + WhatsApp, confirmação, “Meus agendamentos” e cancelamento |
 | Staff cria, conclui e corrige | `tests/e2e/staff-agenda.spec.ts` | Login de admin, criação de agendamento para amanhã, conclusão, no-show e correção de status |
 | Escopo da profissional | `tests/e2e/staff-agenda.spec.ts` | Partner vê apenas a própria agenda, sem filtro de admin, e enxerga o agendamento concluído |
+| Bloqueios de horário | `tests/e2e/staff-blocks.spec.ts` | Admin cria bloqueio semanal pela jornada, vê o item na lista e remove |
 
 Fluxos que ainda entram no E2E conforme os épicos forem concluídos:
 
-- Bloqueios de horário (E5).
 - Remarcação pública com a regra de 24h em interface.
 - Dashboard de métricas (E9).
 - Login com Google (E4, fase final).

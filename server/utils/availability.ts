@@ -126,6 +126,10 @@ export async function getAvailabilityForDay(params: AvailabilityParams): Promise
 
   for (const block of blocks) {
     if (block.recurrence === 'weekly') {
+      if (params.date < localDateOf(block.startsAt)) {
+        continue
+      }
+
       const start = localPartsOf(block.startsAt)
 
       if (start.weekday !== bounds.weekday) {

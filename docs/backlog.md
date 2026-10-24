@@ -171,8 +171,8 @@ indisponível.
 
 - **CA1:** Dado um bloqueio `13:00–14:00`, quando calculo disponibilidade, então
   não há slots nesse intervalo.
-- **CA2:** Dado profissional com Google, quando o bloqueio é salvo, então vira
-  evento na agenda.
+- **CA2:** Dado profissional com Google (E4), quando o bloqueio é salvo, então
+  vira evento na agenda.
 
 ### US5.2 — Bloqueio recorrente
 **Como** profissional, **quero** bloqueios recorrentes (ex.: semanal), **para**
@@ -183,11 +183,13 @@ não recriar o almoço todos os dias.
 
 ### US5.3 — Bloqueio sobre agendamento
 **Como** profissional, **quero** ser avisada ao tentar bloquear sobre um
-agendamento existente, **para** não perder o compromisso. *(decisão em aberto —
-ver discovery §10)*
+agendamento existente, **para** não perder o compromisso.
 
-- **CA1:** Dado conflito com agendamento `scheduled`, quando salvo o bloqueio,
-  então o sistema avisa e não remove o agendamento silenciosamente.
+- **CA1:** Dado conflito com agendamento `scheduled`, quando tento salvar o
+  bloqueio, então a API responde `409` com a lista de conflitos e a UI pede
+  confirmação explícita.
+- **CA2:** Dado que confirmo, quando salvo, então o bloqueio é criado e o
+  agendamento permanece `scheduled`; nenhum agendamento é cancelado.
 
 ---
 

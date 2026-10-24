@@ -20,7 +20,8 @@ const UNIT_INCLUDES = [
   'server/utils/appointment-serialization.ts',
   'server/utils/availability-engine.ts',
   'server/utils/phone.ts',
-  'server/utils/time.ts'
+  'server/utils/time.ts',
+  'server/utils/time-blocks.ts'
 ]
 
 /** Componentes com testes de integração de UI. */

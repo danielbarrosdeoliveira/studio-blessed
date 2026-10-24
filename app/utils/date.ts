@@ -1,3 +1,5 @@
+import { CalendarDateTime, parseDate, toZoned } from '@internationalized/date'
+
 /** Fuso único do produto. */
 export const APP_TIME_ZONE = 'America/Sao_Paulo'
 
@@ -17,6 +19,28 @@ export function addDaysToIsoDate(date: string, days: number): string {
   const result = new Date(Date.UTC(year!, month! - 1, day! + days))
 
   return result.toISOString().slice(0, 10)
+}
+
+/** Converte `YYYY-MM-DD` + `HH:mm` no fuso do produto para ISO UTC. */
+export function instantOfLocalDateTime(date: string, time: string): string {
+  const [hour = 0, minute = 0] = time.split(':').map(Number)
+  const parsed = parseDate(date)
+
+  return toZoned(
+    new CalendarDateTime(parsed.year, parsed.month, parsed.day, hour, minute),
+    APP_TIME_ZONE
+  ).toDate().toISOString()
+}
+
+/** Ex.: `sábado`. */
+export function weekdayOfIsoDate(date: string): string {
+  const [year, month, day] = date.split('-').map(Number)
+  const parsed = new Date(Date.UTC(year!, month! - 1, day!, 12))
+
+  return new Intl.DateTimeFormat('pt-BR', {
+    timeZone: 'UTC',
+    weekday: 'long'
+  }).format(parsed)
 }
 
 /** Ex.: `Sábado, 31 de outubro`. */
