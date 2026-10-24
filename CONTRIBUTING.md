@@ -35,7 +35,8 @@ main
    git push -u origin feat/e2-jornada-profissional
    ```
 6. Abra o PR para `main` e preencha o template.
-7. Após aprovação e CI verde, faça **squash merge**.
+7. Após CI verde, faça **merge commit** (`Create a merge commit`). Não use squash
+   nem rebase: o histórico de commits e branches deve ser preservado (grafo não linear).
 
 ## Convenção de commits
 
@@ -93,4 +94,5 @@ Um PR só está pronto quando:
   - exigir PR antes do merge;
   - exigir CI verde (`lint` + `typecheck`);
   - bloquear force-push e deleção.
-- **Squash merge** como método padrão.
+- **Merge commit** como método padrão (histórico não linear, preservando os nós de
+  commits e branches). Squash e rebase desabilitados.
