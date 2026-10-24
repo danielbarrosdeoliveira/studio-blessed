@@ -18,6 +18,10 @@
   backend, validações e integração com APIs externas.
 - **Modularização por domínio:** `Auth`, `Professionals`, `Services`, `Scheduling`,
   `Availability`, `Calendar`, `Metrics`, `Blocks`.
+- **Fluxo público:** `/agendamento` é a entrada canônica e usa o `UStepper` do
+  Nuxt UI 4 em quatro etapas (serviço → data/horário → dados → confirmação).
+  `/agendar` redireciona para `/agendamento`, preservando query params para
+  links antigos.
 - **Princípio Lean AI:** código limpo, modular e estritamente focado no MVP.
   Sem abstrações prematuras (YAGNI).
 - **Validação:** schemas (ex.: Zod) na fronteira das rotas de API.

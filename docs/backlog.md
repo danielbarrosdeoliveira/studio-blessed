@@ -238,13 +238,15 @@ double-booking.
 ### US7.1 — Fluxo de agendamento
 **Como** cliente, **quero** agendar em poucos passos, **para** reservar meu horário.
 
-- **CA1:** Dado o catálogo, quando escolho serviço → vejo a profissional
-  responsável → escolho horário → informo nome + WhatsApp → confirmo, então o
+- **CA1:** Dado o fluxo público em `/agendamento`, quando avanço pelo stepper
+  escolhendo serviço → data/horário → nome + WhatsApp → confirmação, então o
   agendamento é criado com `origin=client` e `status=scheduled`.
 - **CA2:** Dado WhatsApp já existente, quando informo o telefone, então a cliente
   é reaproveitada (não duplica).
 - **CA3:** Dado conflito no serviço, quando a cliente quer outro serviço, então
   repete o fluxo (1 serviço por agendamento).
+- **CA4:** Dado um link antigo `/agendar`, quando acesso, então sou redirecionada
+  para `/agendamento`, preservando serviço/profissional quando informados.
 
 ### US7.2 — Tela de sucesso
 **Como** cliente, **quero** ver a confirmação na tela, **para** ter o comprovante

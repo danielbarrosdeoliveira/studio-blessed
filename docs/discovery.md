@@ -55,11 +55,14 @@ financeiro de repasse nem comissão.
 
 ## 5. Fluxo de agendamento (cliente)
 
-1. Abre o **Catálogo de Serviços**.
-2. Escolhe um **serviço**.
+1. Abre `/agendamento`.
+2. No **stepper**, escolhe um **serviço**.
 3. O sistema mostra a **profissional responsável** e os **horários disponíveis**.
 4. Informa **nome + WhatsApp** → confirma.
 5. Tela de sucesso. **Nenhuma mensagem é enviada** no MVP.
+
+A rota antiga `/agendar` redireciona para `/agendamento`, preservando os
+parâmetros de serviço/profissional quando existirem.
 
 **Um agendamento = 1 serviço + 1 profissional + 1 horário.** Para mais de um
 serviço, a cliente repete o fluxo (decisão de simplificação do MVP).

@@ -55,8 +55,10 @@
 
 ## 5. Funcionalidades do MVP
 
-- **Cliente:** catálogo público de serviços → profissional responsável →
-  horários disponíveis → informa nome + WhatsApp → confirma.
+- **Cliente:** acessa `/agendamento` e percorre um **stepper** (Nuxt UI):
+  serviço → data/horário → nome + WhatsApp → confirmação. Cada serviço exibe a
+  profissional responsável. A rota antiga `/agendar` redireciona para
+  `/agendamento`.
 - **Profissional:** vê a própria agenda, gerencia seus serviços, cria bloqueios,
   cancela os próprios agendamentos e marca concluído/no-show; vê o faturamento próprio.
 - **Admin:** gerencia jornadas, serviços, profissionais e bloqueios; opera

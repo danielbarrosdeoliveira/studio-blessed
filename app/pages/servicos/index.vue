@@ -226,11 +226,11 @@ const columns = computed<TableColumn<Service>[]>(() => [
 
         <template #right>
           <UButton
-            label="Ver catálogo"
+            label="Abrir agendamento"
             icon="i-ri-external-link-line"
             color="neutral"
             variant="outline"
-            to="/catalogo"
+            to="/agendamento"
             target="_blank"
           />
           <UButton

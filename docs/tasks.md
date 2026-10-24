@@ -23,6 +23,10 @@
 
 - [x] Nome de serviço único entre os serviços ativos e uma profissional responsável por serviço
 
+## Experiência pública
+
+- [x] Criar o fluxo público `/agendamento` com `UStepper` e redirecionar `/agendar`
+
 ## Próximos épicos
 
 - [x] E5 — Bloqueios de horário
