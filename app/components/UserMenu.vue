@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from '@nuxt/ui'
+import { authClient } from '~/lib/auth-client'
 
 defineProps<{
   collapsed?: boolean
@@ -7,34 +8,38 @@ defineProps<{
 
 const colorMode = useColorMode()
 const appConfig = useAppConfig()
+const { user } = await useUserSession()
 
 const colors = ['red', 'orange', 'amber', 'yellow', 'lime', 'green', 'emerald', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose']
 const neutrals = ['slate', 'gray', 'zinc', 'neutral', 'stone', 'taupe', 'mauve', 'mist', 'olive']
 
-const user = ref({
-  name: 'Benjamin Canac',
-  avatar: {
-    src: 'https://github.com/benjamincanac.png',
-    alt: 'Benjamin Canac'
+const displayName = computed(() => user.value?.name ?? 'Usuário')
+
+const avatar = computed(() => {
+  if (!user.value?.image) {
+    return undefined
+  }
+  return {
+    src: user.value.image,
+    alt: displayName.value
   }
 })
 
+async function signOut() {
+  await authClient.signOut()
+  await navigateTo('/login')
+}
+
 const items = computed<DropdownMenuItem[][]>(() => ([[{
   type: 'label',
-  label: user.value.name,
-  avatar: user.value.avatar
+  label: displayName.value,
+  avatar: avatar.value
 }], [{
-  label: 'Profile',
-  icon: 'i-lucide-user'
-}, {
-  label: 'Billing',
-  icon: 'i-lucide-credit-card'
-}, {
-  label: 'Settings',
+  label: 'Configurações',
   icon: 'i-lucide-settings',
   to: '/settings'
 }], [{
-  label: 'Theme',
+  label: 'Tema',
   icon: 'i-lucide-palette',
   children: [{
     label: 'Primary',
@@ -49,10 +54,9 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
       chip: color,
       slot: 'chip',
       checked: appConfig.ui.colors.primary === color,
-      type: 'checkbox',
-      onSelect: (e) => {
+      type: 'checkbox' as const,
+      onSelect: (e: Event) => {
         e.preventDefault()
-
         appConfig.ui.colors.primary = color
       }
     }))
@@ -68,32 +72,30 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
       label: color,
       chip: color === 'neutral' ? 'old-neutral' : color,
       slot: 'chip',
-      type: 'checkbox',
+      type: 'checkbox' as const,
       checked: appConfig.ui.colors.neutral === color,
-      onSelect: (e) => {
+      onSelect: (e: Event) => {
         e.preventDefault()
-
         appConfig.ui.colors.neutral = color
       }
     }))
   }]
 }, {
-  label: 'Appearance',
+  label: 'Aparência',
   icon: 'i-lucide-sun-moon',
   children: [{
-    label: 'Light',
+    label: 'Claro',
     icon: 'i-lucide-sun',
-    type: 'checkbox',
+    type: 'checkbox' as const,
     checked: colorMode.value === 'light',
     onSelect(e: Event) {
       e.preventDefault()
-
       colorMode.preference = 'light'
     }
   }, {
-    label: 'Dark',
+    label: 'Escuro',
     icon: 'i-lucide-moon',
-    type: 'checkbox',
+    type: 'checkbox' as const,
     checked: colorMode.value === 'dark',
     onUpdateChecked(checked: boolean) {
       if (checked) {
@@ -105,60 +107,9 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
     }
   }]
 }], [{
-  label: 'Templates',
-  icon: 'i-lucide-layout-template',
-  children: [{
-    label: 'Starter',
-    to: 'https://starter-template.nuxt.dev/'
-  }, {
-    label: 'Landing',
-    to: 'https://landing-template.nuxt.dev/'
-  }, {
-    label: 'Docs',
-    to: 'https://docs-template.nuxt.dev/'
-  }, {
-    label: 'SaaS',
-    to: 'https://saas-template.nuxt.dev/'
-  }, {
-    label: 'Dashboard',
-    to: 'https://dashboard-template.nuxt.dev/',
-    color: 'primary',
-    checked: true,
-    type: 'checkbox'
-  }, {
-    label: 'Chat',
-    to: 'https://chat-template.nuxt.dev/'
-  }, {
-    label: 'Portfolio',
-    to: 'https://portfolio-template.nuxt.dev/'
-  }, {
-    label: 'Changelog',
-    to: 'https://changelog-template.nuxt.dev/'
-  }, {
-    label: 'Editor',
-    to: 'https://editor-template.nuxt.dev/'
-  }, {
-    label: 'Calendar',
-    to: 'https://calendar-template.nuxt.dev/'
-  }]
-}], [{
-  label: 'Documentation',
-  icon: 'i-lucide-book-open',
-  to: 'https://ui.nuxt.com/docs/getting-started/installation/nuxt',
-  target: '_blank'
-}, {
-  label: 'GitHub repository',
-  icon: 'i-simple-icons-github',
-  to: 'https://github.com/nuxt-ui-templates/dashboard',
-  target: '_blank'
-}, {
-  label: 'Deploy to Vercel',
-  icon: 'i-simple-icons-vercel',
-  to: 'https://vercel.com/new/clone?repository-name=dashboard&repository-url=https%3A%2F%2Fgithub.com%2Fnuxt-ui-templates%2Fdashboard&demo-image=https%3A%2F%2Fui.nuxt.com%2Fassets%2Ftemplates%2Fnuxt%2Fdashboard-dark.png&demo-url=https%3A%2F%2Fdashboard-template.nuxt.dev%2F&demo-title=Nuxt%20Dashboard%20Template&demo-description=A%20dashboard%20template%20with%20multi-column%20layout%20for%20building%20sophisticated%20admin%20interfaces.',
-  target: '_blank'
-}], [{
-  label: 'Log out',
-  icon: 'i-lucide-log-out'
+  label: 'Sair',
+  icon: 'i-lucide-log-out',
+  onSelect: () => signOut()
 }]]))
 </script>
 
@@ -169,11 +120,9 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
     :ui="{ content: collapsed ? 'w-48' : 'w-(--reka-dropdown-menu-trigger-width)' }"
   >
     <UButton
-      v-bind="{
-        ...user,
-        label: collapsed ? undefined : user?.name,
-        trailingIcon: collapsed ? undefined : 'i-lucide-chevrons-up-down'
-      }"
+      :avatar="avatar"
+      :label="collapsed ? undefined : displayName"
+      :trailing-icon="collapsed ? undefined : 'i-lucide-chevrons-up-down'"
       color="neutral"
       variant="ghost"
       block
