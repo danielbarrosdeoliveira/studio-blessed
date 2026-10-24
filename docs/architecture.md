@@ -5,8 +5,8 @@
 ## 1. Stack Tecnológica Core
 
 - **Framework:** Nuxt 4 (SSR full-stack, estrutura `app/`).
-- **Template base:** Nuxt UI Dashboard (`ui/dashboard`) — sidebar, command palette, dark mode, charts e tabelas.
-- **UI & Dashboard:** Nuxt UI Dashboard + Tailwind CSS.
+- **Template base:** Nuxt UI 4 Dashboard — sidebar, command palette, dark mode, charts e tabelas.
+- **UI & Dashboard:** Nuxt UI 4 + Tailwind CSS.
 - **Gerenciador de Pacotes:** **pnpm** (store global, links simbólicos).
 - **Banco de Dados:** PostgreSQL (Oracle Cloud Infrastructure — OCI).
 - **Autenticação:** Better Auth com **Google OAuth** ou **e-mail/senha**.
@@ -93,3 +93,17 @@ fonte de agenda (`agendaProvider`):
 - **Google Calendar API:** OAuth 2.0 + freebusy + events. Quotas e latência exigem
   agrupamento de chamadas e cache.
 - **Referência de deploy:** containers na OCI com PostgreSQL gerenciado.
+
+## 8. Testes e Cobertura
+
+- **Unitário:** Vitest 5 sobre lógica pura de `app/utils/**` e `server/utils/**`.
+- **Integração:** Vitest 5 com servidor Nuxt real para `server/api/**` e
+  `@nuxt/test-utils` para componentes Vue.
+- **E2E:** Playwright + Chromium nos fluxos críticos, com build de produção e
+  cobertura de servidor/SSR via c8.
+- **Banco de teste:** PostgreSQL dedicado `studio_blessed_test`, recriado antes
+  das suítes.
+- **Metas:** 75% para unitário e integração; 50% para E2E. O gate é local
+  enquanto a esteira de DevOps/deploy não existe e passa a bloquear o deploy
+  quando ela for criada.
+- Estratégia completa: [`docs/testing.md`](testing.md).

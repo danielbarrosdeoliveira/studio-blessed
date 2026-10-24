@@ -18,7 +18,7 @@ financeiro de repasse nem comissão.
 
 | Item | Decisão |
 | --- | --- |
-| Frontend / Backend | Nuxt 4 (SSR, estrutura `app/`) + Nuxt UI Dashboard (`ui/dashboard`) + Tailwind CSS |
+| Frontend / Backend | Nuxt 4 (SSR, estrutura `app/`) + Nuxt UI 4 Dashboard + Tailwind CSS |
 | Gerenciador de pacotes | **pnpm** (decidido após setup; store global + links) |
 | Banco de dados | PostgreSQL (OCI) |
 | Autenticação | Better Auth — **Google OAuth** ou **e-mail/senha** |

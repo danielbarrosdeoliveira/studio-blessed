@@ -6,7 +6,8 @@ import {
   canCancelAppointment,
   canSetAppointmentStatus
 } from '../../utils/appointment-actions'
-import { getAppointmentById, serializeStaffAppointment } from '../../utils/appointments'
+import { serializeStaffAppointment } from '../../utils/appointment-serialization'
+import { getAppointmentById } from '../../utils/appointments'
 import { requireUser } from '../../utils/auth-guard'
 
 const bodySchema = z.discriminatedUnion('action', [

@@ -103,11 +103,12 @@ async function onSubmit() {
           />
 
           <UButton
-            type="submit"
+            type="button"
             label="Entrar"
             icon="i-ri-login-box-line"
             block
             :loading="loading"
+            @click="onSubmit"
           />
         </form>
       </UCard>

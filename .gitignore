@@ -23,5 +23,14 @@ logs
 .env.*
 !.env.example
 
+# Testes
+coverage
+.coverage
+test-results
+playwright-report
+.nuxtrc
 
-.opencode/skill
+# Skills locais; apenas a skill do projeto é versionada
+.opencode/skill/*
+!.opencode/skill/studio-blessed-testing/
+!.opencode/skill/studio-blessed-testing/**

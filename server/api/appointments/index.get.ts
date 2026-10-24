@@ -2,10 +2,8 @@ import { and, asc, eq, gte, lt } from 'drizzle-orm'
 import * as z from 'zod'
 import { db } from '../../database'
 import { appointment, client, service, user } from '../../database/schema'
-import {
-  appointmentColumns,
-  serializeStaffAppointment
-} from '../../utils/appointments'
+import { serializeStaffAppointment } from '../../utils/appointment-serialization'
+import { appointmentColumns } from '../../utils/appointments'
 import { requireUser } from '../../utils/auth-guard'
 import { TIME_ZONE, dayBounds, isValidDate } from '../../utils/time'
 

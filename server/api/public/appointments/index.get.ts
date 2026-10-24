@@ -3,10 +3,10 @@ import * as z from 'zod'
 import { db } from '../../../database'
 import { appointment, client, service, user } from '../../../database/schema'
 import {
-  appointmentColumns,
   cancellationPolicy,
   serializeAppointment
-} from '../../../utils/appointments'
+} from '../../../utils/appointment-serialization'
+import { appointmentColumns } from '../../../utils/appointments'
 import { normalizePhone } from '../../../utils/phone'
 
 const querySchema = z.object({

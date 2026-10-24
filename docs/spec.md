@@ -16,7 +16,7 @@
 ## 2. Stack Tecnológica
 
 - **Frontend / Backend:** Nuxt 4 (SSR, estrutura `app/`) + Nuxt UI + Tailwind CSS.
-- **Template base:** Nuxt UI Dashboard (`ui/dashboard`).
+- **Template base:** Nuxt UI 4 Dashboard.
 - **Banco de Dados:** PostgreSQL hospedado na Oracle Cloud Infrastructure (OCI).
 - **Autenticação:** Better Auth — **Google OAuth** (para capturar a agenda do
   profissional) **ou e-mail/senha**.
