@@ -16,6 +16,15 @@ const links = computed<NavigationMenuItem[][]>(() => {
   }]
 
   items.push({
+    label: 'Agenda',
+    icon: 'i-ri-calendar-line',
+    to: '/agenda',
+    onSelect: () => {
+      open.value = false
+    }
+  })
+
+  items.push({
     label: 'Serviços',
     icon: 'i-ri-scissors-line',
     to: '/servicos',

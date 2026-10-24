@@ -31,7 +31,8 @@ export const appointmentColumns = {
   durationMin: service.durationMin,
   priceCents: service.priceCents,
   clientName: client.name,
-  clientPhone: client.phone
+  clientPhone: client.phone,
+  notes: appointment.notes
 }
 
 export interface AppointmentDetails {
@@ -48,6 +49,7 @@ export interface AppointmentDetails {
   priceCents: number
   clientName: string
   clientPhone: string
+  notes: string | null
 }
 
 export async function getAppointmentById(id: string): Promise<AppointmentDetails | null> {
@@ -79,6 +81,26 @@ export function serializeAppointment(row: AppointmentDetails, now = new Date()) 
     priceCents: row.priceCents,
     clientName: row.clientName,
     canChange: row.status === 'scheduled' && canChangeAppointment(row.startsAt, now)
+  }
+}
+
+/** Objeto interno: inclui o WhatsApp da cliente, as observações e o status cru. */
+export function serializeStaffAppointment(row: AppointmentDetails) {
+  return {
+    id: row.id,
+    startsAt: row.startsAt.toISOString(),
+    endsAt: row.endsAt.toISOString(),
+    status: row.status,
+    origin: row.origin,
+    serviceId: row.serviceId,
+    professionalId: row.professionalId,
+    serviceName: row.serviceName,
+    professionalName: row.professionalName,
+    durationMin: row.durationMin,
+    priceCents: row.priceCents,
+    clientName: row.clientName,
+    clientPhone: row.clientPhone,
+    notes: row.notes
   }
 }
 

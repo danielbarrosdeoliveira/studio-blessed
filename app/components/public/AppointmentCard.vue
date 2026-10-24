@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { PublicAppointment, PublicCancellationPolicy } from '~/types/domain'
+import { appointmentStatusMeta } from '~/utils/appointment'
 import { addDaysToIsoDate, formatInstantLong, todayInTimeZone } from '~/utils/date'
 import { getApiErrorMessage } from '~/utils/error'
 
@@ -22,21 +23,7 @@ const actionError = ref('')
 
 const minDate = computed(() => addDaysToIsoDate(todayInTimeZone(), 3))
 
-const statusMeta = computed<{
-  label: string
-  color: 'primary' | 'success' | 'neutral' | 'warning'
-}>(() => {
-  switch (props.appointment.status) {
-    case 'completed':
-      return { label: 'Concluído', color: 'success' }
-    case 'cancelled':
-      return { label: 'Cancelado', color: 'neutral' }
-    case 'no_show':
-      return { label: 'Não compareceu', color: 'warning' }
-    default:
-      return { label: 'Agendado', color: 'primary' }
-  }
-})
+const statusMeta = computed(() => appointmentStatusMeta[props.appointment.status])
 
 function openReschedule() {
   actionError.value = ''
@@ -201,7 +188,7 @@ async function reschedule() {
             {{ appointment.serviceName }} · {{ appointment.professionalName }}
           </p>
 
-          <PublicAvailabilityPicker
+          <AvailabilityPicker
             v-if="rescheduleOpen"
             :key="pickerKey"
             v-model="newSlot"

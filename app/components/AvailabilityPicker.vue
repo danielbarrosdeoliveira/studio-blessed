@@ -3,13 +3,21 @@ import type { PublicAvailability } from '~/types/domain'
 import { addDaysToIsoDate, formatIsoDateLong, todayInTimeZone } from '~/utils/date'
 import { getApiErrorMessage } from '~/utils/error'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   professionalId: string
   serviceId: string
   /** Primeira data permitida (`YYYY-MM-DD`). */
   minDate: string
   label?: string
-}>()
+  /** Rota de disponibilidade (pública ou do staff). */
+  endpoint?: string
+  /** Aplica a antecedência mínima de 3 dias da cliente. */
+  clientLead?: boolean
+}>(), {
+  label: undefined,
+  endpoint: '/api/public/availability',
+  clientLead: true
+})
 
 const selected = defineModel<string | null>({ default: null })
 
@@ -20,18 +28,28 @@ const error = ref('')
 let requestId = 0
 
 const minSelectableDate = computed(() => {
+  if (!props.clientLead) {
+    return props.minDate
+  }
+
   const clientMin = addDaysToIsoDate(todayInTimeZone(), 3)
 
   return props.minDate > clientMin ? props.minDate : clientMin
 })
 
 async function load() {
+  if (!props.professionalId || !props.serviceId) {
+    availability.value = null
+    pending.value = false
+    return
+  }
+
   const current = ++requestId
   pending.value = true
   error.value = ''
 
   try {
-    const result = await $fetch<PublicAvailability>('/api/public/availability', {
+    const result = await $fetch<PublicAvailability>(props.endpoint, {
       query: {
         professionalId: props.professionalId,
         serviceId: props.serviceId,
@@ -64,6 +82,13 @@ async function load() {
 
 onMounted(load)
 watch(selectedDate, load)
+watch(
+  [() => props.professionalId, () => props.serviceId],
+  () => {
+    selected.value = null
+    void load()
+  }
+)
 </script>
 
 <template>
