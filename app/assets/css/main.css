@@ -31,3 +31,23 @@
   --ui-bg-muted: var(--ui-color-neutral-800);
   --ui-text-inverted: var(--ui-color-neutral-900);
 }
+
+/* UX: todo botão é um affordance clicável; estados desativados/bloqueados
+   não convidam a clique. Cobre <button> (UButton sem `to`) e ancoras
+   usadas como botão (UButton com `to`). */
+@layer base {
+  button {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  button[disabled],
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  [aria-disabled="true"] {
+    pointer-events: none;
+  }
+}
