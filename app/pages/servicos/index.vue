@@ -113,7 +113,7 @@ async function onSubmit(event: FormSubmitEvent<FormSchema>) {
 
     toast.add({
       title: editing.value ? 'Serviço atualizado' : 'Serviço criado',
-      icon: 'i-lucide-check',
+      icon: 'i-ri-check-line',
       color: 'success'
     })
 
@@ -123,7 +123,7 @@ async function onSubmit(event: FormSubmitEvent<FormSchema>) {
     toast.add({
       title: 'Não foi possível salvar',
       description: (error as { data?: { message?: string } })?.data?.message ?? 'Tente novamente.',
-      icon: 'i-lucide-circle-alert',
+      icon: 'i-ri-error-warning-line',
       color: 'error'
     })
   } finally {
@@ -142,7 +142,7 @@ async function toggleActive(row: Service) {
     toast.add({
       title: 'Não foi possível alterar o status',
       description: (error as { data?: { message?: string } })?.data?.message ?? 'Tente novamente.',
-      icon: 'i-lucide-circle-alert',
+      icon: 'i-ri-error-warning-line',
       color: 'error'
     })
   }
@@ -197,7 +197,7 @@ const columns = computed<TableColumn<Service>[]>(() => [
     cell: ({ row }) => h('div', { class: 'flex justify-end gap-2' }, [
       h(UButton, {
         label: 'Editar',
-        icon: 'i-lucide-pencil',
+        icon: 'i-ri-pencil-line',
         size: 'xs',
         color: 'neutral',
         variant: 'ghost',
@@ -205,7 +205,7 @@ const columns = computed<TableColumn<Service>[]>(() => [
       }),
       h(UButton, {
         label: row.original.active ? 'Desativar' : 'Ativar',
-        icon: 'i-lucide-power',
+        icon: 'i-ri-shut-down-line',
         size: 'xs',
         color: row.original.active ? 'error' : 'success',
         variant: 'ghost',
@@ -227,7 +227,7 @@ const columns = computed<TableColumn<Service>[]>(() => [
         <template #right>
           <UButton
             label="Ver catálogo"
-            icon="i-lucide-external-link"
+            icon="i-ri-external-link-line"
             color="neutral"
             variant="outline"
             to="/catalogo"
@@ -235,7 +235,7 @@ const columns = computed<TableColumn<Service>[]>(() => [
           />
           <UButton
             label="Novo serviço"
-            icon="i-lucide-plus"
+            icon="i-ri-add-line"
             @click="openCreate"
           />
         </template>
@@ -251,7 +251,7 @@ const columns = computed<TableColumn<Service>[]>(() => [
           v-model="professionalFilter"
           :items="professionalItems"
           class="w-full sm:w-64"
-          icon="i-lucide-user"
+          icon="i-ri-user-line"
         />
       </div>
 

@@ -8,7 +8,7 @@
         >
           <div class="size-8 rounded-lg bg-primary flex items-center justify-center">
             <UIcon
-              name="i-lucide-scissors"
+              name="i-ri-scissors-line"
               class="size-4 text-white"
             />
           </div>
@@ -17,7 +17,7 @@
 
         <UButton
           label="Área da equipe"
-          icon="i-lucide-log-in"
+          icon="i-ri-login-box-line"
           color="neutral"
           variant="outline"
           size="sm"

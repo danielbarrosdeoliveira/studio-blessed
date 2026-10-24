@@ -8,7 +8,7 @@ const { user, isAdmin } = await useUserSession()
 const links = computed<NavigationMenuItem[][]>(() => {
   const items: NavigationMenuItem[] = [{
     label: 'Início',
-    icon: 'i-lucide-house',
+    icon: 'i-ri-home-line',
     to: '/',
     onSelect: () => {
       open.value = false
@@ -17,7 +17,7 @@ const links = computed<NavigationMenuItem[][]>(() => {
 
   items.push({
     label: 'Serviços',
-    icon: 'i-lucide-scissors',
+    icon: 'i-ri-scissors-line',
     to: '/servicos',
     onSelect: () => {
       open.value = false
@@ -27,7 +27,7 @@ const links = computed<NavigationMenuItem[][]>(() => {
   if (isAdmin.value) {
     items.push({
       label: 'Profissionais',
-      icon: 'i-lucide-users',
+      icon: 'i-ri-group-line',
       to: '/profissionais',
       onSelect: () => {
         open.value = false
@@ -36,7 +36,7 @@ const links = computed<NavigationMenuItem[][]>(() => {
   } else if (user.value) {
     items.push({
       label: 'Minha jornada',
-      icon: 'i-lucide-clock',
+      icon: 'i-ri-time-line',
       to: `/profissionais/${user.value.id}`,
       onSelect: () => {
         open.value = false
@@ -65,7 +65,7 @@ const links = computed<NavigationMenuItem[][]>(() => {
         >
           <div class="size-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
             <UIcon
-              name="i-lucide-scissors"
+              name="i-ri-scissors-line"
               class="size-4 text-white"
             />
           </div>

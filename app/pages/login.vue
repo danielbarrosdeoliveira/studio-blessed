@@ -47,7 +47,7 @@ async function onSubmit() {
       <div class="flex flex-col items-center gap-1 mb-8">
         <div class="size-12 rounded-xl bg-primary flex items-center justify-center">
           <UIcon
-            name="i-lucide-scissors"
+            name="i-ri-scissors-line"
             class="size-6 text-white"
           />
         </div>
@@ -72,7 +72,7 @@ async function onSubmit() {
               v-model="email"
               type="email"
               placeholder="voce@studioblessed.local"
-              icon="i-lucide-mail"
+              icon="i-ri-mail-line"
               autocomplete="email"
               required
               class="w-full"
@@ -87,7 +87,7 @@ async function onSubmit() {
               v-model="password"
               type="password"
               placeholder="••••••••"
-              icon="i-lucide-lock"
+              icon="i-ri-lock-line"
               autocomplete="current-password"
               required
               class="w-full"
@@ -98,14 +98,14 @@ async function onSubmit() {
             v-if="errorMessage"
             color="error"
             variant="subtle"
-            icon="i-lucide-circle-alert"
+            icon="i-ri-error-warning-line"
             :title="errorMessage"
           />
 
           <UButton
             type="submit"
             label="Entrar"
-            icon="i-lucide-log-in"
+            icon="i-ri-login-box-line"
             block
             :loading="loading"
           />
