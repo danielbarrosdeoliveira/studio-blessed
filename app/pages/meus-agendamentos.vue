@@ -143,7 +143,7 @@ onMounted(() => {
             Nenhum agendamento encontrado para este WhatsApp.
           </p>
           <UButton
-            to="/catalogo"
+            to="/agendamento"
             label="Agendar um serviço"
             class="mt-2"
           />
