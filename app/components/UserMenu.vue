@@ -36,11 +36,11 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
   avatar: avatar.value
 }], [{
   label: 'Configurações',
-  icon: 'i-lucide-settings',
+  icon: 'i-ri-settings-line',
   to: '/settings'
 }], [{
   label: 'Tema',
-  icon: 'i-lucide-palette',
+  icon: 'i-ri-palette-line',
   children: [{
     label: 'Primary',
     slot: 'chip',
@@ -82,10 +82,10 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
   }]
 }, {
   label: 'Aparência',
-  icon: 'i-lucide-sun-moon',
+  icon: 'i-ri-contrast-line',
   children: [{
     label: 'Claro',
-    icon: 'i-lucide-sun',
+    icon: 'i-ri-sun-line',
     type: 'checkbox' as const,
     checked: colorMode.value === 'light',
     onSelect(e: Event) {
@@ -94,7 +94,7 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
     }
   }, {
     label: 'Escuro',
-    icon: 'i-lucide-moon',
+    icon: 'i-ri-moon-line',
     type: 'checkbox' as const,
     checked: colorMode.value === 'dark',
     onUpdateChecked(checked: boolean) {
@@ -108,7 +108,7 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
   }]
 }], [{
   label: 'Sair',
-  icon: 'i-lucide-log-out',
+  icon: 'i-ri-logout-box-line',
   onSelect: () => signOut()
 }]]))
 </script>
@@ -122,7 +122,7 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
     <UButton
       :avatar="avatar"
       :label="collapsed ? undefined : displayName"
-      :trailing-icon="collapsed ? undefined : 'i-lucide-chevrons-up-down'"
+      :trailing-icon="collapsed ? undefined : 'i-ri-expand-up-down-line'"
       color="neutral"
       variant="ghost"
       block

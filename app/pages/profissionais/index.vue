@@ -46,7 +46,7 @@ async function onCreate(event: FormSubmitEvent<CreateSchema>) {
     toast.add({
       title: 'Profissional cadastrada',
       description: 'Ela já pode entrar com o e-mail e a senha informados.',
-      icon: 'i-lucide-check',
+      icon: 'i-ri-check-line',
       color: 'success'
     })
 
@@ -57,7 +57,7 @@ async function onCreate(event: FormSubmitEvent<CreateSchema>) {
     toast.add({
       title: 'Não foi possível cadastrar',
       description: getErrorMessage(error),
-      icon: 'i-lucide-circle-alert',
+      icon: 'i-ri-error-warning-line',
       color: 'error'
     })
   } finally {
@@ -100,7 +100,7 @@ async function onEdit(event: FormSubmitEvent<EditSchema>) {
 
     toast.add({
       title: 'Dados atualizados',
-      icon: 'i-lucide-check',
+      icon: 'i-ri-check-line',
       color: 'success'
     })
 
@@ -110,7 +110,7 @@ async function onEdit(event: FormSubmitEvent<EditSchema>) {
     toast.add({
       title: 'Não foi possível salvar',
       description: getErrorMessage(error),
-      icon: 'i-lucide-circle-alert',
+      icon: 'i-ri-error-warning-line',
       color: 'error'
     })
   } finally {
@@ -159,7 +159,7 @@ const columns: TableColumn<Professional>[] = [
     cell: ({ row }) => h('div', { class: 'flex justify-end gap-2' }, [
       h(UButton, {
         label: 'Jornada',
-        icon: 'i-lucide-clock',
+        icon: 'i-ri-time-line',
         size: 'xs',
         color: 'neutral',
         variant: 'outline',
@@ -167,7 +167,7 @@ const columns: TableColumn<Professional>[] = [
       }),
       h(UButton, {
         label: 'Editar',
-        icon: 'i-lucide-pencil',
+        icon: 'i-ri-pencil-line',
         size: 'xs',
         color: 'neutral',
         variant: 'ghost',
@@ -194,7 +194,7 @@ function getErrorMessage(error: unknown) {
         <template #right>
           <UButton
             label="Nova profissional"
-            icon="i-lucide-plus"
+            icon="i-ri-add-line"
             @click="createOpen = true"
           />
         </template>

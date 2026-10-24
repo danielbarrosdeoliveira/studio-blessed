@@ -90,7 +90,7 @@ async function save() {
         toast.add({
           title: 'Horário inválido',
           description: `Em ${weekdays[day.weekday]}, o fim deve ser depois do início.`,
-          icon: 'i-lucide-circle-alert',
+          icon: 'i-ri-error-warning-line',
           color: 'error'
         })
         return
@@ -100,7 +100,7 @@ async function save() {
         toast.add({
           title: 'Intervalos sobrepostos',
           description: `Ajuste os intervalos de ${weekdays[day.weekday]}.`,
-          icon: 'i-lucide-circle-alert',
+          icon: 'i-ri-error-warning-line',
           color: 'error'
         })
         return
@@ -125,7 +125,7 @@ async function save() {
 
     toast.add({
       title: 'Jornada salva',
-      icon: 'i-lucide-check',
+      icon: 'i-ri-check-line',
       color: 'success'
     })
 
@@ -134,7 +134,7 @@ async function save() {
     toast.add({
       title: 'Não foi possível salvar a jornada',
       description: (error as { data?: { message?: string } })?.data?.message ?? 'Tente novamente.',
-      icon: 'i-lucide-circle-alert',
+      icon: 'i-ri-error-warning-line',
       color: 'error'
     })
   } finally {
@@ -151,7 +151,7 @@ const backTo = computed(() => isAdmin.value ? '/profissionais' : '/')
       <UDashboardNavbar :title="professional?.name ?? 'Jornada'">
         <template #leading>
           <UButton
-            icon="i-lucide-arrow-left"
+            icon="i-ri-arrow-left-line"
             color="neutral"
             variant="ghost"
             :to="backTo"
@@ -163,7 +163,7 @@ const backTo = computed(() => isAdmin.value ? '/profissionais' : '/')
           <UButton
             v-if="professional"
             label="Salvar jornada"
-            icon="i-lucide-check"
+            icon="i-ri-check-line"
             :loading="saving"
             @click="save"
           />
@@ -177,7 +177,7 @@ const backTo = computed(() => isAdmin.value ? '/profissionais' : '/')
           v-if="professionalError || workingHoursError"
           color="error"
           variant="subtle"
-          icon="i-lucide-circle-alert"
+          icon="i-ri-error-warning-line"
           title="Não foi possível carregar a jornada"
           description="Você não tem acesso a esta profissional ou ela não existe."
         />
@@ -215,7 +215,7 @@ const backTo = computed(() => isAdmin.value ? '/profissionais' : '/')
               <UButton
                 v-if="day.enabled"
                 label="Intervalo"
-                icon="i-lucide-plus"
+                icon="i-ri-add-line"
                 size="xs"
                 color="neutral"
                 variant="ghost"
@@ -247,7 +247,7 @@ const backTo = computed(() => isAdmin.value ? '/profissionais' : '/')
                 />
                 <UButton
                   v-if="day.intervals.length > 1"
-                  icon="i-lucide-trash-2"
+                  icon="i-ri-delete-bin-line"
                   color="error"
                   variant="ghost"
                   size="xs"

@@ -3,24 +3,24 @@ import type { NavigationMenuItem } from '@nuxt/ui'
 
 const links = [[{
   label: 'General',
-  icon: 'i-lucide-user',
+  icon: 'i-ri-user-line',
   to: '/settings',
   exact: true
 }, {
   label: 'Members',
-  icon: 'i-lucide-users',
+  icon: 'i-ri-group-line',
   to: '/settings/members'
 }, {
   label: 'Notifications',
-  icon: 'i-lucide-bell',
+  icon: 'i-ri-notification-3-line',
   to: '/settings/notifications'
 }, {
   label: 'Security',
-  icon: 'i-lucide-shield',
+  icon: 'i-ri-shield-line',
   to: '/settings/security'
 }], [{
   label: 'Documentation',
-  icon: 'i-lucide-book-open',
+  icon: 'i-ri-book-open-line',
   to: 'https://ui.nuxt.com/docs/getting-started/installation/nuxt',
   target: '_blank'
 }]] satisfies NavigationMenuItem[][]

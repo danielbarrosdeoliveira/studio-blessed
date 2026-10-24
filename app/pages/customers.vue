@@ -33,7 +33,7 @@ function getRowItems(row: Row<User>) {
     },
     {
       label: 'Copy customer ID',
-      icon: 'i-lucide-copy',
+      icon: 'i-ri-file-copy-line',
       onSelect() {
         navigator.clipboard.writeText(row.original.id.toString())
         toast.add({
@@ -47,18 +47,18 @@ function getRowItems(row: Row<User>) {
     },
     {
       label: 'View customer details',
-      icon: 'i-lucide-list'
+      icon: 'i-ri-list-unordered'
     },
     {
       label: 'View customer payments',
-      icon: 'i-lucide-wallet'
+      icon: 'i-ri-wallet-line'
     },
     {
       type: 'separator'
     },
     {
       label: 'Delete customer',
-      icon: 'i-lucide-trash',
+      icon: 'i-ri-delete-bin-line',
       color: 'error',
       onSelect() {
         toast.add({
@@ -120,9 +120,9 @@ const columns: TableColumn<User>[] = [
         label: 'Email',
         icon: isSorted
           ? isSorted === 'asc'
-            ? 'i-lucide-arrow-up-narrow-wide'
-            : 'i-lucide-arrow-down-wide-narrow'
-          : 'i-lucide-arrow-up-down',
+            ? 'i-ri-sort-asc'
+            : 'i-ri-sort-desc'
+          : 'i-ri-arrow-up-down-line',
         class: '-mx-2.5',
         onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
       })
@@ -165,7 +165,7 @@ const columns: TableColumn<User>[] = [
           },
           () =>
             h(UButton, {
-              icon: 'i-lucide-ellipsis-vertical',
+              icon: 'i-ri-more-2-line',
               color: 'neutral',
               variant: 'ghost',
               class: 'ml-auto'
@@ -225,7 +225,7 @@ const pagination = ref({
         <UInput
           v-model="email"
           class="max-w-sm"
-          icon="i-lucide-search"
+          icon="i-ri-search-line"
           placeholder="Filter emails..."
         />
 
@@ -236,7 +236,7 @@ const pagination = ref({
               label="Delete"
               color="error"
               variant="subtle"
-              icon="i-lucide-trash"
+              icon="i-ri-delete-bin-line"
             >
               <template #trailing>
                 <UKbd>
@@ -281,7 +281,7 @@ const pagination = ref({
               label="Display"
               color="neutral"
               variant="outline"
-              trailing-icon="i-lucide-settings-2"
+              trailing-icon="i-ri-settings-3-line"
             />
           </UDropdownMenu>
         </div>
