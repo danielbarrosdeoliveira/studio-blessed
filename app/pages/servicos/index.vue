@@ -304,6 +304,7 @@ const columns = computed<TableColumn<Service>[]>(() => [
           label="Nome"
           name="name"
           required
+          description="O nome do serviço é único entre os serviços ativos do salão."
         >
           <UInput
             v-model="state.name"

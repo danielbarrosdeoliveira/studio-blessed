@@ -3,7 +3,7 @@ import * as z from 'zod'
 import { db } from '../../database'
 import { service } from '../../database/schema'
 import { getProfessionalOr404 } from '../../utils/professionals'
-import { serviceColumns } from '../../utils/services'
+import { isUniqueViolation, sameServiceName, serviceColumns } from '../../utils/services'
 
 const bodySchema = z.object({
   professionalId: z.string().min(1).optional(),
@@ -40,17 +40,19 @@ export default defineEventHandler(async (event) => {
     professionalId = current.id
   }
 
-  const [duplicate] = await db
-    .select({ id: service.id })
-    .from(service)
-    .where(and(eq(service.professionalId, professionalId), eq(service.name, parsed.data.name)))
-    .limit(1)
+  if (parsed.data.active) {
+    const [duplicate] = await db
+      .select({ id: service.id })
+      .from(service)
+      .where(and(eq(service.active, true), sameServiceName(parsed.data.name)))
+      .limit(1)
 
-  if (duplicate) {
-    throw createError({ statusCode: 409, message: 'Já existe um serviço com este nome para esta profissional' })
+    if (duplicate) {
+      throw createError({ statusCode: 409, message: 'Já existe um serviço ativo com este nome no salão' })
+    }
   }
 
-  const [created] = await db
+  const rows = await db
     .insert(service)
     .values({
       professionalId,
@@ -61,6 +63,14 @@ export default defineEventHandler(async (event) => {
       active: parsed.data.active
     })
     .returning(serviceColumns)
+    .catch((error: unknown) => {
+      if (isUniqueViolation(error)) {
+        throw createError({ statusCode: 409, message: 'Já existe um serviço ativo com este nome no salão' })
+      }
+      throw error
+    })
+
+  const [created] = rows
 
   setResponseStatus(event, 201)
   return created

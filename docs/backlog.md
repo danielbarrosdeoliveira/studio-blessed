@@ -96,16 +96,21 @@ compromissos externos contem como ocupados.
 
 ## E3 — Serviços (P0)
 
-**Objetivo:** catálogo de serviços por profissional, agregado por nome na vitrine.
+**Objetivo:** catálogo de serviços com uma profissional responsável por serviço e
+nome único entre os serviços ativos do salão.
 
 ### US3.1 — Cadastrar serviço
 **Como** profissional/admin, **quero** criar serviços com nome, duração, buffer e
 preço, **para** oferecê-los aos clientes.
 
 - **CA1:** Dado nome, duração (ex.: 40/90/120 min), buffer e preço válidos, quando
-  salvo, então o serviço pertence à profissional.
+  salvo, então o serviço pertence à profissional e o nome é único entre os serviços
+  ativos do salão.
 - **CA2:** Dado um combo, quando criado como serviço próprio (nome + duração
   maior), então comporta-se como qualquer serviço.
+- **CA3:** Dado um nome já usado por serviço ativo — inclusive de outra
+  profissional ou com variação de maiúsculas/espaços — quando salvo, então a API
+  responde `409`.
 
 ### US3.2 — Editar apenas os próprios serviços
 **Como** profissional, **quero** editar os meus serviços, **para** manter o catálogo
@@ -115,14 +120,14 @@ atualizado.
   então recebe 403.
 - **CA2:** Dado `role=admin`, quando edita qualquer serviço, então é permitido.
 
-### US3.3 — Catálogo agregado por nome
-**Como** cliente, **quero** ver um catálogo unificado, **para** escolher o serviço
-independentemente de quem o executa.
+### US3.3 — Catálogo com profissional responsável
+**Como** cliente, **quero** ver cada serviço uma vez com a profissional responsável,
+**para** escolher o serviço e saber quem o executa.
 
-- **CA1:** Dado o mesmo nome de serviço em 2 profissionais, quando a cliente vê o
-  catálogo, então aparece **uma** entrada do serviço.
-- **CA2:** Dado o serviço escolhido, quando avanço, então vejo as profissionais que
-  o executam, com o preço de cada uma.
+- **CA1:** Dado um serviço ativo, quando a cliente vê o catálogo, então aparece
+  **uma única** entrada do serviço com a profissional responsável.
+- **CA2:** Dado o serviço escolhido, quando avanço, então vejo a profissional
+  responsável, a duração e o preço.
 
 ---
 
@@ -233,9 +238,9 @@ double-booking.
 ### US7.1 — Fluxo de agendamento
 **Como** cliente, **quero** agendar em poucos passos, **para** reservar meu horário.
 
-- **CA1:** Dado o catálogo, quando escolho serviço → profissional → horário →
-  informo nome + WhatsApp → confirmo, então o agendamento é criado com
-  `origin=client` e `status=scheduled`.
+- **CA1:** Dado o catálogo, quando escolho serviço → vejo a profissional
+  responsável → escolho horário → informo nome + WhatsApp → confirmo, então o
+  agendamento é criado com `origin=client` e `status=scheduled`.
 - **CA2:** Dado WhatsApp já existente, quando informo o telefone, então a cliente
   é reaproveitada (não duplica).
 - **CA3:** Dado conflito no serviço, quando a cliente quer outro serviço, então

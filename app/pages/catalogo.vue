@@ -27,7 +27,7 @@ function formatPrice(cents: number) {
         Catálogo
       </h1>
       <p class="text-muted mt-1">
-        Veja os serviços do studio e as profissionais que atendem cada um.
+        Veja os serviços do studio e a profissional responsável por cada um.
       </p>
     </div>
 
@@ -56,8 +56,7 @@ function formatPrice(cents: number) {
               {{ group.name }}
             </h2>
             <p class="text-sm text-muted">
-              {{ group.professionals.length }}
-              {{ group.professionals.length === 1 ? 'profissional' : 'profissionais' }}
+              Profissional responsável
             </p>
           </div>
 
@@ -65,7 +64,7 @@ function formatPrice(cents: number) {
             color="primary"
             variant="subtle"
           >
-            A partir de {{ formatPrice(group.minPriceCents) }}
+            {{ formatPrice(group.minPriceCents) }}
           </UBadge>
         </div>
 

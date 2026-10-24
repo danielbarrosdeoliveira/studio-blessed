@@ -2,7 +2,7 @@ import { and, eq, ne } from 'drizzle-orm'
 import * as z from 'zod'
 import { db } from '../../database'
 import { service } from '../../database/schema'
-import { requireServiceAccess, serviceColumns } from '../../utils/services'
+import { isUniqueViolation, requireServiceAccess, sameServiceName, serviceColumns } from '../../utils/services'
 
 const bodySchema = z.object({
   name: z.string().trim().min(2, 'Informe o nome').max(120, 'Nome muito longo').optional(),
@@ -31,27 +31,38 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  if (parsed.data.name) {
+  const nextName = parsed.data.name ?? existing.name
+  const nextActive = parsed.data.active ?? existing.active
+
+  if (nextActive) {
     const [duplicate] = await db
       .select({ id: service.id })
       .from(service)
       .where(and(
-        eq(service.professionalId, existing.professionalId),
-        eq(service.name, parsed.data.name),
+        eq(service.active, true),
+        sameServiceName(nextName),
         ne(service.id, id)
       ))
       .limit(1)
 
     if (duplicate) {
-      throw createError({ statusCode: 409, message: 'Já existe um serviço com este nome para esta profissional' })
+      throw createError({ statusCode: 409, message: 'Já existe um serviço ativo com este nome no salão' })
     }
   }
 
-  const [updated] = await db
+  const rows = await db
     .update(service)
     .set({ ...parsed.data, updatedAt: new Date() })
     .where(eq(service.id, id))
     .returning(serviceColumns)
+    .catch((error: unknown) => {
+      if (isUniqueViolation(error)) {
+        throw createError({ statusCode: 409, message: 'Já existe um serviço ativo com este nome no salão' })
+      }
+      throw error
+    })
+
+  const [updated] = rows
 
   return updated
 })

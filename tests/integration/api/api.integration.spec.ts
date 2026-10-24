@@ -79,12 +79,16 @@ describe('API pública de agendamento', () => {
   it('lista o catálogo ativo agrupado por serviço', async () => {
     const groups = await $fetch<PublicServiceGroup[]>('/api/public/services')
     const corte = groups.find(group => group.name === 'Corte feminino')
+    const corteMasculino = groups.find(group => group.name === 'Corte masculino')
 
     expect(corte).toBeDefined()
-    expect(corte?.professionals).toEqual(expect.arrayContaining([
-      expect.objectContaining({ id: seed.users.maria.id, name: 'Maria' }),
+    expect(corte?.professionals).toEqual([
+      expect.objectContaining({ id: seed.users.maria.id, name: 'Maria' })
+    ])
+    expect(corteMasculino?.professionals).toEqual([
       expect.objectContaining({ id: seed.users.ana.id, name: 'Ana' })
-    ]))
+    ])
+    expect(groups.every(group => group.professionals.length === 1)).toBe(true)
   })
 
   it('aplica a antecedência de 3 dias somente no fluxo da cliente', async () => {
@@ -618,6 +622,21 @@ describe('gestão de profissionais e serviços', () => {
       headers: authHeaders(admin.cookie),
       body: { ...base, professionalId: seed.users.maria.id }
     }).catch(error => error)
+    const duplicateOtherProfessional = await $fetch('/api/services', {
+      method: 'POST',
+      headers: authHeaders(admin.cookie),
+      body: { ...base, professionalId: seed.users.ana.id }
+    }).catch(error => error)
+    const duplicateCase = await $fetch('/api/services', {
+      method: 'POST',
+      headers: authHeaders(admin.cookie),
+      body: { ...base, name: 'serviço integração', professionalId: seed.users.ana.id }
+    }).catch(error => error)
+    const inactiveDuplicate = await $fetch<Service>('/api/services', {
+      method: 'POST',
+      headers: authHeaders(admin.cookie),
+      body: { ...base, professionalId: seed.users.ana.id, active: false }
+    })
     const missingProfessional = await $fetch('/api/services', {
       method: 'POST',
       headers: authHeaders(admin.cookie),
@@ -642,6 +661,9 @@ describe('gestão de profissionais e serviços', () => {
     expect(created.professionalId).toBe(seed.users.maria.id)
     expect(created.bufferMin).toBe(0)
     expect(errorStatus(duplicate)).toBe(409)
+    expect(errorStatus(duplicateOtherProfessional)).toBe(409)
+    expect(errorStatus(duplicateCase)).toBe(409)
+    expect(inactiveDuplicate.active).toBe(false)
     expect(errorStatus(missingProfessional)).toBe(400)
     expect(errorStatus(invalidDuration)).toBe(400)
     expect(partnerCreated.professionalId).toBe(seed.users.maria.id)
@@ -655,7 +677,12 @@ describe('gestão de profissionais e serviços', () => {
     const duplicateName = await $fetch(`/api/services/${partnerCreated.id}`, {
       method: 'PATCH',
       headers: authHeaders(maria.cookie),
-      body: { name: 'Serviço Integração' }
+      body: { name: 'serviço integração' }
+    }).catch(error => error)
+    const reactivateDuplicate = await $fetch(`/api/services/${inactiveDuplicate.id}`, {
+      method: 'PATCH',
+      headers: authHeaders(admin.cookie),
+      body: { active: true }
     }).catch(error => error)
     const partnerOther = await $fetch(`/api/services/${seed.services.anaCorte}`, {
       method: 'PATCH',
@@ -680,6 +707,7 @@ describe('gestão de profissionais e serviços', () => {
 
     expect(patched.priceCents).toBe(2000)
     expect(errorStatus(duplicateName)).toBe(409)
+    expect(errorStatus(reactivateDuplicate)).toBe(409)
     expect(errorStatus(partnerOther)).toBe(403)
     expect(errorStatus(notFound)).toBe(404)
     expect(partnerList.every(service => service.professionalId === seed.users.maria.id)).toBe(true)
