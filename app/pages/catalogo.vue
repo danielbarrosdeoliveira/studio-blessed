@@ -74,7 +74,7 @@ function formatPrice(cents: number) {
         <ul class="space-y-2">
           <li
             v-for="professional in group.professionals"
-            :key="professional.id"
+            :key="professional.serviceId"
             class="flex items-center justify-between gap-3 text-sm"
           >
             <div class="min-w-0">
@@ -82,13 +82,17 @@ function formatPrice(cents: number) {
                 {{ professional.name }}
               </p>
               <p class="text-muted">
-                {{ professional.durationMin }} min
+                {{ professional.durationMin }} min · {{ formatPrice(professional.priceCents) }}
               </p>
             </div>
 
-            <span class="font-medium text-highlighted whitespace-nowrap">
-              {{ formatPrice(professional.priceCents) }}
-            </span>
+            <UButton
+              label="Agendar"
+              icon="i-ri-calendar-line"
+              size="xs"
+              variant="outline"
+              :to="{ path: '/agendar', query: { serviceId: professional.serviceId, professionalId: professional.id } }"
+            />
           </li>
         </ul>
       </UCard>
@@ -99,9 +103,5 @@ function formatPrice(cents: number) {
         Nenhum serviço disponível no momento.
       </p>
     </UCard>
-
-    <p class="text-xs text-muted text-center">
-      Agendamento online em breve. Por enquanto, fale com o studio para reservar seu horário.
-    </p>
   </div>
 </template>

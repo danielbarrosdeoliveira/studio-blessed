@@ -15,14 +15,35 @@
           <span class="font-semibold text-highlighted">Studio Blessed</span>
         </NuxtLink>
 
-        <UButton
-          label="Área da equipe"
-          icon="i-ri-login-box-line"
-          color="neutral"
-          variant="outline"
-          size="sm"
-          to="/login"
-        />
+        <div class="flex items-center gap-1 sm:gap-2">
+          <UButton
+            to="/meus-agendamentos"
+            icon="i-ri-calendar-line"
+            label="Meus agendamentos"
+            color="neutral"
+            variant="ghost"
+            size="sm"
+            class="hidden sm:inline-flex"
+          />
+          <UButton
+            to="/meus-agendamentos"
+            icon="i-ri-calendar-line"
+            aria-label="Meus agendamentos"
+            color="neutral"
+            variant="ghost"
+            size="sm"
+            square
+            class="sm:hidden"
+          />
+          <UButton
+            label="Equipe"
+            icon="i-ri-login-box-line"
+            color="neutral"
+            variant="outline"
+            size="sm"
+            to="/login"
+          />
+        </div>
       </div>
     </header>
 

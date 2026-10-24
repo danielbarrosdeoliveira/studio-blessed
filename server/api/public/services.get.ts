@@ -6,7 +6,9 @@ interface PublicGroup {
   name: string
   minPriceCents: number
   professionals: {
+    /** `user.id` da profissional. */
     id: string
+    serviceId: string
     name: string
     durationMin: number
     bufferMin: number
@@ -23,6 +25,7 @@ export default defineEventHandler(async () => {
   const rows = await db
     .select({
       name: service.name,
+      serviceId: service.id,
       durationMin: service.durationMin,
       bufferMin: service.bufferMin,
       priceCents: service.priceCents,
@@ -47,6 +50,7 @@ export default defineEventHandler(async () => {
     group.minPriceCents = Math.min(group.minPriceCents, row.priceCents)
     group.professionals.push({
       id: row.professionalId,
+      serviceId: row.serviceId,
       name: row.professionalName,
       durationMin: row.durationMin,
       bufferMin: row.bufferMin,
