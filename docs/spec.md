@@ -15,11 +15,12 @@
 
 ## 2. Stack Tecnológica
 
-- **Frontend / Backend:** Nuxt 3 (SSR) + Nuxt UI Dashboard + Tailwind CSS.
+- **Frontend / Backend:** Nuxt 4 (SSR, estrutura `app/`) + Nuxt UI + Tailwind CSS.
+- **Template base:** Nuxt UI Dashboard (`ui/dashboard`).
 - **Banco de Dados:** PostgreSQL hospedado na Oracle Cloud Infrastructure (OCI).
 - **Autenticação:** Better Auth — **Google OAuth** (para capturar a agenda do
   profissional) **ou e-mail/senha**.
-- **Gerenciador de Pacotes:** **Yarn**.
+- **Gerenciador de Pacotes:** **pnpm**.
 - **Interface:** web responsiva, **pt-BR** (idioma único). ~~PWA~~ não faz parte
   do MVP.
 - **Fuso horário:** `America/Sao_Paulo`.
@@ -35,7 +36,11 @@
 - **Cliente (público):** **sem login**, identificada por **nome + WhatsApp**;
   consulta histórico apenas informando o telefone.
 
-## 4. Agenda (híbrida)
+## 4. Agenda
+
+> **Fase 1 do MVP:** apenas **agenda interna** (PostgreSQL). A integração com o
+> **Google Calendar** fica para a **fase final do MVP** e será plugada como
+> provider adicional, sem mudar o restante do domínio.
 
 - **1 agenda por profissional**, com duas fontes possíveis (`agendaProvider`):
   - `google` → agenda `primary` do Google Calendar é o banco de agendamentos.
