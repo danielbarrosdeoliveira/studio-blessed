@@ -83,7 +83,7 @@ async function reschedule() {
 </script>
 
 <template>
-  <UCard>
+  <UCard data-testid="public-appointment">
     <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
       <div class="min-w-0 space-y-1">
         <div class="flex flex-wrap items-center gap-2">

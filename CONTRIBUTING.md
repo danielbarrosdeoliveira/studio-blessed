@@ -24,19 +24,22 @@ main
    git checkout -b feat/e2-jornada-profissional
    ```
 3. Desenvolva em commits pequenos e atômicos.
-4. Rode as validações locais:
+4. Rode as validações locais (gate de merge enquanto a CI não existe):
    ```bash
+   pnpm db:up
    pnpm lint
    pnpm typecheck
    pnpm build
+   pnpm test:coverage   # unit + integração + E2E com thresholds
    ```
 5. Faça push e abra o PR:
    ```bash
    git push -u origin feat/e2-jornada-profissional
    ```
 6. Abra o PR para `main` e preencha o template.
-7. Após CI verde, faça **merge commit** (`Create a merge commit`). Não use squash
-   nem rebase: o histórico de commits e branches deve ser preservado (grafo não linear).
+7. Após os checks locais verdes e a revisão, faça **merge commit**
+   (`Create a merge commit`). Não use squash nem rebase: o histórico de commits e
+   branches deve ser preservado (grafo não linear).
 
 ## Convenção de commits
 
@@ -78,10 +81,20 @@ Um PR só está pronto quando:
 - [ ] `pnpm lint` passa
 - [ ] `pnpm typecheck` passa
 - [ ] `pnpm build` passa
+- [ ] `pnpm test:coverage` passa com as metas: unit **75%**, integração **75%** e E2E **50%**
+- [ ] Fluxos críticos cobertos por E2E (agendamento público, operação do staff e escopo da partner)
 - [ ] Critérios de aceite da(s) user story(s) implementados
 - [ ] Sem segredos/credenciais no código (`.env` fora do git)
 - [ ] Docs atualizados, se a decisão mudou o comportamento
-- [ ] PR revisado e CI verde
+- [ ] PR revisado
+
+## Testes
+
+- Unitário: sufixo `.unit.spec.ts`, ao lado do código.
+- Integração: sufixo `.integration.spec.ts`, em `tests/integration/**`.
+- E2E: `.spec.ts`, em `tests/e2e/**`.
+- Banco de teste dedicado: `studio_blessed_test` (não use o banco de desenvolvimento).
+- Estratégia completa, comandos e metas: [`docs/testing.md`](docs/testing.md).
 
 ## Banco de dados
 
@@ -92,7 +105,10 @@ Um PR só está pronto quando:
 
 - **Branch protection** na `main`:
   - exigir PR antes do merge;
-  - exigir CI verde (`lint` + `typecheck`);
   - bloquear force-push e deleção.
+- **CI desligada por decisão do MVP** até existir a esteira completa de
+  DevOps/deploy. O gate atual é local (`lint`, `typecheck`, `build` e
+  `test:coverage`). Quando a esteira existir, os mesmos comandos devem ser
+  obrigatórios e bloquear o deploy.
 - **Merge commit** como método padrão (histórico não linear, preservando os nós de
   commits e branches). Squash e rebase desabilitados.

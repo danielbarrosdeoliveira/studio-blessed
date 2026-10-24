@@ -4,10 +4,9 @@ import { db } from '../../../database'
 import { appointment, service } from '../../../database/schema'
 import {
   cancellationPolicy,
-  findOrCreateClient,
-  getAppointmentById,
   serializeAppointment
-} from '../../../utils/appointments'
+} from '../../../utils/appointment-serialization'
+import { findOrCreateClient, getAppointmentById } from '../../../utils/appointments'
 import { isSlotAvailable } from '../../../utils/availability'
 import { normalizePhone } from '../../../utils/phone'
 

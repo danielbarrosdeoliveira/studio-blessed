@@ -93,7 +93,7 @@ async function cancel() {
 </script>
 
 <template>
-  <UCard>
+  <UCard data-testid="staff-appointment">
     <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
       <div class="min-w-0 flex-1 space-y-2">
         <div class="flex flex-wrap items-center gap-2">

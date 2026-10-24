@@ -5,9 +5,9 @@ import { appointment } from '../../../database/schema'
 import {
   canChangeAppointment,
   cancellationPolicy,
-  getAppointmentById,
   serializeAppointment
-} from '../../../utils/appointments'
+} from '../../../utils/appointment-serialization'
+import { getAppointmentById } from '../../../utils/appointments'
 import { isSlotAvailable } from '../../../utils/availability'
 import { normalizePhone } from '../../../utils/phone'
 
