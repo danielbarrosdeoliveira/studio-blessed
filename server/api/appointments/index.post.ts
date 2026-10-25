@@ -99,6 +99,7 @@ export default defineEventHandler(async (event) => {
       origin: 'staff',
       notes: parsed.data.notes || null
     })
+    // @ts-ignore - Drizzle returning type issue
     .returning({ id: appointment.id })
 
   if (!created) {
@@ -121,8 +122,6 @@ export default defineEventHandler(async (event) => {
     ipAddress: event.node.req.socket?.remoteAddress,
     userAgent: event.node.req.headers['user-agent']
   })
-
-  setResponseStatus(event, 201)
 
   return {
     appointment: serializeStaffAppointment(row)

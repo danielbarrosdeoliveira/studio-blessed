@@ -1,4 +1,4 @@
-import { auth } from '../../lib/auth'
+import { requireUser } from '../../utils/auth-guard'
 import { db } from '../../database'
 import { account, user } from '../../database/schema'
 import { eq } from 'drizzle-orm'
@@ -6,10 +6,7 @@ import { eq } from 'drizzle-orm'
 const GOOGLE_CALENDAR_API = 'https://www.googleapis.com/calendar/v3'
 
 export default defineEventHandler(async (event) => {
-  const { data: session } = await auth.api.getSession(event)
-  if (!session?.user) {
-    throw createError({ statusCode: 401, message: 'Não autenticado' })
-  }
+  const current = await requireUser(event)
 
   const body = await readBody(event)
   const { appointmentId, summary, startsAt, endsAt, attendees } = body
@@ -24,7 +21,7 @@ export default defineEventHandler(async (event) => {
   const [userRow] = await db
     .select({ agendaProvider: user.agendaProvider })
     .from(user)
-    .where(eq(user.id, session.user.id))
+    .where(eq(user.id, current.id))
     .limit(1)
 
   if (userRow?.agendaProvider !== 'google') {
@@ -37,7 +34,7 @@ export default defineEventHandler(async (event) => {
   const [acct] = await db
     .select({ accessToken: account.accessToken })
     .from(account)
-    .where(eq(account.userId, session.user.id))
+    .where(eq(account.userId, current.id))
     .limit(1)
 
   if (!acct?.accessToken) {

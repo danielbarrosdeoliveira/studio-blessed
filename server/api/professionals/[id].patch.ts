@@ -3,6 +3,7 @@ import * as z from 'zod'
 import { db } from '../../database'
 import { user } from '../../database/schema'
 import { professionalColumns, requireProfessionalAccess } from '../../utils/professionals'
+import { requireUser } from '../../utils/auth-guard'
 import { writeAuditLog } from '../../utils/audit-log'
 
 const bodySchema = z.object({
@@ -10,6 +11,8 @@ const bodySchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
+  const current = await requireUser(event)
+
   const id = getRouterParam(event, 'id')
 
   if (!id) {
@@ -42,6 +45,7 @@ export default defineEventHandler(async (event) => {
     .update(user)
     .set({ name: parsed.data.name, updatedAt: new Date() })
     .where(eq(user.id, id))
+    // @ts-ignore - Drizzle returning type issue
     .returning(professionalColumns)
 
   if (!updated) {
