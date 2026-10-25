@@ -1,0 +1,47 @@
+name: Migrate - Banco de Dados (Produção)
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Confirmar aplicação de migrations em produção'
+        required: true
+        default: 'não'
+        type: choice
+        options:
+          - 'não'
+          - 'sim'
+
+jobs:
+  migrate:
+    name: Aplicar migrations no Neon
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'workflow_dispatch' &&
+      github.event.inputs.confirm == 'sim'
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Instalar pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Instalar dependências
+        run: pnpm install --frozen-lockfile
+
+      - name: Aplicar migrations (Drizzle)
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: pnpm db:migrate
