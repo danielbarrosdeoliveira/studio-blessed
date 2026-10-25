@@ -1,4 +1,3 @@
-import { drizzle } from 'drizzle-orm'
 import { neon } from '@neondatabase/serverless'
 import { drizzle as drizzleNeon } from 'drizzle-orm/neon-http'
 import { drizzle as drizzlePg, type NodePgDatabase } from 'drizzle-orm/node-postgres'

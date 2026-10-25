@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect width="100%" height="100%" fill="#ec4899" rx="16" ry="16"/>
+  <path d="M180 120 Q200 160 220 120 Q200 120 180 120" fill="#fbbf24"/>
+  <path d="M170 150 Q200 180 230 150" stroke="rgba(255,255,255,0.3)" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M190 130 Q200 150 210 130" fill="rgba(255,255,255,0.2)"/>
+  <text x="200" y="260" font-family="Arial, sans-serif" font-size="14" fill="rgba(255,255,255,0.9)" text-anchor="middle">Hidra Gloss</text>
+</svg>
