@@ -17,6 +17,19 @@ export const auth = betterAuth({
     requireEmailVerification: false
   },
 
+  socialProviders: {
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      scope: [
+        'https://www.googleapis.com/auth/calendar',
+        'https://www.googleapis.com/auth/calendar.events',
+        'https://www.googleapis.com/auth/userinfo.email',
+        'https://www.googleapis.com/auth/userinfo.profile'
+      ] as string[]
+    }
+  },
+
   user: {
     additionalFields: {
       // Nunca aceitos como input do cliente — evitam escalada de privilégio.
