@@ -14,6 +14,8 @@ useSeoMeta({
   ogDescription: 'Alongamento de cílios, lash lifting, sobrancelhas, hidratação labial e mais. Agende agora.',
   ogType: 'website'
 })
+
+const { services } = await import('~/composables/services')
 </script>
 
 <template>
@@ -183,7 +185,3 @@ useSeoMeta({
     </section>
   </div>
 </template>
-
-<script setup lang="ts">
-const { services } = await import('~/composables/services')
-</script>
