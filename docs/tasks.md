@@ -39,3 +39,12 @@
 - [ ] E1 — Desabilitar auto-cadastro público de staff
 - [ ] E9 — Remover páginas de template sem uso (`/inbox`, `/customers`, `/settings/*`)
 - [ ] E9 — Substituir o dashboard de demonstração da rota `/`
+
+## Observabilidade (produção / PRD)
+
+- [x] Middleware de logging estruturado (`server/middleware/logger.ts`)
+- [ ] Health check endpoint (`GET /api/health`)
+- [ ] Tabela `audit_log` para ações críticas (agendamento, bloqueio, serviço, jornada)
+- [ ] Alerta de erros 5xx via coletor de logs da nuvem
+- [ ] Dashboard de métricas operacionais (E9 — Dashboard de Métricas)
+

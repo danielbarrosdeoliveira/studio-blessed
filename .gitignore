@@ -23,6 +23,11 @@ logs
 .env.*
 !.env.example
 
+# Terraform vars (sensíveis)
+terraform.tfvars
+terraform.tfvars.json
+!.terraform.tfvars.example
+
 # Testes
 coverage
 .coverage

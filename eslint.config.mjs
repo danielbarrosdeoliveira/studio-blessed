@@ -2,15 +2,17 @@
 import withNuxt from './.nuxt/eslint.config.mjs'
 import betterTailwindcss from 'eslint-plugin-better-tailwindcss'
 import { getDefaultAttributes } from 'eslint-plugin-better-tailwindcss/api/defaults'
+import eslintConfigPrettier from 'eslint-config-prettier'
 
 export default withNuxt(
   {
     rules: {
       'vue/no-multiple-template-root': 'off',
-      'vue/max-attributes-per-line': ['error', { singleline: 3 }]
+      'vue/max-attributes-per-line': ['error', { singleline: 10 }]
     }
   },
   betterTailwindcss.configs['correctness-error'],
+  eslintConfigPrettier,
   {
     settings: {
       'better-tailwindcss': {
