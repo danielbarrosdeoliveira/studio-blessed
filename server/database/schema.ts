@@ -177,6 +177,27 @@ export const appointment = pgTable('appointment', {
 ])
 
 /* -------------------------------------------------------------------------- */
+/*  Auditoria                                                                  */
+/* -------------------------------------------------------------------------- */
+
+export const auditLog = pgTable('audit_log', {
+  id: id(),
+  action: text('action').notNull(),
+  entity: text('entity').notNull(),
+  entityId: text('entity_id'),
+  userId: text('user_id').references(() => user.id, { onDelete: 'set null' }),
+  userEmail: text('user_email'),
+  metadata: text('metadata'),
+  ipAddress: text('ip_address'),
+  userAgent: text('user_agent'),
+  createdAt: createdAt()
+}, t => [
+  index('audit_log_action_idx').on(t.action),
+  index('audit_log_entity_idx').on(t.entity),
+  index('audit_log_created_idx').on(t.createdAt)
+])
+
+/* -------------------------------------------------------------------------- */
 /*  Tipos                                                                      */
 /* -------------------------------------------------------------------------- */
 
@@ -186,3 +207,4 @@ export type Service = typeof service.$inferSelect
 export type WorkingHours = typeof workingHours.$inferSelect
 export type TimeBlock = typeof timeBlock.$inferSelect
 export type Appointment = typeof appointment.$inferSelect
+export type AuditLog = typeof auditLog.$inferSelect

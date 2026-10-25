@@ -2,6 +2,7 @@ import { and, eq } from 'drizzle-orm'
 import * as z from 'zod'
 import { db } from '../../database'
 import { appointment, service } from '../../database/schema'
+import { writeAuditLog } from '../../utils/audit-log'
 import { serializeStaffAppointment } from '../../utils/appointment-serialization'
 import { findOrCreateClient, getAppointmentById } from '../../utils/appointments'
 import { requireUser } from '../../utils/auth-guard'
@@ -109,6 +110,17 @@ export default defineEventHandler(async (event) => {
   if (!row) {
     throw createError({ statusCode: 500, message: 'Não foi possível carregar o agendamento' })
   }
+
+  await writeAuditLog({
+    action: 'appointment.create',
+    entity: 'appointment',
+    entityId: created.id,
+    userId: current.id,
+    userEmail: current.email,
+    metadata: { serviceId: parsed.data.serviceId, clientPhone: phone, origin: 'staff' },
+    ipAddress: event.node.req.socket?.remoteAddress,
+    userAgent: event.node.req.headers['user-agent']
+  })
 
   setResponseStatus(event, 201)
 

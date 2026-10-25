@@ -4,6 +4,7 @@ import { auth } from '../../lib/auth'
 import { db } from '../../database'
 import { user } from '../../database/schema'
 import { professionalColumns } from '../../utils/professionals'
+import { writeAuditLog } from '../../utils/audit-log'
 
 const bodySchema = z.object({
   name: z.string().trim().min(2, 'Informe o nome').max(120, 'Nome muito longo'),
@@ -42,6 +43,17 @@ export default defineEventHandler(async (event) => {
     .select(professionalColumns)
     .from(user)
     .where(eq(user.id, created.user.id))
+
+  await writeAuditLog({
+    action: 'user.invite',
+    entity: 'user',
+    entityId: created.user.id,
+    userId: current.id,
+    userEmail: current.email,
+    metadata: { invitedEmail: parsed.data.email, role: professional.role },
+    ipAddress: event.node.req.socket?.remoteAddress,
+    userAgent: event.node.req.headers['user-agent']
+  })
 
   setResponseStatus(event, 201)
   return professional

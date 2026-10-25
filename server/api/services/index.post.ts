@@ -4,6 +4,7 @@ import { db } from '../../database'
 import { service } from '../../database/schema'
 import { getProfessionalOr404 } from '../../utils/professionals'
 import { isUniqueViolation, sameServiceName, serviceColumns } from '../../utils/services'
+import { writeAuditLog } from '../../utils/audit-log'
 
 const bodySchema = z.object({
   professionalId: z.string().min(1).optional(),
@@ -71,6 +72,17 @@ export default defineEventHandler(async (event) => {
     })
 
   const [created] = rows
+
+  await writeAuditLog({
+    action: 'service.create',
+    entity: 'service',
+    entityId: created.id,
+    userId: current.id,
+    userEmail: current.email,
+    metadata: { name: parsed.data.name, professionalId },
+    ipAddress: event.node.req.socket?.remoteAddress,
+    userAgent: event.node.req.headers['user-agent']
+  })
 
   setResponseStatus(event, 201)
   return created

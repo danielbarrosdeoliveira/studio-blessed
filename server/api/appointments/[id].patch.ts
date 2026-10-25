@@ -9,6 +9,7 @@ import {
 import { serializeStaffAppointment } from '../../utils/appointment-serialization'
 import { getAppointmentById } from '../../utils/appointments'
 import { requireUser } from '../../utils/auth-guard'
+import { writeAuditLog } from '../../utils/audit-log'
 
 const bodySchema = z.discriminatedUnion('action', [
   z.object({
@@ -61,6 +62,17 @@ export default defineEventHandler(async (event) => {
       .update(appointment)
       .set({ status: 'cancelled', updatedAt: new Date() })
       .where(eq(appointment.id, id))
+
+    await writeAuditLog({
+      action: 'appointment.cancel',
+      entity: 'appointment',
+      entityId: id,
+      userId: current.id,
+      userEmail: current.email,
+      metadata: { previousStatus: existing.status },
+      ipAddress: event.node.req.socket?.remoteAddress,
+      userAgent: event.node.req.headers['user-agent']
+    })
   } else {
     if (parsed.data.status === existing.status) {
       throw createError({ statusCode: 409, message: 'O agendamento já está com este status' })
@@ -77,6 +89,17 @@ export default defineEventHandler(async (event) => {
       .update(appointment)
       .set({ status: parsed.data.status, updatedAt: new Date() })
       .where(eq(appointment.id, id))
+
+    await writeAuditLog({
+      action: `appointment.${parsed.data.status}`,
+      entity: 'appointment',
+      entityId: id,
+      userId: current.id,
+      userEmail: current.email,
+      metadata: { previousStatus: existing.status, newStatus: parsed.data.status },
+      ipAddress: event.node.req.socket?.remoteAddress,
+      userAgent: event.node.req.headers['user-agent']
+    })
   }
 
   const updated = await getAppointmentById(id)
