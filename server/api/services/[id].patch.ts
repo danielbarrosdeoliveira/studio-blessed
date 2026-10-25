@@ -3,6 +3,7 @@ import * as z from 'zod'
 import { db } from '../../database'
 import { service } from '../../database/schema'
 import { isUniqueViolation, requireServiceAccess, sameServiceName, serviceColumns } from '../../utils/services'
+import { writeAuditLog } from '../../utils/audit-log'
 
 const bodySchema = z.object({
   name: z.string().trim().min(2, 'Informe o nome').max(120, 'Nome muito longo').optional(),
@@ -63,6 +64,17 @@ export default defineEventHandler(async (event) => {
     })
 
   const [updated] = rows
+
+  await writeAuditLog({
+    action: 'service.update',
+    entity: 'service',
+    entityId: id,
+    userId: existing.professionalId,
+    userEmail: existing.professionalEmail,
+    metadata: { changes: parsed.data },
+    ipAddress: event.node.req.socket?.remoteAddress,
+    userAgent: event.node.req.headers['user-agent']
+  })
 
   return updated
 })
