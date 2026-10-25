@@ -13,6 +13,7 @@ const bodySchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
+  const current = await requireUser(event)
   await requireAdmin(event)
 
   const body = await readBody(event)
@@ -43,6 +44,11 @@ export default defineEventHandler(async (event) => {
     .select(professionalColumns)
     .from(user)
     .where(eq(user.id, created.user.id))
+    .limit(1)
+
+  if (!professional) {
+    throw createError({ statusCode: 500, message: 'Não foi possível criar a profissional' })
+  }
 
   await writeAuditLog({
     action: 'user.invite',
@@ -55,6 +61,5 @@ export default defineEventHandler(async (event) => {
     userAgent: event.node.req.headers['user-agent']
   })
 
-  setResponseStatus(event, 201)
   return professional
 })

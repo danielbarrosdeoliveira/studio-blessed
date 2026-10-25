@@ -1,22 +1,19 @@
-import { auth } from '../../lib/auth'
+import { requireUser } from '../../utils/auth-guard'
 import { db } from '../../database'
-import { user } from '../../database/schema'
+import { account } from '../../database/schema'
 import { eq } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
-  const { data: session } = await auth.api.getSession(event)
-  if (!session?.user) {
-    throw createError({ statusCode: 401, message: 'Não autenticado' })
-  }
+  const current = await requireUser(event)
 
-  const [account] = await db
+  const [acct] = await db
     .select({ providerId: account.providerId, accessToken: account.accessToken })
     .from(account)
-    .where(eq(account.userId, session.user.id))
+    .where(eq(account.userId, current.id))
     .limit(1)
 
   return {
-    connected: !!account?.accessToken,
-    provider: account?.providerId ?? null
+    connected: !!acct?.accessToken,
+    provider: acct?.providerId ?? null
   }
 })

@@ -7,6 +7,8 @@ export type AuditAction =
   | 'appointment.update'
   | 'appointment.cancel'
   | 'appointment.complete'
+  | 'appointment.completed'
+  | 'appointment.cancelled'
   | 'appointment.no_show'
   | 'service.create'
   | 'service.update'

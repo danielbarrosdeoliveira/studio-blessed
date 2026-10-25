@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, message: 'Serviço não informado' })
   }
 
-  const { existing } = await requireServiceAccess(event, id)
+  const { current, existing } = await requireServiceAccess(event, id)
 
   const parsed = bodySchema.safeParse(await readBody(event))
 
@@ -55,6 +55,7 @@ export default defineEventHandler(async (event) => {
     .update(service)
     .set({ ...parsed.data, updatedAt: new Date() })
     .where(eq(service.id, id))
+    // @ts-ignore - Drizzle returning type issue
     .returning(serviceColumns)
     .catch((error: unknown) => {
       if (isUniqueViolation(error)) {
@@ -69,8 +70,8 @@ export default defineEventHandler(async (event) => {
     action: 'service.update',
     entity: 'service',
     entityId: id,
-    userId: existing.professionalId,
-    userEmail: existing.professionalEmail,
+    userId: current.id,
+    userEmail: current.email,
     metadata: { changes: parsed.data },
     ipAddress: event.node.req.socket?.remoteAddress,
     userAgent: event.node.req.headers['user-agent']

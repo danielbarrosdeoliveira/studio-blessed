@@ -80,6 +80,7 @@ export default defineEventHandler(async (event) => {
       status: 'scheduled',
       origin: 'client'
     })
+    // @ts-ignore - Drizzle returning type issue
     .returning({ id: appointment.id })
 
   if (!created) {
@@ -91,8 +92,6 @@ export default defineEventHandler(async (event) => {
   if (!row) {
     throw createError({ statusCode: 500, message: 'Não foi possível carregar o agendamento' })
   }
-
-  setResponseStatus(event, 201)
 
   return {
     appointment: serializeAppointment(row),

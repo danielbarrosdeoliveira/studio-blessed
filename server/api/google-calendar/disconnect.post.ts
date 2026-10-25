@@ -1,22 +1,19 @@
-import { auth } from '../../lib/auth'
+import { requireUser } from '../../utils/auth-guard'
 import { db } from '../../database'
-import { account } from '../../database/schema'
+import { account, user } from '../../database/schema'
 import { eq } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
-  const { data: session } = await auth.api.getSession(event)
-  if (!session?.user) {
-    throw createError({ statusCode: 401, message: 'Não autenticado' })
-  }
+  const current = await requireUser(event)
 
   await db
     .delete(account)
-    .where(eq(account.userId, session.user.id))
+    .where(eq(account.userId, current.id))
 
   await db
     .update(user)
     .set({ agendaProvider: 'internal' })
-    .where(eq(user.id, session.user.id))
+    .where(eq(user.id, current.id))
 
   return { ok: true }
 })

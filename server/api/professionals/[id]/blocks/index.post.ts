@@ -126,8 +126,6 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 500, message: 'Não foi possível salvar o bloqueio' })
   }
 
-  setResponseStatus(event, 201)
-
   return {
     block: serializeTimeBlock(created),
     conflicts

@@ -63,6 +63,7 @@ export default defineEventHandler(async (event) => {
       priceCents: parsed.data.priceCents,
       active: parsed.data.active
     })
+    // @ts-ignore - Drizzle returning type issue
     .returning(serviceColumns)
     .catch((error: unknown) => {
       if (isUniqueViolation(error)) {
@@ -72,6 +73,10 @@ export default defineEventHandler(async (event) => {
     })
 
   const [created] = rows
+
+  if (!created) {
+    throw createError({ statusCode: 500, message: 'Não foi possível criar o serviço' })
+  }
 
   await writeAuditLog({
     action: 'service.create',
@@ -84,6 +89,5 @@ export default defineEventHandler(async (event) => {
     userAgent: event.node.req.headers['user-agent']
   })
 
-  setResponseStatus(event, 201)
   return created
 })
