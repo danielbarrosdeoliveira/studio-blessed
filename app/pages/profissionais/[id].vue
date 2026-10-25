@@ -6,6 +6,7 @@ import type {
   TimeBlockResponse,
   WorkingHour
 } from '~/types/domain'
+import { CalendarDate } from '@internationalized/date'
 import {
   formatInstantLong,
   formatInstantTime,
@@ -181,6 +182,23 @@ const blockForm = reactive({
   end: '13:00',
   reason: '',
   weekly: false
+})
+
+const todayCalendarDate = computed(() => {
+  const parts = today.split('-')
+  return new CalendarDate(Number(parts[0]), Number(parts[1]), Number(parts[2]))
+})
+
+const blockCalendarDate = computed<CalendarDate | undefined>({
+  get: () => {
+    const parts = blockForm.date.split('-')
+    return new CalendarDate(Number(parts[0]), Number(parts[1]), Number(parts[2]))
+  },
+  set: (value: CalendarDate | undefined) => {
+    blockForm.date = value
+      ? `${value.year}-${String(value.month).padStart(2, '0')}-${String(value.day).padStart(2, '0')}`
+      : today
+  }
 })
 
 const blockList = computed(() => [...(blocks.value ?? [])].sort(
@@ -537,10 +555,9 @@ const backTo = computed(() => isAdmin.value ? '/profissionais' : '/')
             : 'Data única do bloqueio.'"
           required
         >
-          <UInput
-            v-model="blockForm.date"
-            type="date"
-            :min="today"
+          <UCalendar
+            v-model="blockCalendarDate"
+            :min-value="todayCalendarDate"
             class="w-full"
           />
         </UFormField>

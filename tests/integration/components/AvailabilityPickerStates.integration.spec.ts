@@ -1,6 +1,7 @@
 import { flushPromises } from '@vue/test-utils'
 import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { CalendarDate } from '@internationalized/date'
 import AvailabilityPicker from '~/components/AvailabilityPicker.vue'
 
 const { fetchMock } = vi.hoisted(() => ({ fetchMock: vi.fn() }))
@@ -70,9 +71,12 @@ describe('AvailabilityPicker — estados', () => {
 
     await flushPromises()
 
-    const input = wrapper.find('input[type="date"]')
+    const min = (wrapper.vm as unknown as { minCalendarDate: CalendarDate })
+      .minCalendarDate
 
-    expect(input.attributes('min')).toBe('2026-10-29')
+    expect(min.year).toBe(2026)
+    expect(min.month).toBe(10)
+    expect(min.day).toBe(29)
   })
 
   it('limpa o slot selecionado quando ele some da nova data', async () => {
@@ -88,7 +92,11 @@ describe('AvailabilityPicker — estados', () => {
     await slot!.trigger('click')
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([slotA.startsAt])
 
-    await wrapper.find('input[type="date"]').setValue('2026-10-30')
+    ;(wrapper.vm as unknown as { calendarDate: CalendarDate }).calendarDate = new CalendarDate(
+      2026,
+      10,
+      30
+    )
     await flushPromises()
 
     expect(wrapper.emitted('update:modelValue')?.[1]).toEqual([null])

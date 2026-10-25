@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { PublicAvailability } from '~/types/domain'
+import { CalendarDate } from '@internationalized/date'
 import { addDaysToIsoDate, formatIsoDateLong, todayInTimeZone } from '~/utils/date'
 import { getApiErrorMessage } from '~/utils/error'
 
@@ -35,6 +36,23 @@ const minSelectableDate = computed(() => {
   const clientMin = addDaysToIsoDate(todayInTimeZone(), 3)
 
   return props.minDate > clientMin ? props.minDate : clientMin
+})
+
+const calendarDate = computed<CalendarDate | undefined>({
+  get: () => {
+    const parts = selectedDate.value.split('-')
+    return new CalendarDate(Number(parts[0]), Number(parts[1]), Number(parts[2]))
+  },
+  set: (value: CalendarDate | undefined) => {
+    if (value) {
+      selectedDate.value = `${value.year}-${String(value.month).padStart(2, '0')}-${String(value.day).padStart(2, '0')}`
+    }
+  }
+})
+
+const minCalendarDate = computed(() => {
+  const parts = minSelectableDate.value.split('-')
+  return new CalendarDate(Number(parts[0]), Number(parts[1]), Number(parts[2]))
 })
 
 async function load() {
@@ -97,10 +115,9 @@ watch(
       :label="label ?? 'Escolha a data'"
       :help="`Horários no fuso de São Paulo`"
     >
-      <UInput
-        v-model="selectedDate"
-        type="date"
-        :min="minSelectableDate"
+      <UCalendar
+        v-model="calendarDate"
+        :min-value="minCalendarDate"
         class="w-full"
       />
     </UFormField>
