@@ -1,7 +1,7 @@
 import { authClient } from '~/lib/auth-client'
 
 /** Rotas acessíveis sem autenticação. */
-const PUBLIC_PATHS = ['/login', '/agendamento', '/agendar', '/meus-agendamentos']
+const PUBLIC_PATHS = ['/', '/login', '/agendamento', '/agendar', '/meus-agendamentos']
 
 function isPublic(path: string) {
   return PUBLIC_PATHS.some(publicPath =>
