@@ -10,7 +10,7 @@ on:
 
 jobs:
   test:
-    name: Testes, Lint e Typecheck
+    name: Testes, Lint, Typecheck e Cobertura
     runs-on: ubuntu-latest
 
     services:
@@ -41,8 +41,16 @@ jobs:
           node-version: 24
           cache: pnpm
 
-      - name: Instalar dependências
+      - name: Instalar dependências do projeto
         run: pnpm install --frozen-lockfile
+
+      - name: Instalar dependências do sistema (Playwright)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libgbm1 libgtk-3-0 libpango-1.0-0 libxcomposite1 libxdamage1 libxfixes6 libxkbcommon0 libxrandr2 xvfb
+
+      - name: Instalar navegador Playwright
+        run: pnpm exec playwright install --with-deps chromium
 
       - name: Lint
         run: pnpm lint
@@ -50,14 +58,18 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+      - name: Build de produção
+        run: pnpm build
+
       - name: Gerar migrations (dry-run)
         env:
           DATABASE_URL: postgres://studio:studio@localhost:5432/studio_blessed_test
         run: pnpm db:generate
 
-      - name: Testes unitários + integração
+      - name: Cobertura completa (unit + integração + E2E)
         env:
           DATABASE_URL: postgres://studio:studio@localhost:5432/studio_blessed_test
           BETTER_AUTH_SECRET: test-secret-do-not-use-in-production
           BETTER_AUTH_URL: http://localhost:3000
-        run: pnpm test
+          NODE_ENV: test
+        run: pnpm test:coverage
