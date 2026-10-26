@@ -1,12 +1,12 @@
 <template>
-  <section id="gallery" class="py-20 md:py-28 bg-white">
+  <section id="gallery" class="py-20 md:py-28 bg-bg">
     <div class="max-w-[1400px] mx-auto px-8 lg:px-12">
       <div class="text-center mb-16 space-y-2">
-        <span class="font-sans text-xs uppercase tracking-[0.2em] text-[#10b981] font-semibold">Galeria</span>
-        <h2 class="font-serif text-4xl md:text-5xl text-[#0f172a] leading-tight">
+        <span class="font-sans text-xs uppercase tracking-[0.2em] text-primary font-semibold">Galeria</span>
+        <h2 class="font-serif text-4xl md:text-5xl text-primary-foreground leading-tight">
           Nossos Trabalhos
         </h2>
-        <p class="font-sans text-[#f59e0b] text-base italic max-w-xl mx-auto">
+        <p class="font-sans text-muted-foreground text-base italic max-w-xl mx-auto">
           Resultados que falam por si.
         </p>
       </div>
@@ -18,8 +18,8 @@
           @click="selectedCategory = cat"
           class="px-6 py-2 rounded-full text-sm font-medium transition-all duration-300"
           :class="selectedCategory === cat
-            ? 'bg-[#0f172a] text-white'
-            : 'bg-[#f59e0b]/10 text-[#f59e0b] hover:bg-[#f59e0b]/20'"
+            ? 'bg-primary text-primary-foreground'
+            : 'bg-muted text-muted-foreground hover:bg-muted/50'"
         >
           {{ cat }}
         </button>

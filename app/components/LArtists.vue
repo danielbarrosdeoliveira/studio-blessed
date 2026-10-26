@@ -1,13 +1,13 @@
 <template>
-  <section id="artists" class="py-20 md:py-28 bg-[#f59e0b]/10">
+  <section id="artists" class="py-20 md:py-28 bg-muted">
     <div class="max-w-[1400px] mx-auto px-8 lg:px-12">
       <div class="flex flex-col lg:flex-row lg:items-end justify-between mb-16 gap-6">
         <div>
-          <span class="font-sans text-xs uppercase tracking-[0.2em] text-[#10b981] font-semibold">03 / Profissionais</span>
-          <h2 class="font-serif text-4xl md:text-5xl text-[#0f172a] mt-3 leading-tight">
+          <span class="font-sans text-xs uppercase tracking-[0.2em] text-primary font-semibold">03 / Profissionais</span>
+          <h2 class="font-serif text-4xl md:text-5xl text-primary-foreground mt-3 leading-tight">
             Nossa Equipe
           </h2>
-          <p class="font-sans text-[#f59e0b] text-base mt-4 max-w-lg">
+          <p class="font-sans text-muted-foreground text-base mt-4 max-w-lg">
             Conheça as profissionais que fazem do Studio Blessed um espaço único de beleza e cuidado.
           </p>
         </div>
@@ -19,19 +19,19 @@
           :key="member.name"
           class="group"
         >
-          <div class="overflow-hidden rounded-lg bg-[#f59e0b]/20 mb-5">
+          <div class="overflow-hidden rounded-lg bg-bg/50 mb-5">
             <img
               :src="member.image"
               :alt="member.name"
               class="w-full aspect-[3/4] object-cover group-hover:scale-105 transition-transform duration-700"
             />
           </div>
-          <h3 class="font-sans text-sm uppercase tracking-[0.15em] text-[#0f172a] font-bold">
+          <h3 class="font-sans text-sm uppercase tracking-[0.15em] text-primary-foreground font-bold">
             {{ member.role }}
           </h3>
-          <p class="font-serif text-xl text-[#0f172a] mt-1">
+          <p class="font-serif text-xl text-primary-foreground mt-1">
             <template v-if="member.link">
-              <a :href="member.link" target="_blank" rel="noopener noreferrer" class="hover:text-[#10b981] transition-colors">
+              <a :href="member.link" target="_blank" rel="noopener noreferrer" class="hover:text-primary transition-colors">
                 {{ member.name }}
               </a>
             </template>
@@ -39,7 +39,7 @@
               {{ member.name }}
             </template>
           </p>
-          <p class="font-sans text-sm text-[#f59e0b] mt-3 leading-relaxed">
+          <p class="font-sans text-sm text-muted-foreground mt-3 leading-relaxed">
             {{ member.description }}
           </p>
         </div>

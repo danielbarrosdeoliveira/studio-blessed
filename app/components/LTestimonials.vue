@@ -1,12 +1,12 @@
 <template>
-  <section id="testimonials" class="py-20 md:py-28 bg-white">
+  <section id="testimonials" class="py-20 md:py-28 bg-bg">
     <div class="max-w-[1400px] mx-auto px-8 lg:px-12">
       <div class="text-center mb-16 space-y-2">
-        <span class="font-sans text-xs uppercase tracking-[0.2em] text-[#10b981] font-semibold">Depoimentos</span>
-        <h2 class="font-serif text-4xl md:text-5xl text-[#0f172a] leading-tight">
+        <span class="font-sans text-xs uppercase tracking-[0.2em] text-primary font-semibold">Depoimentos</span>
+        <h2 class="font-serif text-4xl md:text-5xl text-primary-foreground leading-tight">
           O que nossas clientes dizem
         </h2>
-        <p class="font-sans text-[#f59e0b] text-base italic max-w-xl mx-auto">
+        <p class="font-sans text-muted-foreground text-base italic max-w-xl mx-auto">
           A satisfação de quem vive a experiência Studio Blessed.
         </p>
       </div>
@@ -16,22 +16,22 @@
           <div class="flex" :class="{ 'transition-transform duration-500 ease-in-out': transitionEnabled }"
             :style="{ transform: `translateX(-${currentIndex * 100}%)` }">
             <div v-for="(depo, i) in displayItems" :key="i" class="min-w-full md:min-w-[50%] px-3">
-              <div class="bg-white border border-[#f59e0b]/30 rounded-xl p-8 h-full shadow-sm flex flex-col">
-                <Icon icon="lucide:quote" class="w-8 h-8 text-[#10b981]/20 mb-4" />
-                <p class="font-sans text-[#f59e0b] italic leading-relaxed mb-6">
+              <div class="bg-bg border border-border rounded-xl p-8 h-full shadow-sm flex flex-col">
+                <Icon icon="lucide:quote" class="w-8 h-8 text-primary/20 mb-4" />
+                <p class="font-sans text-muted-foreground italic leading-relaxed mb-6">
                   "{{ depo.text }}"
                 </p>
                 <div class="flex items-center gap-3 mt-auto">
                   <img v-if="depo.photo" :src="depo.photo" :alt="depo.name"
                     class="w-10 h-10 rounded-full object-cover" />
                   <div v-else
-                    class="w-10 h-10 rounded-full bg-[#f59e0b]/30 flex items-center justify-center font-serif font-bold text-[#10b981]">
+                    class="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center font-serif font-bold text-primary">
                     {{ depo.name.charAt(0) }}
                   </div>
                   <div>
-                    <p class="font-sans font-semibold text-[#0f172a] text-sm">{{ depo.name }}</p>
+                    <p class="font-sans font-semibold text-primary-foreground text-sm">{{ depo.name }}</p>
                     <div class="flex gap-0.5">
-                      <span v-for="s in depo.rating" :key="s" class="text-[#10b981] text-xs">★</span>
+                      <span v-for="s in depo.rating" :key="s" class="text-primary text-xs">★</span>
                     </div>
                   </div>
                 </div>
@@ -41,12 +41,12 @@
         </div>
 
         <button
-          class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-10 h-10 rounded-full bg-white border border-[#f59e0b]/50 shadow-md flex items-center justify-center text-[#0f172a] hover:text-[#10b981] transition-all duration-300"
+          class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-10 h-10 rounded-full bg-bg border border-border shadow-md flex items-center justify-center text-primary-foreground hover:text-primary transition-all duration-300"
           @click="prev">
           <Icon icon="lucide:chevron-left" class="w-5 h-5" />
         </button>
         <button
-          class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 w-10 h-10 rounded-full bg-white border border-[#f59e0b]/50 shadow-md flex items-center justify-center text-[#0f172a] hover:text-[#10b981] transition-all duration-300"
+          class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 w-10 h-10 rounded-full bg-bg border border-border shadow-md flex items-center justify-center text-primary-foreground hover:text-primary transition-all duration-300"
           @click="next">
           <Icon icon="lucide:chevron-right" class="w-5 h-5" />
         </button>
