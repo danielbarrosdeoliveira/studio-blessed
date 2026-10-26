@@ -13,7 +13,7 @@
         <ul class="space-y-2">
           <li v-for="link in studioLinks" :key="link.label">
             <a :href="link.href"
-              class="font-sans text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors duration-300">
+              class="font-sans text-sm text-primary-foreground/80 hover:text-primary-foreground transition-colors duration-300">
               {{ link.label }}
             </a>
           </li>
@@ -24,7 +24,7 @@
         <h4 class="font-sans text-xs uppercase tracking-[0.15em] text-primary font-semibold">Serviços</h4>
         <ul class="space-y-2">
           <li v-for="servico in servicos" :key="servico">
-            <span class="font-sans text-sm text-primary-foreground/70">{{ servico }}</span>
+            <span class="font-sans text-sm text-primary-foreground/80">{{ servico }}</span>
           </li>
         </ul>
       </div>
@@ -33,18 +33,18 @@
         <h3 class="font-sans text-xs uppercase tracking-[0.15em] text-primary font-semibold mb-8">Horários</h3>
         <div class="space-y-4 font-sans text-sm">
           <div class="flex justify-between border-b border-primary-foreground/30 pb-3">
-            <span class="text-primary-foreground/70">Seg a Sex</span>
-            <span class="text-primary-foreground/70 font-medium">08h às 18h</span>
+            <span class="text-primary-foreground/80">Seg a Sex</span>
+            <span class="text-primary-foreground/80 font-medium">08h às 18h</span>
           </div>
           <div class="flex justify-between border-b border-primary-foreground/30 pb-3">
-            <span class="text-primary-foreground/70">Sábado</span>
-            <span class="text-primary-foreground/70 font-medium">08h às 15h</span>
+            <span class="text-primary-foreground/80">Sábado</span>
+            <span class="text-primary-foreground/80 font-medium">08h às 15h</span>
           </div>
           <div class="flex justify-between">
-            <span class="text-primary-foreground/70 italic">Domingo</span>
-            <span class="text-primary-foreground/70 font-bold uppercase tracking-tighter">Fechado</span>
+            <span class="text-primary-foreground/80 italic">Domingo</span>
+            <span class="text-primary-foreground/80 font-bold uppercase tracking-tighter">Fechado</span>
           </div>
-          <p class="text-[10px] text-primary-foreground/50 pt-3 uppercase tracking-[0.2em] italic">
+          <p class="text-[10px] text-primary-foreground/60 pt-3 uppercase tracking-[0.2em] italic">
             *Atendemos somente com agendamento prévio.
           </p>
         </div>
@@ -62,8 +62,8 @@
       </div>
     </div>
 
-    <div class="border-t border-primary-foreground/10 pt-8 text-center">
-      <p class="font-sans text-[10px] tracking-[0.3em] text-primary-foreground/50 uppercase">
+    <div class="border-t border-primary-foreground/20 pt-8 text-center">
+      <p class="font-sans text-[10px] tracking-[0.3em] text-primary-foreground/70 uppercase">
         &copy; 2026 Studio Blessed. Todos os direitos reservados.
       </p>
     </div>

@@ -8,7 +8,7 @@
             Nossa Essência
           </h2>
         </div>
-        <p class="font-sans text-muted-foreground text-base leading-relaxed max-w-xl lg:text-right">
+        <p class="font-sans text-primary-foreground/80 text-base leading-relaxed max-w-xl lg:text-right">
           No Studio Blessed, cada detalhe é pensado para oferecer uma experiência única de beleza e bem-estar.
           Nossos pilares refletem o compromisso com a excelência.
         </p>

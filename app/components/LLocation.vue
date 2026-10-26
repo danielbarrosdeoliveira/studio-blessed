@@ -3,10 +3,10 @@
     <div class="max-w-[1400px] mx-auto px-8 lg:px-12">
       <div class="text-center mb-16 space-y-2">
         <span class="font-sans text-xs uppercase tracking-[0.2em] text-primary font-semibold">Localização</span>
-        <h2 class="font-serif text-4xl md:text-5xl text-primary-foreground leading-tight">
+        <h2 class="font-serif text-4xl md:text-5xl text-neutral-100 leading-tight">
           Onde Estamos
         </h2>
-        <p class="font-sans text-muted-foreground text-base italic max-w-xl mx-auto">
+        <p class="font-sans text-neutral-300 text-base italic max-w-xl mx-auto">
           Estamos localizados no coração do Parque Viana, em Barueri.
         </p>
       </div>
@@ -22,12 +22,12 @@
         <div class="space-y-8">
           <div class="flex items-center gap-4">
             <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-              <Icon icon="lucide:phone" class="w-5 h-5 text-primary" />
+              <Icon icon="lucide:phone" class="w-5 h-5 text-primary-400" />
             </div>
             <div>
-              <p class="font-sans text-xs uppercase tracking-wider text-muted-foreground/60">Telefone</p>
+              <p class="font-sans text-xs uppercase tracking-wider text-neutral-400/60">Telefone</p>
               <a href="tel:+5511988880015"
-                class="font-sans text-base text-primary-foreground hover:text-primary transition-colors">
+                class="font-sans text-base text-neutral-100 hover:text-primary-400 transition-colors">
                 (11) 98888-0015
               </a>
             </div>
@@ -35,12 +35,12 @@
 
           <div class="flex items-center gap-4">
             <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-              <Icon icon="lucide:mail" class="w-5 h-5 text-primary" />
+              <Icon icon="lucide:mail" class="w-5 h-5 text-primary-400" />
             </div>
             <div>
-              <p class="font-sans text-xs uppercase tracking-wider text-muted-foreground/60">E-mail</p>
+              <p class="font-sans text-xs uppercase tracking-wider text-neutral-400/60">E-mail</p>
               <a href="mailto:contato@blessedstudio.com.br"
-                class="font-sans text-base text-primary-foreground hover:text-primary transition-colors">
+                class="font-sans text-base text-neutral-100 hover:text-primary-400 transition-colors">
                 contato@blessedstudio.com.br
               </a>
             </div>
@@ -48,11 +48,11 @@
 
           <div class="flex items-start gap-4">
             <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-              <Icon icon="lucide:map-pin" class="w-5 h-5 text-primary" />
+              <Icon icon="lucide:map-pin" class="w-5 h-5 text-primary-400" />
             </div>
             <div>
-              <p class="font-sans text-xs uppercase tracking-wider text-muted-foreground/60">Endereço</p>
-              <p class="font-sans text-base text-primary-foreground">
+              <p class="font-sans text-xs uppercase tracking-wider text-neutral-400/60">Endereço</p>
+              <p class="font-sans text-base text-neutral-100">
                 R. Imbauva, 20 - Pq. Viana, Sala 3<br>
                 Barueri-SP
               </p>

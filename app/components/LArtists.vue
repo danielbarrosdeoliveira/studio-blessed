@@ -26,12 +26,12 @@
               class="w-full aspect-[3/4] object-cover group-hover:scale-105 transition-transform duration-700"
             />
           </div>
-          <h3 class="font-sans text-sm uppercase tracking-[0.15em] text-primary-foreground font-bold">
+          <h3 class="font-sans text-sm uppercase tracking-[0.15em] text-primary-400 font-bold">
             {{ member.role }}
           </h3>
-          <p class="font-serif text-xl text-primary-foreground mt-1">
+          <p class="font-serif text-xl text-neutral-100 mt-1">
             <template v-if="member.link">
-              <a :href="member.link" target="_blank" rel="noopener noreferrer" class="hover:text-primary transition-colors">
+              <a :href="member.link" target="_blank" rel="noopener noreferrer" class="hover:text-primary-400 transition-colors">
                 {{ member.name }}
               </a>
             </template>
@@ -39,7 +39,7 @@
               {{ member.name }}
             </template>
           </p>
-          <p class="font-sans text-sm text-muted-foreground mt-3 leading-relaxed">
+          <p class="font-sans text-sm text-neutral-300 mt-3 leading-relaxed">
             {{ member.description }}
           </p>
         </div>

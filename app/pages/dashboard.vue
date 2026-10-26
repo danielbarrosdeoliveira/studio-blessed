@@ -25,7 +25,7 @@ const period = ref<Period>('daily')
 <template>
   <UDashboardPanel id="home">
     <template #header>
-      <UDashboardNavbar title="Dashboard" :ui="{ right: 'gap-3' }">
+      <UDashboardNavbar title="Dashboard" :ui="{ right: 'gap-3', left: 'text-neutral-900 dark:text-neutral-100' }">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>

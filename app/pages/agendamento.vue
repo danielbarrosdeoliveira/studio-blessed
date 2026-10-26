@@ -343,34 +343,34 @@ function bookAnother() {
 
           <dl class="space-y-3 text-sm">
             <div class="flex justify-between gap-4">
-              <dt class="text-muted">
+              <dt class="text-neutral-500 dark:text-neutral-400">
                 Serviço
               </dt>
-              <dd class="text-right font-medium text-highlighted">
+              <dd class="text-right font-medium text-neutral-100">
                 {{ selectedService.group.name }}
               </dd>
             </div>
             <div class="flex justify-between gap-4">
-              <dt class="text-muted">
+              <dt class="text-neutral-500 dark:text-neutral-400">
                 Profissional
               </dt>
-              <dd class="text-right font-medium text-highlighted">
+              <dd class="text-right font-medium text-neutral-100">
                 {{ selectedService.professional.name }}
               </dd>
             </div>
             <div class="flex justify-between gap-4">
-              <dt class="text-muted">
+              <dt class="text-neutral-500 dark:text-neutral-400">
                 Duração
               </dt>
-              <dd class="text-right font-medium text-highlighted">
+              <dd class="text-right font-medium text-neutral-100">
                 {{ selectedService.professional.durationMin }} min
               </dd>
             </div>
             <div class="flex justify-between gap-4">
-              <dt class="text-muted">
+              <dt class="text-neutral-500 dark:text-neutral-400">
                 Preço
               </dt>
-              <dd class="text-right font-medium text-highlighted">
+              <dd class="text-right font-medium text-neutral-100">
                 {{ formatPrice(selectedService.professional.priceCents) }}
               </dd>
             </div>
@@ -378,10 +378,10 @@ function bookAnother() {
               v-if="selectedSlot"
               class="flex justify-between gap-4"
             >
-              <dt class="text-muted">
+              <dt class="text-neutral-500 dark:text-neutral-400">
                 Horário
               </dt>
-              <dd class="text-right font-medium text-highlighted">
+              <dd class="text-right font-medium text-neutral-100">
                 {{ formatInstantLong(selectedSlot) }}
               </dd>
             </div>
@@ -413,10 +413,10 @@ function bookAnother() {
             @submit.prevent="submit"
           >
             <div class="rounded-lg border border-default px-3 py-2 text-sm">
-              <p class="text-muted">
+              <p class="text-neutral-500 dark:text-neutral-400">
                 Horário selecionado
               </p>
-              <p class="font-medium text-highlighted">
+              <p class="font-medium text-highlighted dark:text-neutral-100">
                 {{ formatInstantLong(selectedSlot) }}
               </p>
             </div>
@@ -424,12 +424,13 @@ function bookAnother() {
             <UFormField
               label="Nome"
               required
+              class="label-container"
             >
               <UInput
                 v-model="form.name"
                 placeholder="Como devemos te chamar?"
                 autocomplete="name"
-                class="w-full"
+                class="w-full dark:text-white dark:placeholder-neutral-500"
               />
             </UFormField>
 
@@ -443,7 +444,7 @@ function bookAnother() {
                 type="tel"
                 placeholder="(11) 99999-9999"
                 autocomplete="tel"
-                class="w-full"
+                class="w-full dark:text-white dark:placeholder-neutral-500"
               />
               <p
                 v-if="form.phone && !phoneValid"
@@ -557,34 +558,34 @@ function bookAnother() {
 
       <dl class="mt-6 space-y-3 text-sm">
         <div class="flex justify-between gap-4">
-          <dt class="text-muted">
+          <dt class="text-neutral-500 dark:text-neutral-400">
             Serviço
           </dt>
-          <dd class="text-right font-medium text-highlighted">
+          <dd class="text-right font-medium text-neutral-100">
             {{ created.serviceName }}
           </dd>
         </div>
         <div class="flex justify-between gap-4">
-          <dt class="text-muted">
+          <dt class="text-neutral-500 dark:text-neutral-400">
             Profissional
           </dt>
-          <dd class="text-right font-medium text-highlighted">
+          <dd class="text-right font-medium text-neutral-100">
             {{ created.professionalName }}
           </dd>
         </div>
         <div class="flex justify-between gap-4">
-          <dt class="text-muted">
+          <dt class="text-neutral-500 dark:text-neutral-400">
             Data e horário
           </dt>
-          <dd class="text-right font-medium text-highlighted">
+          <dd class="text-right font-medium text-neutral-100">
             {{ formatInstantLong(created.startsAt) }}
           </dd>
         </div>
         <div class="flex justify-between gap-4">
-          <dt class="text-muted">
+          <dt class="text-neutral-500 dark:text-neutral-400">
             Nome
           </dt>
-          <dd class="text-right font-medium text-highlighted">
+          <dd class="text-right font-medium text-neutral-100">
             {{ created.clientName }}
           </dd>
         </div>

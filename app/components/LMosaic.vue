@@ -28,7 +28,7 @@
           <h2 class="font-serif text-4xl md:text-5xl text-primary-foreground leading-tight">
             Um espaço feito para você
           </h2>
-          <div class="space-y-5 font-sans text-muted-foreground text-base leading-relaxed">
+          <div class="space-y-5 font-sans text-primary-foreground/80 text-base leading-relaxed">
             <p class="indent-8">
               A história do Studio Blessed é, acima de tudo, uma jornada de resiliência. O sonho
               começou na sala da casa da mãe de <strong class="text-primary-foreground">Caroline</strong>,
