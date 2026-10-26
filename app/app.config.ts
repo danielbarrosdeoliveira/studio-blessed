@@ -1,14 +1,8 @@
 export default defineAppConfig({
   ui: {
     colors: {
-      primary: 'emerald',
-      secondary: 'zinc',
-      accent: 'emerald',
-      info: 'blue',
-      success: 'emerald',
-      warning: 'amber',
-      error: 'rose',
-      neutral: 'zinc'
+      primary: 'orange',
+      neutral: 'neutral'
     },
     icons: {
       arrowDown: 'i-ri-arrow-down-line',
