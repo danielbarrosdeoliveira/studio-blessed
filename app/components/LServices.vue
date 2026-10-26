@@ -16,14 +16,14 @@
           <div class="w-14 h-14 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-all duration-300 mb-5">
             <Icon :icon="servico.icon" class="w-7 h-7 text-primary" />
           </div>
-          <h3 class="font-sans text-base uppercase tracking-[0.15em] text-primary-foreground font-semibold mb-2">
+          <h3 class="font-sans text-base uppercase tracking-[0.15em] text-neutral-100 font-semibold mb-2">
             {{ servico.name }}
           </h3>
-          <p class="font-sans text-muted-foreground text-sm leading-relaxed">
+          <p class="font-sans text-neutral-300 text-sm leading-relaxed">
             {{ servico.desc }}
           </p>
           <div class="flex items-center justify-center">
-            <span class="font-bold text-primary-foreground">{{ servico.price }}</span>
+            <span class="font-bold text-primary-400">{{ servico.price }}</span>
           </div>
         </div>
       </div>

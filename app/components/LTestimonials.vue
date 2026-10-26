@@ -25,13 +25,13 @@
                   <img v-if="depo.photo" :src="depo.photo" :alt="depo.name"
                     class="w-10 h-10 rounded-full object-cover" />
                   <div v-else
-                    class="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center font-serif font-bold text-primary">
+                    class="w-10 h-10 rounded-full bg-neutral-800/50 flex items-center justify-center font-serif font-bold text-primary-400">
                     {{ depo.name.charAt(0) }}
                   </div>
                   <div>
-                    <p class="font-sans font-semibold text-primary-foreground text-sm">{{ depo.name }}</p>
+                    <p class="font-sans font-semibold text-neutral-100 text-sm">{{ depo.name }}</p>
                     <div class="flex gap-0.5">
-                      <span v-for="s in depo.rating" :key="s" class="text-primary text-xs">★</span>
+                      <span v-for="s in depo.rating" :key="s" class="text-primary-400 text-xs">★</span>
                     </div>
                   </div>
                 </div>

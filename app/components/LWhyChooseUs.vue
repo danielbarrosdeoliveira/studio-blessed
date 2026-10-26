@@ -10,12 +10,12 @@
           </h2>
           <div class="grid grid-cols-2 gap-8">
             <div>
-              <p class="font-serif text-5xl md:text-6xl text-primary font-bold">3.000+</p>
-              <p class="font-sans text-muted-foreground text-sm mt-1">Clientes satisfeitas</p>
+              <p class="font-serif text-5xl md:text-6xl text-primary-400 font-bold">3.000+</p>
+              <p class="font-sans text-neutral-100 text-sm mt-1">Clientes satisfeitas</p>
             </div>
             <div>
-              <p class="font-serif text-5xl md:text-6xl text-primary font-bold">4+</p>
-              <p class="font-sans text-muted-foreground text-sm mt-1">Anos de experiência</p>
+              <p class="font-serif text-5xl md:text-6xl text-primary-400 font-bold">4+</p>
+              <p class="font-sans text-neutral-100 text-sm mt-1">Anos de experiência</p>
             </div>
           </div>
         </div>
@@ -24,10 +24,10 @@
           <div v-for="item in diferenciais" :key="item.title"
             class="bg-bg rounded-xl p-5 shadow-sm border border-border space-y-2">
             <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-              <Icon :icon="item.icon" class="w-5 h-5 text-primary" />
+              <Icon :icon="item.icon" class="w-5 h-5 text-primary-400" />
             </div>
-            <h4 class="font-sans text-sm font-bold text-primary-foreground uppercase tracking-wider">{{ item.title }}</h4>
-            <p class="font-sans text-muted-foreground text-xs leading-relaxed">{{ item.description }}</p>
+            <h4 class="font-sans text-sm font-bold text-neutral-100 uppercase tracking-wider">{{ item.title }}</h4>
+            <p class="font-sans text-neutral-300 text-xs leading-relaxed">{{ item.description }}</p>
           </div>
         </div>
       </div>
