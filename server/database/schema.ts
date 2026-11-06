@@ -31,7 +31,6 @@ export const user = pgTable('user', {
   email: text('email').notNull().unique(),
   emailVerified: boolean('email_verified').notNull().default(false),
   image: text('image'),
-  // Modelo single-owner: apenas a dona do salão
   createdAt: createdAt(),
   updatedAt: updatedAt()
 })
@@ -99,9 +98,9 @@ export const client = pgTable('client', {
   phone: text('phone').notNull(),
   createdAt: createdAt(),
   updatedAt: updatedAt()
-}, t => uniqueIndex('client_phone_unique').on(t.phone))
+}, t => [uniqueIndex('client_phone_unique').on(t.phone)])
 
-/** Serviço — pertence à dona do salão (sem professionalId). */
+/** Serviço — pertence à dona do salão. */
 export const service = pgTable('service', {
   id: id(),
   name: text('name').notNull(),
