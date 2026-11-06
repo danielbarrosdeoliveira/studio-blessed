@@ -1,8 +1,8 @@
 <template>
-  <div class="page-landing min-h-screen bg-[#ffffff] text-[#0f172a] overflow-x-hidden">
-    <LNavbar />
+  <div class="min-h-screen bg-zinc-950 text-zinc-100 overflow-x-hidden">
+    <LandingNavbar />
     <slot />
-    <LFooter />
+    <LandingFooter />
   </div>
 </template>
 

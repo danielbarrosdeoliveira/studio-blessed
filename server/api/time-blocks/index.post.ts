@@ -1,10 +1,10 @@
 import { and, asc, eq, gt, lt } from 'drizzle-orm'
 import * as z from 'zod'
-import { db } from '../../../../database'
-import { appointment, client, service, timeBlock } from '../../../../database/schema'
-import { getProfessionalOr404, requireProfessionalAccess } from '../../../../utils/professionals'
-import { localDateOf } from '../../../../utils/time'
-import { findBlockConflicts, serializeTimeBlock } from '../../../../utils/time-blocks'
+import { db } from '../../database'
+import { appointment, client, service, timeBlock } from '../../database/schema'
+import { requireUser } from '../../utils/auth-guard'
+import { localDateOf } from '../../utils/time'
+import { findBlockConflicts, serializeTimeBlock } from '../../utils/time-blocks'
 
 function isMinutePrecision(value: Date) {
   return value.getSeconds() === 0 && value.getMilliseconds() === 0
@@ -51,14 +51,7 @@ const bodySchema = z.object({
 
 /** Cria um bloqueio pontual ou semanal para a dona do salão. */
 export default defineEventHandler(async (event) => {
-  const id = getRouterParam(event, 'id')
-
-  if (!id) {
-    throw createError({ statusCode: 400, message: 'Profissional não informada' })
-  }
-
-  await requireProfessionalAccess(event, id)
-  await getProfessionalOr404(id)
+  await requireUser(event)
 
   const parsed = bodySchema.safeParse(await readBody(event))
 
@@ -73,6 +66,42 @@ export default defineEventHandler(async (event) => {
   const startsAt = new Date(parsed.data.startsAt)
   const endsAt = new Date(parsed.data.endsAt)
   const recurrence = parsed.data.recurrence ?? null
+
+  const conditions = [
+    eq(appointment.status, 'scheduled'),
+    gt(appointment.endsAt, startsAt)
+  ]
+
+  if (recurrence !== 'weekly') {
+    conditions.push(lt(appointment.startsAt, endsAt))
+  }
+
+  const appointments = await db
+    .select({
+      id: appointment.id,
+      startsAt: appointment.startsAt,
+      endsAt: appointment.endsAt,
+      clientName: client.name,
+      serviceName: service.name
+    })
+    .from(appointment)
+    .innerJoin(client, eq(appointment.clientId, client.id))
+    .innerJoin(service, eq(appointment.serviceId, service.id))
+    .where(and(...conditions))
+    .orderBy(asc(appointment.startsAt))
+
+  const conflicts = findBlockConflicts(
+    { startsAt, endsAt, recurrence },
+    appointments
+  )
+
+  if (conflicts.length && !parsed.data.confirmConflict) {
+    throw createError({
+      statusCode: 409,
+      message: 'Existe agendamento neste período. Confirme para salvar o bloqueio sem cancelar o agendamento.',
+      data: { conflicts }
+    })
+  }
 
   const [created] = await db
     .insert(timeBlock)
@@ -89,6 +118,7 @@ export default defineEventHandler(async (event) => {
   }
 
   return {
-    block: serializeTimeBlock(created)
+    block: serializeTimeBlock(created),
+    conflicts
   }
 })

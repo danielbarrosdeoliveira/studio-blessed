@@ -30,6 +30,7 @@ export interface AppointmentDetails {
   durationMin: number
   priceCents: number
   clientName: string
+  clientPhone: string
   notes: string | null
 }
 
@@ -53,7 +54,7 @@ export function serializeAppointment(row: AppointmentDetails, now = new Date()) 
   }
 }
 
-/** Objeto interno: inclui as observações e o status cru. */
+/** Objeto interno: inclui telefone, observações e o status cru. */
 export function serializeStaffAppointment(row: AppointmentDetails) {
   return {
     id: row.id,
@@ -62,12 +63,11 @@ export function serializeStaffAppointment(row: AppointmentDetails) {
     status: row.status,
     origin: row.origin,
     serviceId: row.serviceId,
-    professionalId: row.clientId,
     serviceName: row.serviceName,
-    professionalName: row.clientName,
     durationMin: row.durationMin,
     priceCents: row.priceCents,
     clientName: row.clientName,
+    clientPhone: row.clientPhone,
     notes: row.notes
   }
 }

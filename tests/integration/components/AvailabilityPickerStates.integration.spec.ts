@@ -32,7 +32,6 @@ function availability(slots: typeof slotA[]) {
 function mountPicker(overrides: Record<string, unknown> = {}) {
   return mountSuspended(AvailabilityPicker, {
     props: {
-      professionalId: 'maria-1',
       serviceId: 'service-1',
       minDate: '2026-10-29',
       ...overrides
@@ -46,8 +45,8 @@ beforeEach(() => {
 })
 
 describe('AvailabilityPicker — estados', () => {
-  it('não busca horários sem profissional ou serviço', async () => {
-    const wrapper = await mountPicker({ professionalId: '', serviceId: '' })
+  it('não busca horários sem serviço', async () => {
+    const wrapper = await mountPicker({ serviceId: '' })
 
     await flushPromises()
 
@@ -102,14 +101,13 @@ describe('AvailabilityPicker — estados', () => {
     expect(wrapper.emitted('update:modelValue')?.[1]).toEqual([null])
     expect(fetchMock).toHaveBeenLastCalledWith('/api/public/availability', {
       query: {
-        professionalId: 'maria-1',
         serviceId: 'service-1',
         date: '2026-10-30'
       }
     })
   })
 
-  it('recarrega ao trocar profissional ou serviço e limpa a seleção', async () => {
+  it('recarrega ao trocar de serviço e limpa a seleção', async () => {
     const wrapper = await mountPicker()
     await flushPromises()
 
@@ -121,7 +119,6 @@ describe('AvailabilityPicker — estados', () => {
     expect(fetchMock).toHaveBeenCalledTimes(2)
     expect(fetchMock).toHaveBeenLastCalledWith('/api/public/availability', {
       query: {
-        professionalId: 'maria-1',
         serviceId: 'service-2',
         date: '2026-10-29'
       }

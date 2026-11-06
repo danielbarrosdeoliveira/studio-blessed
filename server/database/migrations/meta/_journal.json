@@ -36,6 +36,13 @@
       "when": 1793928284588,
       "tag": "0004_exotic_junta",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793981454934,
+      "tag": "0005_burly_boomer",
+      "breakpoints": true
     }
   ]
 }

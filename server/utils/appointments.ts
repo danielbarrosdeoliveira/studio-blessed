@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm'
 import { db } from '../database'
-import { appointment, client, service, user } from '../database/schema'
+import { appointment, client, service } from '../database/schema'
 import type { AppointmentDetails } from './appointment-serialization'
 
 export const appointmentColumns = {

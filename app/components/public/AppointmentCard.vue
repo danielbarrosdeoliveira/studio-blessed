@@ -101,7 +101,7 @@ async function reschedule() {
         </div>
 
         <p class="text-sm text-muted">
-          {{ appointment.professionalName }} · {{ appointment.durationMin }} min
+          {{ appointment.durationMin }} min
         </p>
 
         <p class="text-sm text-highlighted">
@@ -151,7 +151,7 @@ async function reschedule() {
             <strong class="text-highlighted">{{ appointment.serviceName }}</strong>?
           </p>
           <p class="text-sm text-muted">
-            {{ formatInstantLong(appointment.startsAt) }} com {{ appointment.professionalName }}.
+            {{ formatInstantLong(appointment.startsAt) }}.
           </p>
           <UAlert
             v-if="actionError"
@@ -187,14 +187,13 @@ async function reschedule() {
       <template #body>
         <div class="space-y-4">
           <p class="text-sm text-muted">
-            {{ appointment.serviceName }} · {{ appointment.professionalName }}
+            {{ appointment.serviceName }}
           </p>
 
           <AvailabilityPicker
             v-if="rescheduleOpen"
             :key="pickerKey"
             v-model="newSlot"
-            :professional-id="appointment.professionalId"
             :service-id="appointment.serviceId"
             :min-date="minDate"
           />

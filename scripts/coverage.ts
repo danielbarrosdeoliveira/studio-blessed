@@ -94,6 +94,10 @@ function coverageE2E() {
     '--include=server/**',
     '--exclude=**/*.spec.ts',
     '--exclude=**/*.test.ts',
+    // `server/database/schema.ts` é DDL declarativo do Drizzle: os "callbacks"
+    // de `uniqueIndex`/`$defaultFn` não são lógica de aplicação. O arquivo já
+    // é medido pelo gate de integração de API.
+    '--exclude=server/database/schema.ts',
     '--check-coverage',
     // Cobertura de linhas/statements/funções pelos fluxos críticos.
     // Branches ficam visíveis no relatório, mas são aprofundadas em unit/integration.

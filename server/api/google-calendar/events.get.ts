@@ -1,9 +1,17 @@
 import { requireUser } from '../../utils/auth-guard'
 import { db } from '../../database'
-import { account, user } from '../../database/schema'
+import { account } from '../../database/schema'
 import { eq } from 'drizzle-orm'
 
 const GOOGLE_CALENDAR_API = 'https://www.googleapis.com/calendar/v3'
+
+interface GoogleCalendarEvent {
+  id?: string
+  summary?: string
+  status?: string
+  start?: { dateTime?: string, date?: string }
+  end?: { dateTime?: string, date?: string }
+}
 
 export default defineEventHandler(async (event) => {
   const current = await requireUser(event)
@@ -48,9 +56,9 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const data = await res.json()
+  const data = await res.json() as { items?: GoogleCalendarEvent[] }
 
-  const busy = (data.items ?? []).map((item: any) => ({
+  const busy = (data.items ?? []).map(item => ({
     id: item.id,
     summary: item.summary,
     startsAt: item.start?.dateTime ?? item.start?.date,

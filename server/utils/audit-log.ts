@@ -1,6 +1,6 @@
 import { auditLog } from '../database/schema'
 import { db } from '../database'
-import { eq } from 'drizzle-orm'
+import type { H3Event } from 'h3'
 
 export type AuditAction =
   | 'appointment.create'
@@ -19,8 +19,6 @@ export type AuditAction =
   | 'time_block.create'
   | 'time_block.update'
   | 'time_block.delete'
-  | 'user.invite'
-  | 'user.role_change'
   | 'user.delete'
 
 export async function writeAuditLog({
@@ -57,7 +55,7 @@ export async function writeAuditLog({
 /**
  * Helper para extrair IP e user agent do evento H3/Nitro.
  */
-export function extractRequestMeta(event: any) {
+export function extractRequestMeta(event: H3Event) {
   return {
     ipAddress: event.node.req.socket?.remoteAddress ?? event.node.req.headers['x-forwarded-for'] ?? null,
     userAgent: event.node.req.headers['user-agent'] ?? null

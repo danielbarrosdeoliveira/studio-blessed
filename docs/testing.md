@@ -11,7 +11,7 @@
 | Unitário | Vitest 5 (`unit`) | Lógica pura de `app/utils/**` e `server/utils/**` |
 | Integração de API | Vitest 5 (`integration-api`) + Nuxt server real | Rotas HTTP em `server/api/**` e utilitários de servidor |
 | Integração de UI | Vitest 5 (`integration-nuxt`) + `@nuxt/test-utils` | Componentes Vue em ambiente Nuxt/happy-dom |
-| E2E | Playwright + Chromium | Fluxos críticos no browser + SSR/API do Nuxt 4 |
+| E2E | Playwright + Chromium (build de produção) | Fluxos críticos no browser + SSR/API do Nuxt 4 |
 
 O projeto usa **Nuxt 4** (SSR, estrutura `app/`), **Vue 3** e **Nuxt UI 4**.
 Não há suporte a Nuxt 3 nesta base.
@@ -23,8 +23,8 @@ Não há suporte a Nuxt 3 nesta base.
 - `pnpm test:db:setup` derruba os schemas `public` e `drizzle`, aplica as
   migrations e recria os dados de seed.
 - O seed grava IDs em `.data/test-seed.json` (ignorado pelo git).
-- Usuários: `admin@studioblessed.test`, `maria@studioblessed.test`,
-  `ana@studioblessed.test`; senha `senha123456`.
+- Usuário (dona do salão): `owner@studioblessed.test`; senha `senha123456`.
+  O modelo é single-owner — não há outros usuários de teste.
 - O banco de desenvolvimento (`studio_blessed`) não é tocado pelos testes.
 
 Subir o PostgreSQL antes de qualquer suíte:
@@ -41,8 +41,8 @@ pnpm db:up
 | `pnpm test:unit` | Somente unitários |
 | `pnpm test:unit:watch` | Unitários em watch |
 | `pnpm test:integration` | Reset do banco + integração de API + UI |
-| `pnpm test:e2e` | Playwright nos fluxos críticos (Chromium) |
-| `pnpm test:e2e:ui` | Playwright em modo UI |
+| `pnpm test:e2e` | Build de produção + Playwright nos fluxos críticos (Chromium) |
+| `pnpm test:e2e:ui` | Build de produção + Playwright em modo UI |
 | `pnpm test:db:setup` | Recria o banco de teste e o seed |
 | `pnpm test:all` | `pnpm test` + `pnpm test:e2e` |
 | `pnpm test:coverage` | Cobertura completa: unit + integração + E2E |
@@ -74,7 +74,7 @@ E2E ficam em `tests/`, com helpers compartilhados em `tests/helpers/`.
 | Unitário | Arquivos puros de `app/utils/**` e `server/utils/**` | 75% linhas, statements, funções e branches |
 | Integração de API | `server/**` | 75% linhas, statements, funções e branches |
 | Integração de UI | `AvailabilityPicker.vue` e `StaffAppointmentCard.vue` | 75% linhas, statements, funções e branches |
-| E2E | Código de servidor/SSR executado pelos fluxos críticos | 50% linhas, statements e funções |
+| E2E | Código de servidor/SSR executado pelos fluxos críticos (sem o DDL de `server/database/schema.ts`) | 50% linhas, statements e funções |
 
 O runner de cobertura está em `scripts/coverage.ts` e falha com exit code
 diferente de zero quando a meta não é atingida. O `vitest.config.ts` também
@@ -82,14 +82,14 @@ declara os thresholds de 75% para as suítes Vitest.
 
 ### Medição de referência
 
-Execução local em 2026-10-24, com os fluxos atuais:
+Execução local em 2026-11-06, com os fluxos atuais:
 
-| Suíte | Testes | Linhas | Branches |
-| --- | ---: | ---: | ---: |
-| Unitário | 48 | 98,26% | 92,10% |
-| Integração de API | 18 | 95,32% | 78,42% |
-| Integração de UI | 16 | 93,13% | 92,20% |
-| E2E (SSR/API) | 5 | 87,23% | 43,24% |
+| Suíte | Testes | Linhas | Branches | Funções |
+| --- | ---: | ---: | ---: | ---: |
+| Unitário | 44 | 98,19% | 92,64% | 97,05% |
+| Integração de API | 17 | 96,01% | 76,41% | 94,11% |
+| Integração de UI | 14 | 92,59% | 88,23% | 81,81% |
+| E2E (SSR/API) | 10 | 87,23% | 42,99% | 70,58% |
 
 A cobertura E2E mede os módulos de servidor/SSR carregados durante os fluxos.
 Os asserts do Playwright validam o comportamento no browser; a instrumentação
@@ -100,10 +100,13 @@ do bundle cliente é uma evolução futura, não um requisito para o gate atual.
 | Fluxo | Spec | O que valida |
 | --- | --- | --- |
 | Cliente agenda e cancela | `tests/e2e/public-booking.spec.ts` | Stepper em `/agendamento`, escolha de serviço/data/horário, nome + WhatsApp, confirmação, “Meus agendamentos” e cancelamento |
-| Redirecionamento do agendamento antigo | `tests/e2e/public-booking.spec.ts` | `/agendar` redireciona para `/agendamento` preservando serviço/profissional |
-| Staff cria, conclui e corrige | `tests/e2e/staff-agenda.spec.ts` | Login de admin, criação de agendamento para amanhã, conclusão, no-show e correção de status |
-| Escopo da profissional | `tests/e2e/staff-agenda.spec.ts` | Partner vê apenas a própria agenda, sem filtro de admin, e enxerga o agendamento concluído |
-| Bloqueios de horário | `tests/e2e/staff-blocks.spec.ts` | Admin cria bloqueio semanal pela jornada, vê o item na lista e remove |
+| Link com serviço pré-selecionado | `tests/e2e/public-booking.spec.ts` | `/agendamento?serviceId=…` abre direto no stepper de data/horário |
+| Catálogo público sem profissionais | `tests/e2e/public-booking.spec.ts` | O catálogo lista cada serviço uma vez, sem "profissional responsável" |
+| Dona cria, conclui e corrige | `tests/e2e/staff-agenda.spec.ts` | Login da dona, criação de agendamento para amanhã, conclusão, no-show e correção de status |
+| Agenda sem filtro de profissional | `tests/e2e/staff-agenda.spec.ts` | A agenda não exibe seleção de profissional nem filtro por papel |
+| Navegação lateral | `tests/e2e/staff-agenda.spec.ts` | A sidebar leva a Jornada e Serviços |
+| Bloqueios de horário | `tests/e2e/staff-blocks.spec.ts` | A dona cria bloqueio semanal pela jornada, vê o item na lista e remove |
+| Gestão de serviços | `tests/e2e/staff-services.spec.ts` | A dona cadastra, edita e desativa um serviço; o nome é único entre os serviços ativos |
 
 Fluxos que ainda entram no E2E conforme os épicos forem concluídos:
 
@@ -119,15 +122,29 @@ Fluxos que ainda entram no E2E conforme os épicos forem concluídos:
    apontando para `.coverage/e2e/server`.
 3. Ao final, o web server recebe `SIGTERM` para descarregar a cobertura.
 4. O c8 remapeia o bundle para `app/**` e `server/**` com
-   `--exclude-after-remap` e aplica a meta de 50%.
+   `--exclude-after-remap` e aplica a meta de 50%. O DDL declarativo de
+   `server/database/schema.ts` fica fora da medição: ele já é coberto pelo
+   gate de integração de API.
 
 O Playwright roda com **1 worker**, Chromium e reset do banco no início. O helper
 `tests/e2e/helpers.ts` espera a hidratação do Nuxt (`window.useNuxtApp`) antes de
 interagir, evitando cliques antes do Vue montar.
 
+### Por que o E2E roda contra o build de produção
+
+O E2E **não** usa `nuxt dev`. Durante a navegação, o otimizador de dependências
+do Vite re-otimiza pacotes e dispara um *full reload* no meio do teste, o que
+desmonta dropdowns abertos e deixa a suíte instável. O build de produção
+(`.output/server/index.mjs`) elimina HMR e mede exatamente o artefato que é
+publicado — por isso `pnpm test:e2e` faz `pnpm build` antes de subir o servidor.
+
 ## Isolamento e armadilhas conhecidas
 
 - A suíte de integração de API sobe o Nuxt na porta `3101`; o E2E usa `3100`.
+- O driver do banco é escolhido pelo **esquema da URL** (`postgres://` → `pg`,
+  `https://` → Neon HTTP), nunca por `NODE_ENV`. Assim um build de produção
+  apontado para um PostgreSQL local continua funcionando. `DB_DRIVER=neon|pg`
+  força o driver explicitamente.
 - As sessões do Better Auth são cacheadas no spec de API para evitar `429` por
   rate limit de login.
 - `nitro.sourceMap` é habilitado somente no build de cobertura E2E.

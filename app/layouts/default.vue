@@ -3,64 +3,32 @@ import type { NavigationMenuItem } from '@nuxt/ui'
 
 const open = ref(false)
 
-const { user, isAdmin } = await useUserSession()
-
 const links = computed<NavigationMenuItem[][]>(() => {
-  const items: NavigationMenuItem[] = [{
-    label: 'Início',
-    icon: 'i-ri-home-line',
-    to: '/',
-    onSelect: () => {
-      open.value = false
-    }
-  }]
-
-  items.push({
-    label: 'Agenda',
-    icon: 'i-ri-calendar-line',
-    to: '/painel',
-    onSelect: () => {
-      open.value = false
-    }
-  })
-
-  items.push({
-    label: 'Serviços',
-    icon: 'i-ri-scissors-line',
-    to: '/servicos',
-    onSelect: () => {
-      open.value = false
-    }
-  })
-
-  if (isAdmin.value) {
-    items.push({
-      label: 'Profissionais',
-      icon: 'i-ri-group-line',
-      to: '',
-      onSelect: () => {
-        open.value = false
-      }
-    })
-  } else if (user.value) {
-    items.push({
-      label: 'Minha jornada',
-      icon: 'i-ri-time-line',
-      to: `/${user.value.id}`,
-      onSelect: () => {
-        open.value = false
-      }
-    })
+  const close = () => {
+    open.value = false
   }
 
-  return [items]
+  return [[
+    { label: 'Início', icon: 'i-ri-home-line', to: '/', onSelect: close },
+    { label: 'Agenda', icon: 'i-ri-calendar-line', to: '/painel', onSelect: close },
+    { label: 'Serviços', icon: 'i-ri-scissors-line', to: '/servicos', onSelect: close },
+    { label: 'Jornada', icon: 'i-ri-time-line', to: '/jornada', onSelect: close },
+    { label: 'Métricas', icon: 'i-ri-bar-chart-line', to: '/metricas', onSelect: close },
+    { label: 'Configurações', icon: 'i-ri-settings-3-line', to: '/configuracoes', onSelect: close }
+  ]]
 })
 </script>
 
 <template>
   <UDashboardGroup unit="rem">
-    <UDashboardSidebar id="default" v-model:open="open" collapsible resizable class="bg-elevated/25"
-      :ui="{ footer: 'lg:border-t lg:border-default' }">
+    <UDashboardSidebar
+      id="default"
+      v-model:open="open"
+      collapsible
+      resizable
+      class="bg-elevated/25"
+      :ui="{ footer: 'lg:border-t lg:border-default' }"
+    >
       <template #header="{ collapsed }">
         <NuxtLink to="/" class="flex items-center gap-2 min-w-0">
           <div class="size-8 rounded-lg bg-primary flex items-center justify-center shrink-0">

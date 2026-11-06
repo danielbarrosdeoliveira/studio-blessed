@@ -55,7 +55,7 @@ export default defineEventHandler(async (event) => {
     .update(service)
     .set({ ...parsed.data, updatedAt: new Date() })
     .where(eq(service.id, id))
-    // @ts-ignore - Drizzle returning type issue
+    // @ts-expect-error - Drizzle returning type issue
     .returning(serviceColumns)
     .catch((error: unknown) => {
       if (isUniqueViolation(error)) {

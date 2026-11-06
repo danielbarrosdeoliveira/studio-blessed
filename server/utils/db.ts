@@ -15,24 +15,28 @@ if (!connectionString) {
 /**
  * Driver híbrido para Drizzle ORM.
  *
- * - Desenvolvimento (localhost / Docker): usa `drizzle-orm/node-postgres`
- *   com o driver tradicional `pg` (Pool).
- * - Produção (Neon): usa `drizzle-orm/neon-http` com o driver HTTP/serverless
- *   do `@neondatabase/serverless`.
+ * A escolha é feita pelo **esquema da URL**, nunca por `NODE_ENV`:
+ * um build de produção apontado para um PostgreSQL local (builds de teste,
+ * self-hosting) precisa continuar usando o driver TCP.
  *
- * A variável DATABASE_URL é a referência única para ambos os ambientes.
+ * - `postgres://` / `postgresql://`: `drizzle-orm/node-postgres` com `pg` (Pool).
+ * - `https://`: `drizzle-orm/neon-http` com o driver HTTP/serverless do Neon.
+ *
+ * `DB_DRIVER=neon|pg` força o driver explicitamente.
  */
 
-let db: NodePgDatabase<typeof schema> | ReturnType<typeof drizzleNeon>
+type DatabaseDriver = 'neon' | 'pg'
 
-if (process.env.NODE_ENV === 'production' || connectionString.includes('neon.tech')) {
-  // Produção: Neon serverless via HTTP
-  const sql = neon(connectionString)
-  db = drizzleNeon(sql, { schema })
-} else {
-  // Desenvolvimento: PostgreSQL local via Docker com node-postgres
-  const pool = new Pool({ connectionString, max: 10 })
-  db = drizzlePg(pool, { schema })
-}
+const forcedDriver = process.env.DB_DRIVER?.toLowerCase()
+const driver: DatabaseDriver = forcedDriver === 'neon' || forcedDriver === 'pg'
+  ? forcedDriver
+  : connectionString.startsWith('https://')
+    ? 'neon'
+    : 'pg'
+
+const db: NodePgDatabase<typeof schema> | ReturnType<typeof drizzleNeon>
+  = driver === 'neon'
+    ? drizzleNeon(neon(connectionString), { schema })
+    : drizzlePg(new Pool({ connectionString, max: 10 }), { schema })
 
 export { db }

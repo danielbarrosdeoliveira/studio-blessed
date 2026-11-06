@@ -4,20 +4,15 @@ export interface SeedUser {
   id: string
   email: string
   name: string
-  role: 'admin' | 'partner'
 }
 
 export interface SeedState {
   users: {
-    admin: SeedUser
-    maria: SeedUser
-    ana: SeedUser
+    owner: SeedUser
   }
   services: {
-    mariaCorte: string
-    mariaEscova: string
-    anaCorte: string
-    anaEscova: string
+    corte: string
+    escova: string
   }
 }
 

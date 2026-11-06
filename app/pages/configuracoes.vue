@@ -1,49 +1,67 @@
 <script setup lang="ts">
-import type { NavigationMenuItem } from '@nuxt/ui'
-
-const links = [[{
-  label: 'General',
-  icon: 'i-ri-user-line',
-  to: '/configuracoes',
-  exact: true
-}, {
-  label: 'Members',
-  icon: 'i-ri-group-line',
-  to: '/configuracoes/members'
-}, {
-  label: 'Notifications',
-  icon: 'i-ri-notification-3-line',
-  to: '/configuracoes/notifications'
-}, {
-  label: 'Security',
-  icon: 'i-ri-shield-line',
-  to: '/configuracoes/security'
-}], [{
-  label: 'Documentation',
-  icon: 'i-ri-book-open-line',
-  to: 'https://ui.nuxt.com/docs/getting-started/installation/nuxt',
-  target: '_blank'
-}]] satisfies NavigationMenuItem[][]
+useHead({
+  title: 'Configurações · Studio Blessed'
+})
 </script>
 
 <template>
-  <UDashboardPanel id="configuracoes" :ui="{ body: 'lg:py-12' }">
+  <UDashboardPanel id="configuracoes">
     <template #header>
       <UDashboardNavbar title="Configurações">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
       </UDashboardNavbar>
-
-      <UDashboardToolbar>
-        <!-- NOTE: The `-mx-1` class is used to align with the `DashboardSidebarCollapse` button here. -->
-        <UNavigationMenu :items="links" highlight class="-mx-1 flex-1" />
-      </UDashboardToolbar>
     </template>
 
     <template #body>
-      <div class="flex flex-col gap-4 sm:gap-6 lg:gap-12 w-full lg:max-w-2xl mx-auto">
-        <NuxtPage />
+      <div class="flex flex-col gap-4 sm:gap-6 w-full lg:max-w-2xl">
+        <UCard>
+          <template #header>
+            <h2 class="font-semibold text-highlighted">
+              Studio Blessed
+            </h2>
+          </template>
+
+          <dl class="space-y-3 text-sm">
+            <div class="flex items-center justify-between gap-4">
+              <dt class="text-muted">
+                Modelo de agenda
+              </dt>
+              <dd class="font-medium text-highlighted">
+                Dona única
+              </dd>
+            </div>
+            <div class="flex items-center justify-between gap-4">
+              <dt class="text-muted">
+                Jornada e bloqueios
+              </dt>
+              <dd>
+                <UButton
+                  to="/jornada"
+                  label="Gerenciar"
+                  size="xs"
+                  color="neutral"
+                  variant="outline"
+                />
+              </dd>
+            </div>
+            <div class="flex items-center justify-between gap-4">
+              <dt class="text-muted">
+                Serviços
+              </dt>
+              <dd>
+                <UButton
+                  to="/servicos"
+                  label="Gerenciar"
+                  size="xs"
+                  color="neutral"
+                  variant="outline"
+                />
+              </dd>
+            </div>
+          </dl>
+        </UCard>
       </div>
     </template>
   </UDashboardPanel>

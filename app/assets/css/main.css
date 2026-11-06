@@ -2,38 +2,12 @@
 @import "@nuxt/ui";
 
 @theme {
-  --font-sans: 'Figtree', sans-serif;
-  --font-serif: 'Instrument Serif', serif;
-}
-
-/* until v5 ships --ui-font-heading */
-@layer base {
-  h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-serif);
-  }
-}
-
-:root {
-  --ui-radius: 0.125rem;
-}
-
-:root, .light {
-  --ui-bg: var(--ui-color-neutral-50);
-  --ui-bg-muted: var(--ui-color-neutral-100);
-  --ui-text-inverted: var(--ui-color-neutral-50);
-}
-
-.dark {
-  --ui-text-highlighted: var(--ui-color-neutral-50);
-  --ui-bg-inverted: var(--ui-color-neutral-50);
-  --ui-border-inverted: var(--ui-color-neutral-50);
-  --ui-bg: var(--ui-color-neutral-900);
-  --ui-bg-muted: var(--ui-color-neutral-800);
-  --ui-text-inverted: var(--ui-color-neutral-900);
+  --font-sans: 'Manrope', sans-serif;
+  --font-serif: 'Playfair Display', serif;
 }
 
 /* UX: todo botão é um affordance clicável; estados desativados/bloqueados
-   não convidam a clique. Cobre <button> (UButton sem `to`) e ancoras
+   não convidam a clique. Cobre <button> (UButton sem `to`) e âncoras
    usadas como botão (UButton com `to`). */
 @layer base {
   button {

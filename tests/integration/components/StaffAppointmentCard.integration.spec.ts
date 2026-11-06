@@ -19,9 +19,7 @@ const appointment: StaffAppointment = {
   status: 'scheduled',
   origin: 'staff',
   serviceId: 'service-1',
-  professionalId: 'maria-1',
   serviceName: 'Corte feminino',
-  professionalName: 'Maria',
   durationMin: 40,
   priceCents: 13000,
   clientName: 'Cliente Teste',
@@ -33,15 +31,10 @@ function buttonByText(wrapper: Awaited<ReturnType<typeof mountSuspended>>, text:
   return wrapper.findAll('button').find(button => button.text() === text)
 }
 
-function mountCard(overrides: Partial<StaffAppointment> = {}, props: {
-  isAdmin?: boolean
-  currentUserId?: string
-} = {}) {
+function mountCard(overrides: Partial<StaffAppointment> = {}) {
   return mountSuspended(StaffAppointmentCard, {
     props: {
-      appointment: { ...appointment, ...overrides },
-      isAdmin: props.isAdmin ?? false,
-      currentUserId: props.currentUserId ?? 'maria-1'
+      appointment: { ...appointment, ...overrides }
     }
   })
 }
@@ -67,17 +60,11 @@ describe('StaffAppointmentCard', () => {
     expect(wrapper.text()).toContain('Agendado')
   })
 
-  it('esconde ações de um agendamento já concluído para a partner', async () => {
+  it('permite corrigir um status já marcado', async () => {
     const wrapper = await mountCard({ status: 'completed' })
 
     expect(buttonByText(wrapper, 'Concluir')).toBeUndefined()
     expect(buttonByText(wrapper, 'Cancelar')).toBeUndefined()
-    expect(buttonByText(wrapper, 'Corrigir para no-show')).toBeUndefined()
-  })
-
-  it('permite ao admin corrigir um status já marcado', async () => {
-    const wrapper = await mountCard({ status: 'completed' }, { isAdmin: true })
-
     expect(buttonByText(wrapper, 'Corrigir para no-show')).toBeDefined()
   })
 
@@ -150,18 +137,8 @@ describe('StaffAppointmentCard', () => {
     wrapper.unmount()
   })
 
-  it('não oferece ações para agendamento de outra profissional', async () => {
-    const wrapper = await mountCard(
-      { professionalId: 'ana-1' },
-      { currentUserId: 'maria-1' }
-    )
-
-    expect(buttonByText(wrapper, 'Concluir')).toBeUndefined()
-    expect(buttonByText(wrapper, 'Cancelar')).toBeUndefined()
-  })
-
-  it('oferece a correção inversa para um no-show do admin', async () => {
-    const wrapper = await mountCard({ status: 'no_show' }, { isAdmin: true })
+  it('oferece a correção inversa para um no-show', async () => {
+    const wrapper = await mountCard({ status: 'no_show' })
 
     expect(buttonByText(wrapper, 'Corrigir para concluído')).toBeDefined()
   })

@@ -8,9 +8,16 @@ import {
 } from './tests/env'
 
 const coverageEnabled = process.env.E2E_COVERAGE === 'true'
-const serverCommand = coverageEnabled
-  ? 'exec node .output/server/index.mjs'
-  : `pnpm exec nuxt dev --port ${E2E_PORT} --host 127.0.0.1`
+
+/**
+ * O E2E roda sempre contra o **build de produção** (`.output/server`).
+ *
+ * No `nuxt dev`, o otimizador de dependências do Vite re-otimiza pacotes
+ * durante a navegação e dispara um *full reload* no meio do teste, o que
+ * desmonta dropdowns abertos e deixa o E2E instável. O build de produção
+ * elimina HMR e mede o que realmente é publicado.
+ */
+const serverCommand = 'exec node .output/server/index.mjs'
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -28,22 +35,20 @@ export default defineConfig({
     screenshot: 'only-on-failure'
   },
   webServer: {
-    command: coverageEnabled ? serverCommand : `pnpm test:db:setup && ${serverCommand}`,
+    command: `pnpm test:db:setup && ${serverCommand}`,
     url: E2E_BASE_URL,
     timeout: 240_000,
     reuseExistingServer: false,
-    gracefulShutdown: coverageEnabled
-      ? { signal: 'SIGTERM', timeout: 10_000 }
-      : undefined,
+    gracefulShutdown: { signal: 'SIGTERM', timeout: 10_000 },
     env: {
       DATABASE_URL: TEST_DATABASE_URL,
       BETTER_AUTH_URL: E2E_BASE_URL,
       BETTER_AUTH_SECRET: TEST_AUTH_SECRET,
       NUXT_TELEMETRY_DISABLED: '1',
+      PORT: String(E2E_PORT),
+      HOST: '127.0.0.1',
       ...(coverageEnabled
         ? {
-            PORT: String(E2E_PORT),
-            HOST: '127.0.0.1',
             NODE_V8_COVERAGE: resolve(process.cwd(), '.coverage/e2e/server')
           }
         : {})

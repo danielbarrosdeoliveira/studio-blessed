@@ -28,24 +28,6 @@ export const auth = betterAuth({
         'https://www.googleapis.com/auth/userinfo.profile'
       ] as string[]
     }
-  },
-
-  user: {
-    additionalFields: {
-      // Nunca aceitos como input do cliente — evitam escalada de privilégio.
-      role: {
-        type: 'string',
-        required: false,
-        defaultValue: 'partner',
-        input: false
-      },
-      agendaProvider: {
-        type: 'string',
-        required: false,
-        defaultValue: 'internal',
-        input: false
-      }
-    }
   }
 })
 

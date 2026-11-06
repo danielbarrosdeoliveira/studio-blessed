@@ -73,7 +73,6 @@ describe('bloqueios de horário', () => {
 
     expect(block).toEqual({
       id: 'block-1',
-      professionalId: 'maria',
       startsAt: '2026-10-26T16:00:00.000Z',
       endsAt: '2026-10-26T17:00:00.000Z',
       reason: 'Almoço',

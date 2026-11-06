@@ -1,5 +1,5 @@
 import { db } from '../../database'
-import { appointment, service, user } from '../../database/schema'
+import { appointment, service } from '../../database/schema'
 import { eq, and, gte, lte, count, sum, desc } from 'drizzle-orm'
 import { requireUser } from '../../utils/auth-guard'
 import { writeAuditLog } from '../../utils/audit-log'
@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
   const dateFrom = from ? new Date(from as string) : new Date(now.getFullYear(), now.getMonth() - 1, 1)
   const dateTo = to ? new Date(to as string) : new Date(now.getFullYear(), now.getMonth() + 1, 0)
 
-  // No há mais professionalId - todas as métricas são da dona única (current user)
+  // Modelo single-owner: todas as métricas são da dona única.
   const baseWhere = and(
     gte(appointment.startsAt, dateFrom),
     lte(appointment.startsAt, dateTo)
@@ -72,7 +72,6 @@ export default defineEventHandler(async (event) => {
     completedCount: completedCountResult[0]?.count ?? 0,
     noShowCount: noShowCountResult[0]?.count ?? 0,
     cancelledCount: cancelledCountResult[0]?.count ?? 0,
-    serviceRanking,
-    revenueByProfessional: [] // Não há profissionais no modelo single-owner
+    serviceRanking
   }
 })

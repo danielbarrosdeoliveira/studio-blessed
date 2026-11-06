@@ -1,10 +1,9 @@
 import * as z from 'zod'
 import { getAvailabilityForDay } from '../utils/availability'
-import { requireProfessionalAccess } from '../utils/professionals'
+import { requireUser } from '../utils/auth-guard'
 import { isValidDate } from '../utils/time'
 
 const querySchema = z.object({
-  professionalId: z.string().min(1, 'Profissional não informada'),
   serviceId: z.string().min(1, 'Serviço não informado'),
   date: z.string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Data inválida')
@@ -13,6 +12,8 @@ const querySchema = z.object({
 
 /** Disponibilidade para o staff: hoje/amanhã e encaixes, sem os 3 dias da cliente. */
 export default defineEventHandler(async (event) => {
+  await requireUser(event)
+
   const parsed = querySchema.safeParse(getQuery(event))
 
   if (!parsed.success) {
@@ -23,12 +24,11 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  await requireProfessionalAccess(event, parsed.data.professionalId)
-
   setResponseHeader(event, 'Cache-Control', 'no-store')
 
   return getAvailabilityForDay({
-    ...parsed.data,
+    serviceId: parsed.data.serviceId,
+    date: parsed.data.date,
     origin: 'staff'
   })
 })

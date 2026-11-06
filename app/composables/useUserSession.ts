@@ -5,8 +5,6 @@ type SessionUser = {
   name: string
   email: string
   image?: string | null
-  role?: string
-  agendaProvider?: string
 }
 
 /**
@@ -18,7 +16,6 @@ export async function useUserSession() {
 
   const user = computed(() => (data.value?.user ?? null) as SessionUser | null)
   const isAuthenticated = computed(() => !!user.value)
-  const isAdmin = computed(() => user.value?.role === 'admin')
 
-  return { data, user, isAuthenticated, isAdmin, isPending, error }
+  return { data, user, isAuthenticated, isPending, error }
 }
