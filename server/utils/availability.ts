@@ -7,6 +7,7 @@ import type { MinuteInterval } from './time'
 import {
   MINUTES_PER_DAY,
   TIME_ZONE,
+  addDaysToIsoDate,
   dayBounds,
   localDateOf,
   localPartsOf,
@@ -16,8 +17,14 @@ import {
 /** Maior buffer aceito no cadastro de serviço (`server/api/services/index.post.ts`). */
 const MAX_BUFFER_MIN = 240
 
-/** Antecedência mínima da cliente (ver `docs/discovery.md` §6). */
-const CLIENT_LEAD_MS = 3 * 24 * 60 * 60 * 1000
+/**
+ * Antecedência mínima da cliente (ver `docs/discovery.md` §6).
+ *
+ * A regra é por **data local**, não por instante: a cliente pode agendar
+ * qualquer horário a partir do 3º dia — inclusive o primeiro slot (09:00)
+ * do dia limite.
+ */
+const CLIENT_LEAD_DAYS = 3
 
 export type AvailabilityOrigin = 'client' | 'staff'
 
@@ -150,9 +157,15 @@ export async function getAvailabilityForDay(params: AvailabilityParams): Promise
     .filter(interval => interval.end > interval.start)
 
   const now = params.now ?? new Date()
-  const earliestStart = new Date(
-    now.getTime() + (params.origin === 'client' ? CLIENT_LEAD_MS : 0)
-  )
+
+  /**
+   * Para a cliente, o primeiro horário permitido é a meia-noite local do
+   * 3º dia — assim o primeiro slot do dia limite já fica disponível.
+   * Para a dona, vale o instante atual (encaixes e hoje/amanhã).
+   */
+  const earliestStart = params.origin === 'client'
+    ? dayBounds(addDaysToIsoDate(localDateOf(now), CLIENT_LEAD_DAYS)).start
+    : now
 
   const slots = computeAvailability({
     workingIntervals,

@@ -61,6 +61,11 @@ export function localDateOf(instant: Date): string {
   return `${zoned.year}-${month}-${day}`
 }
 
+/** Soma dias a uma data local `YYYY-MM-DD` sem envolver fuso horário. */
+export function addDaysToIsoDate(date: string, days: number): string {
+  return parseDate(date).add({ days }).toString()
+}
+
 /** Componentes de relógio local de um instante. */
 export function localPartsOf(instant: Date) {
   const zoned = fromDate(instant, TIME_ZONE)
