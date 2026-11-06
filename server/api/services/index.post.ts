@@ -2,12 +2,11 @@ import { and, eq } from 'drizzle-orm'
 import * as z from 'zod'
 import { db } from '../../database'
 import { service } from '../../database/schema'
-import { getProfessionalOr404 } from '../../utils/professionals'
+import { requireUser } from '../../utils/auth-guard'
 import { isUniqueViolation, sameServiceName, serviceColumns } from '../../utils/services'
 import { writeAuditLog } from '../../utils/audit-log'
 
 const bodySchema = z.object({
-  professionalId: z.string().min(1).optional(),
   name: z.string().trim().min(2, 'Informe o nome').max(120, 'Nome muito longo'),
   durationMin: z.number().int().min(5, 'Duração mínima de 5 min').max(600, 'Duração máxima de 600 min'),
   bufferMin: z.number().int().min(0).max(240).default(0),
@@ -25,20 +24,6 @@ export default defineEventHandler(async (event) => {
       message: parsed.error.issues[0]?.message ?? 'Dados inválidos',
       data: z.treeifyError(parsed.error)
     })
-  }
-
-  let professionalId = parsed.data.professionalId
-
-  if (current.role === 'admin') {
-    if (!professionalId) {
-      throw createError({ statusCode: 400, message: 'Selecione a profissional' })
-    }
-    await getProfessionalOr404(professionalId)
-  } else {
-    if (professionalId && professionalId !== current.id) {
-      throw createError({ statusCode: 403, message: 'Você só pode criar serviços para si mesma' })
-    }
-    professionalId = current.id
   }
 
   if (parsed.data.active) {
@@ -62,7 +47,7 @@ export default defineEventHandler(async (event) => {
       priceCents: parsed.data.priceCents,
       active: parsed.data.active
     })
-    // @ts-ignore - Drizzle returning type issue
+    // @ts-expect-error - Drizzle returning type issue
     .returning(serviceColumns)
     .catch((error: unknown) => {
       if (isUniqueViolation(error)) {
@@ -83,7 +68,7 @@ export default defineEventHandler(async (event) => {
     entityId: created.id,
     userId: current.id,
     userEmail: current.email,
-    metadata: { name: parsed.data.name, professionalId },
+    metadata: { name: parsed.data.name },
     ipAddress: event.node.req.socket?.remoteAddress,
     userAgent: event.node.req.headers['user-agent']
   })

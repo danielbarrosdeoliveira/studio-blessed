@@ -2,7 +2,11 @@ import { desc, eq } from 'drizzle-orm'
 import * as z from 'zod'
 import { db } from '../../../database'
 import { appointment, client, service } from '../../../database/schema'
-import { serializeAppointment } from '../../../utils/appointment-serialization'
+import {
+  cancellationPolicy,
+  serializeAppointment
+} from '../../../utils/appointment-serialization'
+import { appointmentColumns } from '../../../utils/appointments'
 import { normalizePhone } from '../../../utils/phone'
 
 const querySchema = z.object({
@@ -39,6 +43,7 @@ export default defineEventHandler(async (event) => {
 
   return {
     phone,
+    cancellation: cancellationPolicy,
     appointments: rows.map(row => serializeAppointment(row))
   }
 })

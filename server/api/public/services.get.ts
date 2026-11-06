@@ -1,17 +1,11 @@
 import { asc, eq } from 'drizzle-orm'
 import { db } from '../../database'
-import { service, user } from '../../database/schema'
-
-interface PublicService {
-  id: string
-  durationMin: number
-  bufferMin: number
-  priceCents: number
-}
+import { service } from '../../database/schema'
 
 /**
  * Catálogo público (sem autenticação).
- * Lista serviços ativos. Como há apenas uma dona do salão, não há distinção de profissional por serviço.
+ * Lista serviços ativos. Como há apenas uma dona do salão, cada serviço
+ * aparece uma única vez.
  */
 export default defineEventHandler(async () => {
   const rows = await db

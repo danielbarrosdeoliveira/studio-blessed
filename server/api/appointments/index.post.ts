@@ -1,9 +1,10 @@
 import { and, eq } from 'drizzle-orm'
 import * as z from 'zod'
 import { db } from '../../database'
-import { appointment, service, client } from '../../database/schema'
+import { appointment, service } from '../../database/schema'
 import { writeAuditLog } from '../../utils/audit-log'
-import { findOrCreateClient } from '../../utils/appointments'
+import { serializeStaffAppointment } from '../../utils/appointment-serialization'
+import { findOrCreateClient, getAppointmentById } from '../../utils/appointments'
 import { isSlotAvailable } from '../../utils/availability'
 import { normalizePhone } from '../../utils/phone'
 import { requireUser } from '../../utils/auth-guard'
@@ -16,7 +17,7 @@ const bodySchema = z.object({
   notes: z.string().trim().max(500, 'Observações muito longas').optional()
 })
 
-/** Cria um agendamento pela dona do salão (origem `client`), com antecedência de 3 dias. */
+/** Cria um agendamento pela dona do salão (origem `staff`, sem antecedência mínima). */
 export default defineEventHandler(async (event) => {
   const current = await requireUser(event)
   const parsed = bodySchema.safeParse(await readBody(event))
@@ -54,7 +55,7 @@ export default defineEventHandler(async (event) => {
   const available = await isSlotAvailable({
     serviceId: parsed.data.serviceId,
     startsAt,
-    origin: 'client'
+    origin: 'staff'
   })
 
   if (!available) {
@@ -74,10 +75,10 @@ export default defineEventHandler(async (event) => {
       startsAt,
       endsAt: new Date(startsAt.getTime() + found.durationMin * 60_000),
       status: 'scheduled',
-      origin: 'client',
+      origin: 'staff',
       notes: parsed.data.notes || null
     })
-    // @ts-ignore - Drizzle returning type issue
+    // @ts-expect-error - Drizzle returning type issue
     .returning({ id: appointment.id })
 
   if (!created) {
@@ -96,12 +97,12 @@ export default defineEventHandler(async (event) => {
     entityId: created.id,
     userId: current.id,
     userEmail: current.email,
-    metadata: { serviceId: parsed.data.serviceId, clientPhone: phone, origin: 'client' },
+    metadata: { serviceId: parsed.data.serviceId, clientPhone: phone, origin: 'staff' },
     ipAddress: event.node.req.socket?.remoteAddress,
     userAgent: event.node.req.headers['user-agent']
   })
 
   return {
-    appointment: serializeAppointment(row)
+    appointment: serializeStaffAppointment(row)
   }
 })

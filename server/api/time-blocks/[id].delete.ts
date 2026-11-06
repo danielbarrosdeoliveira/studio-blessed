@@ -1,23 +1,17 @@
-import { and, eq } from 'drizzle-orm'
-import { db } from '../../../../database'
-import { timeBlock } from '../../../../database/schema'
-import { getProfessionalOr404, requireProfessionalAccess } from '../../../../utils/professionals'
+import { eq } from 'drizzle-orm'
+import { db } from '../../database'
+import { timeBlock } from '../../database/schema'
+import { requireUser } from '../../utils/auth-guard'
 
 /** Remove um bloqueio da dona do salão. */
 export default defineEventHandler(async (event) => {
-  const id = getRouterParam(event, 'id')
-  const blockId = getRouterParam(event, 'blockId')
+  await requireUser(event)
 
-  if (!id) {
-    throw createError({ statusCode: 400, message: 'Profissional não informada' })
-  }
+  const blockId = getRouterParam(event, 'id')
 
   if (!blockId) {
     throw createError({ statusCode: 400, message: 'Bloqueio não informado' })
   }
-
-  await requireProfessionalAccess(event, id)
-  await getProfessionalOr404(id)
 
   const [existing] = await db
     .select({ id: timeBlock.id })

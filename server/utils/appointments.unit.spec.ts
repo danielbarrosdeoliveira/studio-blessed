@@ -11,14 +11,15 @@ const NOW = new Date('2026-10-27T12:00:00.000Z')
 
 const details: AppointmentDetails = {
   id: 'appointment-1',
+  createdAt: new Date('2026-10-26T12:00:00.000Z'),
+  updatedAt: new Date('2026-10-26T12:00:00.000Z'),
   startsAt: new Date('2026-10-29T12:00:00.000Z'),
   endsAt: new Date('2026-10-29T12:40:00.000Z'),
   status: 'scheduled',
   origin: 'client',
   serviceId: 'service-1',
-  professionalId: 'professional-1',
+  clientId: 'client-1',
   serviceName: 'Corte feminino',
-  professionalName: 'Maria',
   durationMin: 40,
   priceCents: 13000,
   clientName: 'Cliente Teste',

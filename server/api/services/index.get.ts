@@ -1,9 +1,11 @@
 import { and, asc, eq } from 'drizzle-orm'
 import { db } from '../../database'
 import { service } from '../../database/schema'
+import { requireUser } from '../../utils/auth-guard'
+import { serviceColumns } from '../../utils/services'
 
 export default defineEventHandler(async (event) => {
-  const current = await requireUser(event)
+  await requireUser(event)
 
   const query = getQuery(event)
   const active = query.active === 'true'
@@ -14,9 +16,7 @@ export default defineEventHandler(async (event) => {
   }
 
   return db
-    .select({
-      ...serviceColumns,
-    })
+    .select(serviceColumns)
     .from(service)
     .where(conditions.length ? and(...conditions) : undefined)
     .orderBy(asc(service.name))

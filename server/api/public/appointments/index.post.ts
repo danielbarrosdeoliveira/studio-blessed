@@ -19,8 +19,6 @@ const bodySchema = z.object({
 
 /** Cria um agendamento público (origem `client`) com revalidação do horário. */
 export default defineEventHandler(async (event) => {
-  const current = await requireUser(event)
-
   const parsed = bodySchema.safeParse(await readBody(event))
 
   if (!parsed.success) {

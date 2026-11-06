@@ -1,8 +1,8 @@
-import { asc, eq } from 'drizzle-orm'
+import { asc } from 'drizzle-orm'
 import * as z from 'zod'
-import { db } from '../../../database'
-import { workingHours } from '../../../database/schema'
-import { getProfessionalOr404, requireProfessionalAccess } from '../../../utils/professionals'
+import { db } from '../database'
+import { workingHours } from '../database/schema'
+import { requireUser } from '../utils/auth-guard'
 
 const hourSchema = z.object({
   weekday: z.number().int().min(0).max(6),
@@ -48,14 +48,7 @@ const bodySchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  const id = getRouterParam(event, 'id')
-
-  if (!id) {
-    throw createError({ statusCode: 400, message: 'Profissional não informada' })
-  }
-
-  await requireProfessionalAccess(event, id)
-  await getProfessionalOr404(id)
+  await requireUser(event)
 
   const parsed = bodySchema.safeParse(await readBody(event))
 

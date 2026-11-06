@@ -1,6 +1,6 @@
 import { requireUser } from '../../utils/auth-guard'
 import { db } from '../../database'
-import { account, user } from '../../database/schema'
+import { account } from '../../database/schema'
 import { eq } from 'drizzle-orm'
 
 const GOOGLE_CALENDAR_API = 'https://www.googleapis.com/calendar/v3'
@@ -31,7 +31,13 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const eventPayload: any = {
+  const eventPayload: {
+    summary: string
+    start: { dateTime: string, timeZone: string }
+    end: { dateTime: string, timeZone: string }
+    extendedProperties: { private: { appointmentId: string } }
+    attendees?: Array<{ email: string }>
+  } = {
     summary,
     start: { dateTime: startsAt, timeZone: 'America/Sao_Paulo' },
     end: { dateTime: endsAt, timeZone: 'America/Sao_Paulo' },
@@ -67,7 +73,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const data = await res.json()
+  const data = await res.json() as { id?: string, htmlLink?: string }
 
   return {
     ok: true,

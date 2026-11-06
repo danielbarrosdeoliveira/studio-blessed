@@ -2,7 +2,8 @@ import { and, asc, eq, gte, lt } from 'drizzle-orm'
 import * as z from 'zod'
 import { db } from '../../database'
 import { appointment, client, service } from '../../database/schema'
-import { serializeAppointment } from '../../utils/appointment-serialization'
+import { serializeStaffAppointment } from '../../utils/appointment-serialization'
+import { appointmentColumns } from '../../utils/appointments'
 import { requireUser } from '../../utils/auth-guard'
 import { TIME_ZONE, dayBounds, isValidDate } from '../../utils/time'
 
@@ -12,9 +13,10 @@ const querySchema = z.object({
     .refine(isValidDate, 'Data inválida')
 })
 
-/** Retorna a agenda do dia para a dona do salão (apenas admin). */
+/** Retorna a agenda do dia para a dona do salão. */
 export default defineEventHandler(async (event) => {
-  const current = await requireUser(event)
+  await requireUser(event)
+
   const parsed = querySchema.safeParse(getQuery(event))
 
   if (!parsed.success) {
@@ -23,10 +25,6 @@ export default defineEventHandler(async (event) => {
       message: parsed.error.issues[0]?.message ?? 'Dados inválidos',
       data: z.treeifyError(parsed.error)
     })
-  }
-
-  if (current.role !== 'admin') {
-    throw createError({ statusCode: 403, message: 'Acesso negado' })
   }
 
   const bounds = dayBounds(parsed.data.date)
@@ -49,6 +47,6 @@ export default defineEventHandler(async (event) => {
   return {
     date: parsed.data.date,
     timezone: TIME_ZONE,
-    appointments: rows.map(row => serializeAppointment(row))
+    appointments: rows.map(row => serializeStaffAppointment(row))
   }
 })

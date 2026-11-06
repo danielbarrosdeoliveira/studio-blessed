@@ -1,6 +1,6 @@
 import { requireUser } from '../../utils/auth-guard'
 import { db } from '../../database'
-import { account, user } from '../../database/schema'
+import { account } from '../../database/schema'
 import { eq } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {

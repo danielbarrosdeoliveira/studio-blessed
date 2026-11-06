@@ -3,7 +3,6 @@ import { getAvailabilityForDay } from '../../utils/availability'
 import { isValidDate } from '../../utils/time'
 
 const querySchema = z.object({
-  professionalId: z.string().min(1, 'Profissional não informada'),
   serviceId: z.string().min(1, 'Serviço não informado'),
   date: z.string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Data inválida')
@@ -25,7 +24,8 @@ export default defineEventHandler(async (event) => {
   setResponseHeader(event, 'Cache-Control', 'no-store')
 
   return getAvailabilityForDay({
-    ...parsed.data,
+    serviceId: parsed.data.serviceId,
+    date: parsed.data.date,
     origin: 'client'
   })
 })
