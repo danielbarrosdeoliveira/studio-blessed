@@ -4,20 +4,20 @@ import type { NavigationMenuItem } from '@nuxt/ui'
 const links = [[{
   label: 'General',
   icon: 'i-ri-user-line',
-  to: '/settings',
+  to: '/configuracoes',
   exact: true
 }, {
   label: 'Members',
   icon: 'i-ri-group-line',
-  to: '/settings/members'
+  to: '/configuracoes/members'
 }, {
   label: 'Notifications',
   icon: 'i-ri-notification-3-line',
-  to: '/settings/notifications'
+  to: '/configuracoes/notifications'
 }, {
   label: 'Security',
   icon: 'i-ri-shield-line',
-  to: '/settings/security'
+  to: '/configuracoes/security'
 }], [{
   label: 'Documentation',
   icon: 'i-ri-book-open-line',
@@ -27,9 +27,9 @@ const links = [[{
 </script>
 
 <template>
-  <UDashboardPanel id="settings" :ui="{ body: 'lg:py-12' }">
+  <UDashboardPanel id="configuracoes" :ui="{ body: 'lg:py-12' }">
     <template #header>
-      <UDashboardNavbar title="Settings">
+      <UDashboardNavbar title="Configurações">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>

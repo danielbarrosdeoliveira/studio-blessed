@@ -36,6 +36,7 @@ async function cancel() {
   actionError.value = ''
 
   try {
+    // @ts-ignore - Nuxt $fetch PATCH method type
     await $fetch(`/api/public/appointments/${props.appointment.id}`, {
       method: 'PATCH',
       body: { action: 'cancel', phone: props.phone }
@@ -60,6 +61,7 @@ async function reschedule() {
   actionError.value = ''
 
   try {
+    // @ts-ignore - Nuxt $fetch PATCH method type
     await $fetch(`/api/public/appointments/${props.appointment.id}`, {
       method: 'PATCH',
       body: {

@@ -3,7 +3,7 @@ import { db } from '../../../../database'
 import { timeBlock } from '../../../../database/schema'
 import { getProfessionalOr404, requireProfessionalAccess } from '../../../../utils/professionals'
 
-/** Remove um bloqueio da profissional. */
+/** Remove um bloqueio da dona do salão. */
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id')
   const blockId = getRouterParam(event, 'blockId')
@@ -22,10 +22,7 @@ export default defineEventHandler(async (event) => {
   const [existing] = await db
     .select({ id: timeBlock.id })
     .from(timeBlock)
-    .where(and(
-      eq(timeBlock.id, blockId),
-      eq(timeBlock.professionalId, id)
-    ))
+    .where(eq(timeBlock.id, blockId))
     .limit(1)
 
   if (!existing) {

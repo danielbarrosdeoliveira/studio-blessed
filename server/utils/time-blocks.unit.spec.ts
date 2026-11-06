@@ -64,7 +64,6 @@ describe('bloqueios de horário', () => {
   it('serializa bloqueios e conflitos para a API', () => {
     const block = serializeTimeBlock({
       id: 'block-1',
-      professionalId: 'maria',
       startsAt: local('2026-10-26', '13:00'),
       endsAt: local('2026-10-26', '14:00'),
       reason: 'Almoço',

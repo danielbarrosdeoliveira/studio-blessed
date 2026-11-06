@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { FormSubmitEvent, TableColumn } from '@nuxt/ui'
 import * as z from 'zod'
-import type { Professional, Service } from '~/types/domain'
 
 const UBadge = resolveComponent('UBadge')
 const UButton = resolveComponent('UButton')
@@ -9,41 +8,11 @@ const UButton = resolveComponent('UButton')
 const toast = useToast()
 const { user, isAdmin } = await useUserSession()
 
-const { data: professionals } = await useFetch<Professional[]>('/api/professionals', {
-  immediate: isAdmin.value,
-  default: () => []
-})
-
-const professionalFilter = ref('all')
-
 const { data: services, status, refresh } = await useFetch<Service[]>('/api/services', {
-  query: computed(() => professionalFilter.value === 'all'
-    ? {}
-    : { professionalId: professionalFilter.value }),
   default: () => []
 })
-
-const professionalItems = computed(() => [
-  { label: 'Todas as profissionais', value: 'all' },
-  ...(professionals.value ?? []).map(professional => ({
-    label: professional.name,
-    value: professional.id
-  }))
-])
-
-/* ------------------------------- Formulário ------------------------------ */
-
-interface FormState {
-  professionalId: string
-  name: string
-  durationMin: string
-  bufferMin: string
-  price: string
-  active: boolean
-}
 
 const formSchema = z.object({
-  professionalId: z.string().min(1, 'Selecione a profissional'),
   name: z.string().min(2, 'Informe o nome'),
   durationMin: z.coerce.number().int().min(5, 'Duração mínima de 5 min').max(600, 'Duração máxima de 600 min'),
   bufferMin: z.coerce.number().int().min(0).max(240),
@@ -57,8 +26,7 @@ const formOpen = ref(false)
 const saving = ref(false)
 const editing = ref<Service | null>(null)
 
-const state = reactive<FormState>({
-  professionalId: '',
+const state = reactive({
   name: '',
   durationMin: '60',
   bufferMin: '0',
@@ -67,7 +35,6 @@ const state = reactive<FormState>({
 })
 
 function resetState() {
-  state.professionalId = isAdmin.value ? '' : (user.value?.id ?? '')
   state.name = ''
   state.durationMin = '60'
   state.bufferMin = '0'
@@ -83,7 +50,6 @@ function openCreate() {
 
 function openEdit(row: Service) {
   editing.value = row
-  state.professionalId = row.professionalId
   state.name = row.name
   state.durationMin = String(row.durationMin)
   state.bufferMin = String(row.bufferMin)
@@ -98,8 +64,7 @@ async function onSubmit(event: FormSubmitEvent<FormSchema>) {
     durationMin: event.data.durationMin,
     bufferMin: event.data.bufferMin,
     priceCents: Math.round(event.data.price * 100),
-    active: event.data.active,
-    ...(isAdmin.value ? { professionalId: event.data.professionalId } : {})
+    active: event.data.active
   }
 
   saving.value = true
@@ -148,7 +113,7 @@ async function toggleActive(row: Service) {
   }
 }
 
-/* -------------------------------- Tabela -------------------------------- */
+/* ------------------------------- Tabela -------------------------------- */
 
 const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
 
@@ -163,7 +128,7 @@ const columns = computed<TableColumn<Service>[]>(() => [
     cell: ({ row }) => h('div', undefined, [
       h('p', { class: 'font-medium text-highlighted' }, row.original.name),
       ...(isAdmin.value
-        ? [h('p', { class: 'text-sm text-muted' }, row.original.professionalName)]
+        ? [h('p', { class: 'text-sm text-muted' }, row.original.name)]
         : [])
     ])
   },
@@ -247,12 +212,9 @@ const columns = computed<TableColumn<Service>[]>(() => [
         v-if="isAdmin"
         class="flex flex-col sm:flex-row sm:items-center gap-3 mb-4"
       >
-        <USelect
-          v-model="professionalFilter"
-          :items="professionalItems"
-          class="w-full sm:w-64"
-          icon="i-ri-user-line"
-        />
+        <p class="text-sm text-muted">
+          Serviços cadastrados pela dona do salão.
+        </p>
       </div>
 
       <div class="overflow-x-auto">
@@ -277,7 +239,7 @@ const columns = computed<TableColumn<Service>[]>(() => [
   <UModal
     v-model:open="formOpen"
     :title="editing ? 'Editar serviço' : 'Novo serviço'"
-    :description="editing ? undefined : 'O serviço pertence a uma profissional. Combos são serviços de duração maior.'"
+    :description="editing ? undefined : 'O serviço pertence à dona do salão. Combos são serviços de duração maior.'"
   >
     <template #body>
       <UForm
@@ -286,20 +248,6 @@ const columns = computed<TableColumn<Service>[]>(() => [
         class="space-y-4"
         @submit="onSubmit"
       >
-        <UFormField
-          v-if="isAdmin"
-          label="Profissional"
-          name="professionalId"
-          required
-        >
-          <USelect
-            v-model="state.professionalId"
-            :items="(professionals ?? []).map(p => ({ label: p.name, value: p.id }))"
-            placeholder="Selecione"
-            class="w-full"
-          />
-        </UFormField>
-
         <UFormField
           label="Nome"
           name="name"

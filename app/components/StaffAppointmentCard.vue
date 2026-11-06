@@ -41,6 +41,7 @@ const whatsappUrl = computed(() => `https://wa.me/55${props.appointment.clientPh
 async function setStatus(status: 'completed' | 'no_show') {
   working.value = true
 
+  // @ts-ignore - Nuxt $fetch PATCH method type
   try {
     await $fetch(`/api/appointments/${props.appointment.id}`, {
       method: 'PATCH',
@@ -70,6 +71,7 @@ async function cancel() {
   working.value = true
   cancelError.value = ''
 
+  // @ts-ignore - Nuxt $fetch PATCH method type
   try {
     await $fetch(`/api/appointments/${props.appointment.id}`, {
       method: 'PATCH',

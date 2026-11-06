@@ -1,39 +1,39 @@
 <template>
-  <section id="services" class="py-20 md:py-28 bg-bg">
+  <section id="services" class="py-20 md:py-28 bg-zinc-950">
     <div class="max-w-[1400px] mx-auto px-8 lg:px-12">
       <div class="flex flex-col items-center text-center mb-16">
-        <span class="font-sans text-xs uppercase tracking-[0.2em] text-primary font-semibold">04 / Serviços</span>
-        <h2 class="font-serif text-4xl md:text-5xl text-primary-foreground mt-3 leading-tight">
+        <span class="font-sans text-xs uppercase tracking-[0.2em] text-zinc-400 font-semibold">04 / Serviços</span>
+        <h2 class="font-serif text-4xl md:text-5xl text-zinc-100 mt-3 leading-tight">
           Nossos Serviços
         </h2>
-        <p class="font-sans text-muted-foreground text-base leading-relaxed max-w-xl mt-4">
+        <p class="font-sans text-zinc-400/80 text-base leading-relaxed max-w-xl mt-4">
           Do olhar ao bem-estar, cada detalhe pensado para realçar sua beleza natural.
         </p>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
         <div v-for="servico in servicos" :key="servico.name" class="text-center group">
-          <div class="w-14 h-14 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-all duration-300 mb-5">
-            <Icon :icon="servico.icon" class="w-7 h-7 text-primary" />
+          <div
+            class="w-14 h-14 mx-auto rounded-2xl bg-zinc-950/20 flex items-center justify-center group-hover:bg-zinc-950/30 transition-all duration-300 mb-5">
+            <Icon :icon="servico.icon" class="w-7 h-7 text-zinc-400" />
           </div>
-          <h3 class="font-sans text-base uppercase tracking-[0.15em] text-neutral-100 font-semibold mb-2">
+          <h3 class="font-sans text-base uppercase tracking-[0.15em] text-zinc-100 font-semibold mb-2">
             {{ servico.name }}
           </h3>
-          <p class="font-sans text-neutral-300 text-sm leading-relaxed">
+          <p class="font-sans text-zinc-500 text-sm leading-relaxed">
             {{ servico.desc }}
           </p>
           <div class="flex items-center justify-center">
-            <span class="font-bold text-primary-400">{{ servico.price }}</span>
+            <span class="font-bold text-zinc-400">{{ servico.price }}</span>
           </div>
         </div>
       </div>
 
       <div class="flex justify-center mt-16">
-        <a
-          href="https://agenda.studioblessed.com.br"
-          class="rounded-full bg-primary text-primary-foreground text-sm uppercase tracking-wider px-10 py-4 font-semibold hover:bg-primary/90 transition-all duration-300 shadow-lg">
-          Agende Seu Horário
-        </a>
+        <NuxtLink to="/agendamento"
+          class="rounded-full bg-orange-500 text-zinc-950 text-sm uppercase tracking-wider px-8 py-4 font-semibold hover:bg-orange-500/90 transition-all duration-300 shadow-lg whitespace-nowrap">
+          Agendar Agora
+        </NuxtLink>
       </div>
     </div>
   </section>

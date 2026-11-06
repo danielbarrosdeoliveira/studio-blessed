@@ -4,7 +4,7 @@ import { timeBlock } from '../../../../database/schema'
 import { getProfessionalOr404, requireProfessionalAccess } from '../../../../utils/professionals'
 import { serializeTimeBlock } from '../../../../utils/time-blocks'
 
-/** Lista os bloqueios cadastrados da profissional. */
+/** Lista os bloqueios cadastrados da dona do salão. */
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id')
 
@@ -18,7 +18,6 @@ export default defineEventHandler(async (event) => {
   const rows = await db
     .select()
     .from(timeBlock)
-    .where(eq(timeBlock.professionalId, id))
     .orderBy(asc(timeBlock.startsAt))
 
   setResponseHeader(event, 'Cache-Control', 'no-store')

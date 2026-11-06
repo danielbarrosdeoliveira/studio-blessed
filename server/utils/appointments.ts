@@ -5,18 +5,19 @@ import type { AppointmentDetails } from './appointment-serialization'
 
 export const appointmentColumns = {
   id: appointment.id,
+  createdAt: appointment.createdAt,
+  updatedAt: appointment.updatedAt,
   startsAt: appointment.startsAt,
   endsAt: appointment.endsAt,
   status: appointment.status,
   origin: appointment.origin,
   serviceId: appointment.serviceId,
-  professionalId: appointment.professionalId,
   serviceName: service.name,
-  professionalName: user.name,
   durationMin: service.durationMin,
   priceCents: service.priceCents,
   clientName: client.name,
   clientPhone: client.phone,
+  clientId: appointment.clientId,
   notes: appointment.notes
 }
 
@@ -26,7 +27,6 @@ export async function getAppointmentById(id: string): Promise<AppointmentDetails
     .from(appointment)
     .innerJoin(client, eq(appointment.clientId, client.id))
     .innerJoin(service, eq(appointment.serviceId, service.id))
-    .innerJoin(user, eq(appointment.professionalId, user.id))
     .where(eq(appointment.id, id))
     .limit(1)
 

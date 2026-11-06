@@ -70,27 +70,31 @@ const { data: stats } = await useAsyncData<Stat[]>('stats', async () => {
       :key="index"
       :icon="stat.icon"
       :title="stat.title"
-      to="/customers"
+      to="/clientes"
       variant="subtle"
       :ui="{
         container: 'gap-y-1.5',
         wrapper: 'items-start',
-        leading: 'p-2.5 rounded-full bg-primary/10 ring ring-inset ring-primary/25 flex-col',
-        title: 'font-normal text-muted text-xs uppercase'
+        leading: 'p-2.5 rounded-full bg-zinc-950/20 ring ring-inset ring-zinc-800/25 flex-col',
+        title: 'font-normal text-zinc-400 text-xs uppercase'
       }"
       class="lg:rounded-none first:rounded-l-lg last:rounded-r-lg hover:z-1"
     >
       <div class="flex items-center gap-2">
-        <span class="text-2xl font-semibold text-highlighted">
+        <span class="text-2xl font-semibold text-zinc-100">
           {{ stat.value }}
         </span>
 
         <UBadge
           :color="stat.variation > 0 ? 'success' : 'error'"
           variant="subtle"
-          class="text-xs"
         >
-          {{ stat.variation > 0 ? '+' : '' }}{{ stat.variation }}%
+          <span v-if="stat.variation > 0" class="text-zinc-400/80 text-xs">
+            +{{ stat.variation }}%
+          </span>
+          <span v-else class="text-zinc-600/80 text-xs">
+            -{{ Math.abs(stat.variation) }}%
+          </span>
         </UBadge>
       </div>
     </UPageCard>

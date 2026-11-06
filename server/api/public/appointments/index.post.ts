@@ -11,7 +11,6 @@ import { isSlotAvailable } from '../../../utils/availability'
 import { normalizePhone } from '../../../utils/phone'
 
 const bodySchema = z.object({
-  professionalId: z.string().min(1, 'Profissional não informada'),
   serviceId: z.string().min(1, 'Serviço não informado'),
   startsAt: z.string().refine(value => !Number.isNaN(Date.parse(value)), 'Horário inválido'),
   clientName: z.string().trim().min(2, 'Informe seu nome').max(120),
@@ -20,6 +19,8 @@ const bodySchema = z.object({
 
 /** Cria um agendamento público (origem `client`) com revalidação do horário. */
 export default defineEventHandler(async (event) => {
+  const current = await requireUser(event)
+
   const parsed = bodySchema.safeParse(await readBody(event))
 
   if (!parsed.success) {
@@ -43,7 +44,6 @@ export default defineEventHandler(async (event) => {
     .from(service)
     .where(and(
       eq(service.id, parsed.data.serviceId),
-      eq(service.professionalId, parsed.data.professionalId),
       eq(service.active, true)
     ))
     .limit(1)
@@ -54,7 +54,6 @@ export default defineEventHandler(async (event) => {
 
   // Revalida imediatamente antes de gravar (US6.3).
   const available = await isSlotAvailable({
-    professionalId: parsed.data.professionalId,
     serviceId: parsed.data.serviceId,
     startsAt,
     origin: 'client'
@@ -73,7 +72,6 @@ export default defineEventHandler(async (event) => {
     .insert(appointment)
     .values({
       clientId: clientRow.id,
-      professionalId: parsed.data.professionalId,
       serviceId: parsed.data.serviceId,
       startsAt,
       endsAt: new Date(startsAt.getTime() + found.durationMin * 60_000),

@@ -10,9 +10,9 @@ Plataforma web responsiva **single-tenant** para gestão de agendamentos do sal�
 Studio Blessed. Foco em velocidade, arquitetura enxuta e manutenibilidade por
 **1 desenvolvedor + IA** ("Lean AI").
 
-O salão opera em **modelo de parceria**: a cliente paga diretamente à
-profissional e o salão cobra **mensalidade fixa** das parceiras. Não há controle
-financeiro de repasse nem comissão.
+O salão opera em **modelo de dona única**: a cliente paga diretamente à dona do salão
+e o salão cobra **mensalidade fixa** da própria administração. Não há controle
+financeiro de repasse nem comissão, pois há apenas uma usuária.
 
 ## 2. Stack (corrigida)
 
@@ -27,45 +27,29 @@ financeiro de repasse nem comissão.
 
 ## 3. Papéis e permissões
 
-- **Admin (dona):** acesso total. Cadastra serviços, profissionais, horários e
-  bloqueios para todos. Cria agendamentos para hoje/amanhã/encaixes.
-- **Profissional (partner/service provider):** loga no sistema, opera **apenas o
-  que é dela** — agenda própria, serviços próprios, blocos próprios, cancelar os
-  **próprios** agendamentos, marcar concluído/no-show. Vê o **faturamento próprio**.
-- **Cliente (público):** **sem login**. Identificada por **nome + WhatsApp**.
-  Consulta histórico apenas informando o telefone (risco aceito).
+- **Admin (dona):** acesso total. Cadastra serviços, horários e bloqueios para todos. Cria agendamentos para hoje/amanhã/encaixes. Vê todas as métricas e corrige status.
+- **Cliente (público):** **sem login**. Identificada por **nome + WhatsApp**. Consulta histórico apenas informando o telefone (risco aceito).
+- **Profissional:** **Não existe** como papel distinto no MVP. Todas as funcionalidades antes atribuídas a profissionais agora pertencem à dona.
 
 ## 4. Modelo de dados (conceitual)
 
 - **Client:** `name`, `phone` — **única por telefone no salão todo**.
-- **Professional:** `name`, `email`, `role` (admin/partner), `agendaProvider`
-  (`google` | `internal`), tokens OAuth (quando Google).
-- **Service:** pertence a **uma profissional** → `name`, `durationMin`, `bufferMin`,
-  `price`. O nome é **único entre os serviços ativos** (sem diferenciar
-  maiúsculas/espaços); o catálogo lista cada serviço uma vez com a profissional
-  responsável. Serviços inativos preservam o histórico. Combos são serviços
-  próprios com nome e duração maior.
-- **WorkingHours:** por profissional, por dia da semana, com intervalos (almoço/folgas).
-- **Appointment:** `client`, `professional`, `service`, `startsAt`, `endsAt`,
-  `status` (`scheduled` | `completed` | `cancelled` | `no_show`), `origin`
-  (`client` | `staff`), `externalEventId` (quando Google).
-- **TimeBlock:** bloqueio de horário (`professional`, `startsAt`, `endsAt`,
-  `reason`, `recurrence?` — ex.: semanal). Em Google vira evento; em agenda
-  interna é registro local.
+- **Service:** `name`, `durationMin`, `bufferMin`, `priceCents`, `active`. O nome é **único entre os serviços ativos** (sem diferenciar maiúsculas/faixas); o catálogo lista cada serviço uma vez. Serviços inativos preservam o histórico. Combos são serviços próprios com nome e duração maior.
+- **WorkingHour:** `weekday`, `startMinute`, `endMinute`, `createdAt`. Pertence à dona.
+- **Appointment:** `client`, `service`, `startsAt`, `endsAt`, `status` (`scheduled` | `completed` | `cancelled` | `no_show`), `origin` (`client`). **Sem `professionalId`** — a relação é implícita pelo dono único do salão.
+- **TimeBlock:** `startsAt`, `endsAt`, `reason`, `recurrence` (`weekly`). Bloqueios da dona.
 
 ## 5. Fluxo de agendamento (cliente)
 
 1. Abre `/agendamento`.
 2. No **stepper**, escolhe um **serviço**.
-3. O sistema mostra a **profissional responsável** e os **horários disponíveis**.
+3. O sistema mostra a **duração e o preço** do serviço selecionado.
 4. Informa **nome + WhatsApp** → confirma.
 5. Tela de sucesso. **Nenhuma mensagem é enviada** no MVP.
 
-A rota antiga `/agendar` redireciona para `/agendamento`, preservando os
-parâmetros de serviço/profissional quando existirem.
+A rota antiga `/agendar` redireciona para `/agendamento`, preservando os parâmetros de serviço quando existirem.
 
-**Um agendamento = 1 serviço + 1 profissional + 1 horário.** Para mais de um
-serviço, a cliente repete o fluxo (decisão de simplificação do MVP).
+**Um agendamento = 1 serviço + 1 horário.** Para mais de um serviço, a cliente repete o fluxo (decisão de simplificação do MVP).
 
 ## 6. Motor de disponibilidade
 
@@ -73,92 +57,68 @@ serviço, a cliente repete o fluxo (decisão de simplificação do MVP).
 > O Google Calendar entra na **fase final do MVP**. A abstração de provider já
 > existe no código, mas sem chamadas reais ao Google nesta fase.
 
-- **Duas fontes por profissional:**
-  - `google` → agenda `primary` da profissional é o banco de agendamentos.
-  - `internal` → agenda interna no Postgres (fonte usada na Fase 1).
-- **Fonte da verdade:** Google Calendar quando conectado; caso contrário, a
-  agenda interna.
-- **Disponibilidade =** `WorkingHours` − `bloqueios` − `eventos busy`.
-  - Professional com Google: **qualquer evento na agenda dela conta como busy**
-    (inclusive criados fora do sistema, no celular dela).
-  - Professional com agenda interna: só o que está no sistema conta.
-- **Escrita:** ao confirmar, cria/atualiza o evento no Google (ou o registro
-  interno). Cancelar/remarcar atualiza ou remove o evento correspondente.
-
-### Regras de antecedência
-- **Cliente:** antecedência mínima de **3 dias** para qualquer serviço.
-- **Staff (admin/profissional):** pode agendar para **hoje/amanhã** e fazer **encaixes**.
+- **Fonte da verdade:** Agenda interna no Postgres (fase 1).
+- **Disponibilidade =** `WorkingHours` − `TimeBlocks` − eventos busy.
+- **Escrita:** ao confirmar, cria registro no PostgreSQL.
+- **Rules de antecedência:**
+  - **Cliente:** antecedência mínima de **3 dias** para qualquer serviço.
+  - **Staff (dona):** pode agendar para **hoje/amanhã** e fazer **encaixes**.
 
 ### Granularidade dos horários
 - Inícios de horário a cada **15 minutos** dentro da jornada.
 
 ### Bloqueios
-- Admin **e** a própria profissional podem criar bloqueios.
+- A dona **pode** criar bloqueios pontuais ou semanais.
 - Suportam **recorrência** (ex.: semanal), além de bloqueios pontuais.
-- Em profissional com Google, o bloqueio é gravado como evento na agenda `primary`.
 
 ### Concorrência
-- Sem lock distribuído no MVP. Estratégia: **revalidar a disponibilidade
-  imediatamente antes de gravar**; se ocupou, o cliente escolhe outro horário.
+- Sem lock distribuído no MVP. Estratégia: **revalidar a disponibilidade imediatamente antes de gravar**; se ocupou, o cliente escolhe outro horário.
 - Risco residual aceito: double-booking é improvável (salão pequeno, baixo volume).
 
 ### Cancelamento / reagendamento (cliente)
 - Permitido **até 24h antes**.
 - Dentro de 24h **não** é possível (vira **no-show**).
 - Reagendamento segue a mesma regra.
-- Cancelamento com menos de 24h prevê **taxa de 50%** — **apenas exibida como
-  política**; o sistema não calcula, não registra e não bloqueia.
+- Cancelamento com menos de 24h prevê **taxa de 50%**, **apenas exibida como política** — o sistema não calcula, não registra e não bloqueia.
 
 ## 7. Métricas (dashboard do admin)
 
 Períodos: **dia, semana, mês e ano**.
-- **Faturamento** = soma dos preços dos serviços **concluídos**, com **quebra por
-  profissional** (mede movimento, não receita recebida pelo salão).
+- **Faturamento** = soma dos preços dos serviços **concluídos** (mede movimento, não receita recebida por profissional, pois não há profissionais).
 - **Total de atendimentos**.
 - **Ranking de serviços** mais realizados.
 - **No-show**.
-- A profissional vê **apenas o próprio faturamento**.
-- O **admin pode corrigir o status** de qualquer agendamento (concluído/no-show)
-  a qualquer momento.
+- O **admin (dona)** vê **todos os dados** (não há separação por profissional, pois há apenas uma).
 
 ## 8. Fora do escopo do MVP
 
-Multi-tenant; pagamento online/gateway; engine fiscal; notificações automáticas
-(e-mail/SMS/WhatsApp); PWA/offline; reserva multi-serviço atômica; controle de
-pagamento da mensalidade das parceiras; controle financeiro de repasse/comissão;
-suporte a outros idiomas.
+Multi-tenant; pagamento online/gateway; engine fiscal; notificações automáticas (e-mail/SMS/WhatsApp); PWA/offline; reserva multi-serviço atômica; suporte a outros idiomas.
 
 ## 9. Riscos
 
-1. **OAuth do Google em modo Testing** — escopos de Calendar são sensíveis/restritos.
-   Enquanto não verificado, o app fica limitado a ~100 usuários de teste e tokens
-   expiram em 7 dias. **Decisão: aceitável no MVP** (só a equipe usa Google:
-   2 profissionais). Rever antes de crescer.
-2. **Latência/quota da API do Google** ao calcular disponibilidade.
-3. **Consistência do `freebusy`** — resolvida por revalidação antes de gravar.
-4. **Metadados no evento** — nome do cliente, telefone e serviço precisam ir para
-   `description`/`extendedProperties` do evento.
+1. **Latência/quota da API do Google** ao calcular disponibilidade (se/quando ativado).
+2. **Consistência do `freebusy`** — resolvida por revalidação antes de gravar.
+3. **Metadados no evento** — nome do cliente e telefone precisam ir para `description`/`extendedProperties` do evento (quando Google Calendar for ativado).
 
 ## 10. Pontos ainda em aberto (backlog de discovery)
 
-1. **Admin agendando para uma profissional sem Google conectado:** confirma que
-   cai na agenda interna?
-2. **LGPD:** texto de consentimento ao informar nome/telefone e política de
-   retenção (dados vão para a agenda Google da profissional).
-3. **Semana:** semanas de calendário ou ISO? Início no domingo ou segunda?
+1. **Semana:** semanas de calendário ou ISO? Início no domingo ou segunda?
 
 ## 11. Contradições resolvidas
 
 - `architecture.md` (Yarn) × `spec.md` (pnpm) → **pnpm** (decisão final pós-setup).
-- `spec.md`: "Profissional: comissão por valor fixo" → **modelo de parceria com
-  mensalidade fixa**; sem comissão.
-- "Sem notificações" × "enviar mensagem de confirmação" → **sem envio no MVP**
-  (só tela de sucesso); automação futura via WAHA + N8N.
+- Modelo multi-tenant × modelo single-owner → **single-owner** (decisão de escopo pós-funding).
+- `spec.md`: "Profissional: comissão por valor fixo" → **modelo de parceria com mensalidade fixa**; sem comissão (ainda que haja apenas uma dona, a lógica de "movimento vs receita" se mantém).
+- "Sem notificações" × "enviar mensagem de confirmação" → **sem envio no MVP** (só tela de sucesso); automação futura via WAHA + N8N.
 - PWA (ambos os docs) → **web responsivo, sem PWA**.
-- "Comissão/repasse" × métrica "faturamento" → faturamento = **movimento**
-  (soma dos preços de serviços concluídos), quebrado por profissional.
-- **Bloqueio sobre agendamento existente** → exige **confirmação explícita**;
-  o bloqueio é salvo e o agendamento permanece `scheduled`.
-- **Agregação de serviços por nome** → regra definida: o nome é **único entre os
-  serviços ativos** (sem diferenciar maiúsculas/espaços) e cada serviço tem **uma
-  profissional responsável**. Não há o mesmo serviço em profissionais diferentes.
+- "Comissão/repasse" × métrica "faturamento" → faturamento = **movimento** (soma dos preços de serviços concluídos), sem quebra por profissional (não há profissionais).
+- **Bloqueio sobre agendamento existente** → exige **confirmação explícita**; o bloqueio é salvo e o agendamento permanece `scheduled`.
+- **Agregação de serviços por nome** → regra definida: o nome é **único entre os serviços ativos** (sem diferenciar maiúsculas/espaços) e cada serviço pertence à dona. Não há o mesmo serviço em profissionais diferentes (não há profissionais).
+
+---
+
+### Próximos Steps (Discovery Completo)
+
+- [ ] Validar com usuárias se a remoção de "profissional display" afeta a confiança no serviço.
+- [ ] Confirmar se o fluxo de 4 steps ainda é esperado ou pode ser reduzido para 3.
+- [ ] Definir política de retenção de dados (LGPD) para a única cliente do salão.

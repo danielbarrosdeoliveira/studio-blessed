@@ -8,7 +8,7 @@ definePageMeta({
 const session = await betterAuth.api.getSession()
 const isAdmin = session?.user?.role === 'admin'
 
-const { data: metrics, pending } = await useFetch<any>('/api/metrics')
+const { data: metrics, pending } = await useFetch<any>('/api/metricas')
 
 const formatCurrency = (cents: number) =>
   new Intl.NumberFormat('pt-BR', {
@@ -88,7 +88,7 @@ const formatCurrency = (cents: number) =>
 
     <UCard v-if="isAdmin && metrics && metrics.revenueByProfessional?.length" class="mb-8">
       <div class="p-6">
-        <h3 class="text-lg font-bold mb-4">Faturamento por profissional</h3>
+        <h3 class="text-lg font-bold mb-4">Faturamento total</h3>
         <table class="w-full text-left border-collapse">
           <thead>
             <tr class="border-b border-muted/30">
