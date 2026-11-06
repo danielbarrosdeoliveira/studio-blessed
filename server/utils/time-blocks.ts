@@ -4,7 +4,6 @@ export type TimeBlockRecurrence = 'weekly'
 
 export interface TimeBlockRecord {
   id: string
-  professionalId: string
   startsAt: Date
   endsAt: Date
   reason: string | null
@@ -38,7 +37,6 @@ export interface BlockRange {
 export function serializeTimeBlock(row: TimeBlockRecord) {
   return {
     id: row.id,
-    professionalId: row.professionalId,
     startsAt: row.startsAt.toISOString(),
     endsAt: row.endsAt.toISOString(),
     reason: row.reason,

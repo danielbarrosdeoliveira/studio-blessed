@@ -68,12 +68,11 @@ export default defineEventHandler(async (event) => {
   }
 
   await db.transaction(async (tx) => {
-    await tx.delete(workingHours).where(eq(workingHours.professionalId, id))
+    await tx.delete(workingHours)
 
     if (parsed.data.hours.length) {
       await tx.insert(workingHours).values(
         parsed.data.hours.map(hour => ({
-          professionalId: id,
           weekday: hour.weekday,
           startMinute: hour.startMinute,
           endMinute: hour.endMinute
@@ -85,6 +84,5 @@ export default defineEventHandler(async (event) => {
   return db
     .select()
     .from(workingHours)
-    .where(eq(workingHours.professionalId, id))
     .orderBy(asc(workingHours.weekday), asc(workingHours.startMinute))
 })

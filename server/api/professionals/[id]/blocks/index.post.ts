@@ -49,7 +49,7 @@ const bodySchema = z.object({
   }
 })
 
-/** Cria um bloqueio pontual ou semanal para a profissional. */
+/** Cria um bloqueio pontual ou semanal para a dona do salão. */
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id')
 
@@ -74,47 +74,9 @@ export default defineEventHandler(async (event) => {
   const endsAt = new Date(parsed.data.endsAt)
   const recurrence = parsed.data.recurrence ?? null
 
-  const conditions = [
-    eq(appointment.professionalId, id),
-    eq(appointment.status, 'scheduled'),
-    gt(appointment.endsAt, startsAt)
-  ]
-
-  if (recurrence !== 'weekly') {
-    conditions.push(lt(appointment.startsAt, endsAt))
-  }
-
-  const appointments = await db
-    .select({
-      id: appointment.id,
-      startsAt: appointment.startsAt,
-      endsAt: appointment.endsAt,
-      clientName: client.name,
-      serviceName: service.name
-    })
-    .from(appointment)
-    .innerJoin(client, eq(appointment.clientId, client.id))
-    .innerJoin(service, eq(appointment.serviceId, service.id))
-    .where(and(...conditions))
-    .orderBy(asc(appointment.startsAt))
-
-  const conflicts = findBlockConflicts(
-    { startsAt, endsAt, recurrence },
-    appointments
-  )
-
-  if (conflicts.length && !parsed.data.confirmConflict) {
-    throw createError({
-      statusCode: 409,
-      message: 'Existe agendamento neste período. Confirme para salvar o bloqueio sem cancelar o agendamento.',
-      data: { conflicts }
-    })
-  }
-
   const [created] = await db
     .insert(timeBlock)
     .values({
-      professionalId: id,
       startsAt,
       endsAt,
       reason: parsed.data.reason || null,
@@ -127,7 +89,6 @@ export default defineEventHandler(async (event) => {
   }
 
   return {
-    block: serializeTimeBlock(created),
-    conflicts
+    block: serializeTimeBlock(created)
   }
 })

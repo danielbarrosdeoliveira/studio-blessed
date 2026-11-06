@@ -82,7 +82,7 @@ const summary = computed(() => {
 })
 
 const professionalItems = computed(() => [
-  { label: 'Todas as profissionais', value: 'all' },
+  { label: 'Todas as clientes', value: 'all' },
   ...(professionals.value ?? []).map(professional => ({
     label: professional.name,
     value: professional.id
@@ -352,7 +352,7 @@ v-model="form.professionalId"
 v-model="form.serviceId" :items="serviceItems" :loading="loadingServices"
             :disabled="!form.professionalId || !serviceItems.length" :placeholder="form.professionalId
               ? (serviceItems.length ? 'Selecione' : 'Nenhum serviço ativo')
-              : 'Selecione a profissional primeiro'" class="w-full" />
+              : 'Selecione o serviço'" class="w-full" />
         </UFormField>
 
         <div v-if="form.professionalId && form.serviceId" class="rounded-lg border border-default p-3">

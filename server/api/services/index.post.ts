@@ -56,7 +56,6 @@ export default defineEventHandler(async (event) => {
   const rows = await db
     .insert(service)
     .values({
-      professionalId,
       name: parsed.data.name,
       durationMin: parsed.data.durationMin,
       bufferMin: parsed.data.bufferMin,

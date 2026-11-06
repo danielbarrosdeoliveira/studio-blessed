@@ -37,7 +37,7 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
 }], [{
   label: 'Configurações',
   icon: 'i-ri-settings-line',
-  to: '/settings'
+  to: '/configuracoes'
 }], [{
   label: 'Tema',
   icon: 'i-ri-palette-line',

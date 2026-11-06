@@ -18,7 +18,7 @@ const links = computed<NavigationMenuItem[][]>(() => {
   items.push({
     label: 'Agenda',
     icon: 'i-ri-calendar-line',
-    to: '/agenda',
+    to: '/painel',
     onSelect: () => {
       open.value = false
     }
@@ -37,7 +37,7 @@ const links = computed<NavigationMenuItem[][]>(() => {
     items.push({
       label: 'Profissionais',
       icon: 'i-ri-group-line',
-      to: '/profissionais',
+      to: '',
       onSelect: () => {
         open.value = false
       }
@@ -46,7 +46,7 @@ const links = computed<NavigationMenuItem[][]>(() => {
     items.push({
       label: 'Minha jornada',
       icon: 'i-ri-time-line',
-      to: `/profissionais/${user.value.id}`,
+      to: `/${user.value.id}`,
       onSelect: () => {
         open.value = false
       }
@@ -59,41 +59,21 @@ const links = computed<NavigationMenuItem[][]>(() => {
 
 <template>
   <UDashboardGroup unit="rem">
-    <UDashboardSidebar
-      id="default"
-      v-model:open="open"
-      collapsible
-      resizable
-      class="bg-elevated/25"
-      :ui="{ footer: 'lg:border-t lg:border-default' }"
-    >
+    <UDashboardSidebar id="default" v-model:open="open" collapsible resizable class="bg-elevated/25"
+      :ui="{ footer: 'lg:border-t lg:border-default' }">
       <template #header="{ collapsed }">
-        <NuxtLink
-          to="/"
-          class="flex items-center gap-2 min-w-0"
-        >
+        <NuxtLink to="/" class="flex items-center gap-2 min-w-0">
           <div class="size-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
-            <UIcon
-              name="i-ri-scissors-line"
-              class="size-4 text-white"
-            />
+            <UIcon name="i-ri-scissors-line" class="size-4 text-white" />
           </div>
-          <span
-            v-if="!collapsed"
-            class="font-semibold text-highlighted truncate"
-          >
+          <span v-if="!collapsed" class="font-semibold text-highlighted truncate">
             Studio Blessed
           </span>
         </NuxtLink>
       </template>
 
       <template #default="{ collapsed }">
-        <UNavigationMenu
-          :collapsed="collapsed"
-          :items="links[0]"
-          orientation="vertical"
-          tooltip
-        />
+        <UNavigationMenu :collapsed="collapsed" :items="links[0]" orientation="vertical" tooltip />
       </template>
 
       <template #footer="{ collapsed }">

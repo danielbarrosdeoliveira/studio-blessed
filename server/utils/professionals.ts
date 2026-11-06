@@ -8,20 +8,17 @@ import { requireUser } from './auth-guard'
 export const professionalColumns = {
   id: user.id,
   name: user.name,
-  email: user.email,
-  role: user.role,
-  agendaProvider: user.agendaProvider,
-  createdAt: user.createdAt
+  email: user.email
 }
 
 /**
- * Admin acessa qualquer profissional; `partner` só a si mesma.
- * Lança 403 caso contrário.
+ * Acesso ao recurso único (só há uma dona do salão).
+ * Lança 404 se não existir.
  */
 export async function requireProfessionalAccess(event: H3Event, professionalId: string) {
   const current = await requireUser(event)
 
-  if (current.role !== 'admin' && current.id !== professionalId) {
+  if (current.id !== professionalId) {
     throw createError({ statusCode: 403, message: 'Acesso negado' })
   }
 

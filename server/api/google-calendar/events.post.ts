@@ -18,19 +18,6 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const [userRow] = await db
-    .select({ agendaProvider: user.agendaProvider })
-    .from(user)
-    .where(eq(user.id, current.id))
-    .limit(1)
-
-  if (userRow?.agendaProvider !== 'google') {
-    throw createError({
-      statusCode: 400,
-      message: 'Profissional não usa agenda Google'
-    })
-  }
-
   const [acct] = await db
     .select({ accessToken: account.accessToken })
     .from(account)

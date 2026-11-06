@@ -43,7 +43,7 @@ defineShortcuts({
 </script>
 
 <template>
-  <div class="overflow-y-auto divide-y divide-default">
+  <div class="overflow-y-auto divide-y divide-zinc-800/30">
     <div
       v-for="(mail, index) in mails"
       :key="index"
@@ -52,10 +52,10 @@ defineShortcuts({
       <div
         class="p-4 sm:px-6 text-sm cursor-pointer border-l-2 transition-colors"
         :class="[
-          mail.unread ? 'text-highlighted' : 'text-toned',
+          mail.unread ? 'text-zinc-100' : 'text-zinc-400',
           selectedMail && selectedMail.id === mail.id
-            ? 'border-primary bg-primary/10'
-            : 'border-bg hover:border-primary hover:bg-primary/5'
+            ? 'border-zinc-800/50 bg-zinc-950/20'
+            : 'border-zinc-800/30 hover:bg-zinc-950/10'
         ]"
         @click="selectedMail = mail"
       >

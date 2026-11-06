@@ -1,6 +1,6 @@
 import type { Appointment } from '../database/schema'
 
-/** Status que o staff pode atribuir ao marcar o resultado do atendimento. */
+/** Status que o admin pode atribuir ao marcar o resultado do atendimento. */
 export type StaffStatusTarget = Extract<Appointment['status'], 'completed' | 'no_show'>
 
 export interface AppointmentActor {
@@ -8,22 +8,19 @@ export interface AppointmentActor {
   role?: string
 }
 
-type ManageableAppointment = Pick<Appointment, 'professionalId' | 'status'>
-
-/** Admin gerencia qualquer agendamento; `partner` apenas os próprios. */
+/** Admin (dona) gerencia qualquer agendamento. */
 export function canManageAppointment(
-  actor: AppointmentActor,
-  professionalId: string
+  actor: AppointmentActor
 ): boolean {
-  return actor.role === 'admin' || actor.id === professionalId
+  return actor.role === 'admin'
 }
 
-/** Só agendamentos ainda ativos podem ser cancelados pelo staff. */
+/** Apenas agendamentos ainda ativos podem ser cancelados pelo admin. */
 export function canCancelAppointment(
   actor: AppointmentActor,
-  appointment: ManageableAppointment
+  appointment: Appointment
 ): boolean {
-  return canManageAppointment(actor, appointment.professionalId)
+  return canManageAppointment(actor)
     && appointment.status === 'scheduled'
 }
 
@@ -33,10 +30,10 @@ export function canCancelAppointment(
  */
 export function canSetAppointmentStatus(
   actor: AppointmentActor,
-  appointment: ManageableAppointment,
+  appointment: Appointment,
   target: StaffStatusTarget
 ): boolean {
-  if (!canManageAppointment(actor, appointment.professionalId)) {
+  if (!canManageAppointment(actor)) {
     return false
   }
 

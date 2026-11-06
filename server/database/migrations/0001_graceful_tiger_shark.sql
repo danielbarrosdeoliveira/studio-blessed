@@ -1,1 +1,0 @@
-CREATE UNIQUE INDEX "service_professional_name_unique" ON "service" USING btree ("professional_id","name");

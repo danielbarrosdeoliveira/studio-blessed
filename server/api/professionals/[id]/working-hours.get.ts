@@ -16,6 +16,5 @@ export default defineEventHandler(async (event) => {
   return db
     .select()
     .from(workingHours)
-    .where(eq(workingHours.professionalId, id))
     .orderBy(asc(workingHours.weekday), asc(workingHours.startMinute))
 })

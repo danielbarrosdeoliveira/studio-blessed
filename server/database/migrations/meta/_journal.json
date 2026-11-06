@@ -29,6 +29,13 @@
       "when": 1792900707000,
       "tag": "0003_numerous_kulan_gath",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793928284588,
+      "tag": "0004_exotic_junta",
+      "breakpoints": true
     }
   ]
 }

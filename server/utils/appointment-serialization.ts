@@ -15,20 +15,21 @@ export function canChangeAppointment(startsAt: Date, now = new Date()): boolean 
   return startsAt.getTime() - now.getTime() >= CANCELLATION_WINDOW_MS
 }
 
+/** Detalhes do agendamento para o modelo single-owner (dona do salão). */
 export interface AppointmentDetails {
   id: string
+  createdAt: Date
+  updatedAt: Date
   startsAt: Date
   endsAt: Date
+  clientId: string
+  serviceId: string
   status: Appointment['status']
   origin: Appointment['origin']
-  serviceId: string
-  professionalId: string
   serviceName: string
-  professionalName: string
   durationMin: number
   priceCents: number
   clientName: string
-  clientPhone: string
   notes: string | null
 }
 
@@ -36,14 +37,15 @@ export interface AppointmentDetails {
 export function serializeAppointment(row: AppointmentDetails, now = new Date()) {
   return {
     id: row.id,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
     startsAt: row.startsAt.toISOString(),
     endsAt: row.endsAt.toISOString(),
     status: row.status,
     origin: row.origin,
     serviceId: row.serviceId,
-    professionalId: row.professionalId,
+    clientId: row.clientId,
     serviceName: row.serviceName,
-    professionalName: row.professionalName,
     durationMin: row.durationMin,
     priceCents: row.priceCents,
     clientName: row.clientName,
@@ -51,7 +53,7 @@ export function serializeAppointment(row: AppointmentDetails, now = new Date()) 
   }
 }
 
-/** Objeto interno: inclui o WhatsApp da cliente, as observações e o status cru. */
+/** Objeto interno: inclui as observações e o status cru. */
 export function serializeStaffAppointment(row: AppointmentDetails) {
   return {
     id: row.id,
@@ -60,13 +62,12 @@ export function serializeStaffAppointment(row: AppointmentDetails) {
     status: row.status,
     origin: row.origin,
     serviceId: row.serviceId,
-    professionalId: row.professionalId,
+    professionalId: row.clientId,
     serviceName: row.serviceName,
-    professionalName: row.professionalName,
+    professionalName: row.clientName,
     durationMin: row.durationMin,
     priceCents: row.priceCents,
     clientName: row.clientName,
-    clientPhone: row.clientPhone,
     notes: row.notes
   }
 }

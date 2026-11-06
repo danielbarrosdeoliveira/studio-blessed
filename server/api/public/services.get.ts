@@ -2,63 +2,29 @@ import { asc, eq } from 'drizzle-orm'
 import { db } from '../../database'
 import { service, user } from '../../database/schema'
 
-interface PublicGroup {
-  name: string
-  minPriceCents: number
-  professionals: {
-    /** `user.id` da profissional. */
-    id: string
-    serviceId: string
-    name: string
-    durationMin: number
-    bufferMin: number
-    priceCents: number
-  }[]
+interface PublicService {
+  id: string
+  durationMin: number
+  bufferMin: number
+  priceCents: number
 }
 
 /**
  * Catálogo público (sem autenticação).
- * Cada serviço ativo tem uma única profissional responsável; a agregação por
- * nome mantém o formato da vitrine e evita entradas duplicadas.
+ * Lista serviços ativos. Como há apenas uma dona do salão, não há distinção de profissional por serviço.
  */
 export default defineEventHandler(async () => {
   const rows = await db
     .select({
+      id: service.id,
       name: service.name,
-      serviceId: service.id,
       durationMin: service.durationMin,
       bufferMin: service.bufferMin,
-      priceCents: service.priceCents,
-      professionalId: service.professionalId,
-      professionalName: user.name
+      priceCents: service.priceCents
     })
     .from(service)
-    .innerJoin(user, eq(service.professionalId, user.id))
     .where(eq(service.active, true))
-    .orderBy(asc(service.name), asc(user.name))
+    .orderBy(asc(service.name))
 
-  const groups = new Map<string, PublicGroup>()
-
-  for (const row of rows) {
-    const key = row.name.trim().toLowerCase()
-    const group = groups.get(key) ?? {
-      name: row.name.trim(),
-      minPriceCents: row.priceCents,
-      professionals: []
-    }
-
-    group.minPriceCents = Math.min(group.minPriceCents, row.priceCents)
-    group.professionals.push({
-      id: row.professionalId,
-      serviceId: row.serviceId,
-      name: row.professionalName,
-      durationMin: row.durationMin,
-      bufferMin: row.bufferMin,
-      priceCents: row.priceCents
-    })
-
-    groups.set(key, group)
-  }
-
-  return [...groups.values()].sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'))
+  return rows
 })

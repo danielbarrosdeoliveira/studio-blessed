@@ -10,10 +10,5 @@ export default defineEventHandler(async (event) => {
     .delete(account)
     .where(eq(account.userId, current.id))
 
-  await db
-    .update(user)
-    .set({ agendaProvider: 'internal' })
-    .where(eq(user.id, current.id))
-
   return { ok: true }
 })

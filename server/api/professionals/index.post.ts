@@ -14,7 +14,6 @@ const bodySchema = z.object({
 
 export default defineEventHandler(async (event) => {
   const current = await requireUser(event)
-  await requireAdmin(event)
 
   const body = await readBody(event)
   const parsed = bodySchema.safeParse(body)
@@ -56,7 +55,7 @@ export default defineEventHandler(async (event) => {
     entityId: created.user.id,
     userId: current.id,
     userEmail: current.email,
-    metadata: { invitedEmail: parsed.data.email, role: professional.role },
+    metadata: { invitedEmail: parsed.data.email },
     ipAddress: event.node.req.socket?.remoteAddress,
     userAgent: event.node.req.headers['user-agent']
   })

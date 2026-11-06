@@ -22,7 +22,6 @@ const CLIENT_LEAD_MS = 3 * 24 * 60 * 60 * 1000
 export type AvailabilityOrigin = 'client' | 'staff'
 
 export interface AvailabilityParams {
-  professionalId: string
   serviceId: string
   /** Data local `YYYY-MM-DD`. */
   date: string
@@ -39,7 +38,7 @@ export interface DayAvailability {
 }
 
 /**
- * Disponibilidade de um serviço em um dia:
+ * Disponibilidade do serviço da dona do salão:
  * jornada − agendamentos ativos (com buffer) − bloqueios.
  */
 export async function getAvailabilityForDay(params: AvailabilityParams): Promise<DayAvailability> {
@@ -51,7 +50,6 @@ export async function getAvailabilityForDay(params: AvailabilityParams): Promise
     .from(service)
     .where(and(
       eq(service.id, params.serviceId),
-      eq(service.professionalId, params.professionalId),
       eq(service.active, true)
     ))
     .limit(1)
@@ -69,10 +67,7 @@ export async function getAvailabilityForDay(params: AvailabilityParams): Promise
         end: workingHours.endMinute
       })
       .from(workingHours)
-      .where(and(
-        eq(workingHours.professionalId, params.professionalId),
-        eq(workingHours.weekday, bounds.weekday)
-      ))
+      .where(eq(workingHours.weekday, bounds.weekday))
       .orderBy(asc(workingHours.startMinute)),
 
     db
@@ -84,7 +79,6 @@ export async function getAvailabilityForDay(params: AvailabilityParams): Promise
       .from(appointment)
       .innerJoin(service, eq(appointment.serviceId, service.id))
       .where(and(
-        eq(appointment.professionalId, params.professionalId),
         inArray(appointment.status, ['scheduled', 'completed']),
         lt(appointment.startsAt, bounds.end),
         gt(appointment.endsAt, new Date(bounds.start.getTime() - MAX_BUFFER_MIN * 60_000))
@@ -97,15 +91,12 @@ export async function getAvailabilityForDay(params: AvailabilityParams): Promise
         recurrence: timeBlock.recurrence
       })
       .from(timeBlock)
-      .where(and(
-        eq(timeBlock.professionalId, params.professionalId),
-        or(
-          and(
-            lt(timeBlock.startsAt, bounds.end),
-            gt(timeBlock.endsAt, bounds.start)
-          ),
-          eq(timeBlock.recurrence, 'weekly')
-        )
+      .where(or(
+        and(
+          lt(timeBlock.startsAt, bounds.end),
+          gt(timeBlock.endsAt, bounds.start)
+        ),
+        eq(timeBlock.recurrence, 'weekly')
       ))
   ])
 
@@ -185,7 +176,6 @@ export async function getAvailabilityForDay(params: AvailabilityParams): Promise
  * exatamente na grade de 15 minutos e ainda constar na disponibilidade do dia.
  */
 export async function isSlotAvailable(params: {
-  professionalId: string
   serviceId: string
   startsAt: Date
   origin: AvailabilityOrigin
@@ -200,7 +190,6 @@ export async function isSlotAvailable(params: {
   }
 
   const availability = await getAvailabilityForDay({
-    professionalId: params.professionalId,
     serviceId: params.serviceId,
     date: localDateOf(params.startsAt),
     origin: params.origin,
