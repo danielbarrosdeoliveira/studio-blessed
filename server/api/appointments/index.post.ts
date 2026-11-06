@@ -1,17 +1,14 @@
 import { and, eq } from 'drizzle-orm'
 import * as z from 'zod'
 import { db } from '../../database'
-import { appointment, service } from '../../database/schema'
+import { appointment, service, client } from '../../database/schema'
 import { writeAuditLog } from '../../utils/audit-log'
-import { serializeStaffAppointment } from '../../utils/appointment-serialization'
-import { findOrCreateClient, getAppointmentById } from '../../utils/appointments'
-import { requireUser } from '../../utils/auth-guard'
+import { findOrCreateClient } from '../../utils/appointments'
 import { isSlotAvailable } from '../../utils/availability'
 import { normalizePhone } from '../../utils/phone'
-import { getProfessionalOr404 } from '../../utils/professionals'
+import { requireUser } from '../../utils/auth-guard'
 
 const bodySchema = z.object({
-  professionalId: z.string().min(1).optional(),
   serviceId: z.string().min(1, 'Serviço não informado'),
   startsAt: z.string().refine(value => !Number.isNaN(Date.parse(value)), 'Horário inválido'),
   clientName: z.string().trim().min(2, 'Informe o nome da cliente').max(120),
@@ -19,7 +16,7 @@ const bodySchema = z.object({
   notes: z.string().trim().max(500, 'Observações muito longas').optional()
 })
 
-/** Cria um agendamento pelo staff (origem `staff`), sem a antecedência de 3 dias. */
+/** Cria um agendamento pela dona do salão (origem `client`), com antecedência de 3 dias. */
 export default defineEventHandler(async (event) => {
   const current = await requireUser(event)
   const parsed = bodySchema.safeParse(await readBody(event))
@@ -30,22 +27,6 @@ export default defineEventHandler(async (event) => {
       message: parsed.error.issues[0]?.message ?? 'Dados inválidos',
       data: z.treeifyError(parsed.error)
     })
-  }
-
-  let professionalId = parsed.data.professionalId
-
-  if (current.role === 'admin') {
-    if (!professionalId) {
-      throw createError({ statusCode: 400, message: 'Selecione a profissional' })
-    }
-
-    await getProfessionalOr404(professionalId)
-  } else {
-    if (professionalId && professionalId !== current.id) {
-      throw createError({ statusCode: 403, message: 'Acesso negado' })
-    }
-
-    professionalId = current.id
   }
 
   const phone = normalizePhone(parsed.data.clientPhone)
@@ -61,7 +42,6 @@ export default defineEventHandler(async (event) => {
     .from(service)
     .where(and(
       eq(service.id, parsed.data.serviceId),
-      eq(service.professionalId, professionalId),
       eq(service.active, true)
     ))
     .limit(1)
@@ -72,10 +52,9 @@ export default defineEventHandler(async (event) => {
 
   // Revalida imediatamente antes de gravar, como no fluxo público.
   const available = await isSlotAvailable({
-    professionalId,
     serviceId: parsed.data.serviceId,
     startsAt,
-    origin: 'staff'
+    origin: 'client'
   })
 
   if (!available) {
@@ -91,12 +70,11 @@ export default defineEventHandler(async (event) => {
     .insert(appointment)
     .values({
       clientId: clientRow.id,
-      professionalId,
       serviceId: parsed.data.serviceId,
       startsAt,
       endsAt: new Date(startsAt.getTime() + found.durationMin * 60_000),
       status: 'scheduled',
-      origin: 'staff',
+      origin: 'client',
       notes: parsed.data.notes || null
     })
     // @ts-ignore - Drizzle returning type issue
@@ -118,12 +96,12 @@ export default defineEventHandler(async (event) => {
     entityId: created.id,
     userId: current.id,
     userEmail: current.email,
-    metadata: { serviceId: parsed.data.serviceId, clientPhone: phone, origin: 'staff' },
+    metadata: { serviceId: parsed.data.serviceId, clientPhone: phone, origin: 'client' },
     ipAddress: event.node.req.socket?.remoteAddress,
     userAgent: event.node.req.headers['user-agent']
   })
 
   return {
-    appointment: serializeStaffAppointment(row)
+    appointment: serializeAppointment(row)
   }
 })

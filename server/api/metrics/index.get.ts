@@ -9,16 +9,14 @@ export default defineEventHandler(async (event) => {
 
   const { period = 'month', from, to } = getQuery(event)
 
-  const isAdmin = current.role === 'admin'
-
   const now = new Date()
   const dateFrom = from ? new Date(from as string) : new Date(now.getFullYear(), now.getMonth() - 1, 1)
   const dateTo = to ? new Date(to as string) : new Date(now.getFullYear(), now.getMonth() + 1, 0)
 
+  // No há mais professionalId - todas as métricas são da dona única (current user)
   const baseWhere = and(
     gte(appointment.startsAt, dateFrom),
-    lte(appointment.startsAt, dateTo),
-    isAdmin ? undefined : eq(appointment.professionalId, current.id)
+    lte(appointment.startsAt, dateTo)
   )
 
   const revenueResult = await db
@@ -56,24 +54,6 @@ export default defineEventHandler(async (event) => {
     .groupBy(service.id, service.name)
     .orderBy(desc(count()))
 
-  let revenueByProfessional: any[] = []
-  if (isAdmin) {
-    revenueByProfessional = await db
-      .select({
-        professionalId: user.id,
-        professionalName: user.name,
-        professionalEmail: user.email,
-        total: sum(service.priceCents).mapWith(Number),
-        count: count()
-      })
-      .from(appointment)
-      .innerJoin(service, eq(appointment.serviceId, service.id))
-      .innerJoin(user, eq(appointment.professionalId, user.id))
-      .where(and(baseWhere, eq(appointment.status, 'completed')))
-      .groupBy(user.id, user.name, user.email)
-      .orderBy(desc(sum(service.priceCents)))
-  }
-
   await writeAuditLog({
     action: 'appointment.complete',
     entity: 'metrics',
@@ -93,6 +73,6 @@ export default defineEventHandler(async (event) => {
     noShowCount: noShowCountResult[0]?.count ?? 0,
     cancelledCount: cancelledCountResult[0]?.count ?? 0,
     serviceRanking,
-    revenueByProfessional
+    revenueByProfessional: [] // Não há profissionais no modelo single-owner
   }
 })
