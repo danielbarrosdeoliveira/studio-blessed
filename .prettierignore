@@ -1,0 +1,14 @@
+# Build / dependências
+node_modules
+.output
+.nuxt
+.nitro
+.cache
+dist
+coverage
+.data
+
+# Gerados
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
