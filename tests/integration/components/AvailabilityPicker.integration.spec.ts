@@ -35,12 +35,10 @@ describe('AvailabilityPicker', () => {
     expect(wrapper.text()).toContain('09:00')
     expect(wrapper.text()).toContain('09:15')
 
-    const slot = wrapper.findAll('button').find(button => button.text() === '09:15')
+    const slot = wrapper.findAll('button').find((button) => button.text() === '09:15')
 
     await slot!.trigger('click')
 
-    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([
-      '2026-10-29T12:15:00.000Z'
-    ])
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['2026-10-29T12:15:00.000Z'])
   })
 })

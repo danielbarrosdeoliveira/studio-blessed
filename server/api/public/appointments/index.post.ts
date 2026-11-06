@@ -2,17 +2,14 @@ import { and, eq } from 'drizzle-orm'
 import * as z from 'zod'
 import { db } from '../../../database'
 import { appointment, service } from '../../../database/schema'
-import {
-  cancellationPolicy,
-  serializeAppointment
-} from '../../../utils/appointment-serialization'
+import { cancellationPolicy, serializeAppointment } from '../../../utils/appointment-serialization'
 import { findOrCreateClient, getAppointmentById } from '../../../utils/appointments'
 import { isSlotAvailable } from '../../../utils/availability'
 import { normalizePhone } from '../../../utils/phone'
 
 const bodySchema = z.object({
   serviceId: z.string().min(1, 'Serviço não informado'),
-  startsAt: z.string().refine(value => !Number.isNaN(Date.parse(value)), 'Horário inválido'),
+  startsAt: z.string().refine((value) => !Number.isNaN(Date.parse(value)), 'Horário inválido'),
   clientName: z.string().trim().min(2, 'Informe seu nome').max(120),
   clientPhone: z.string().trim().min(10, 'Informe seu WhatsApp').max(20)
 })
@@ -40,10 +37,7 @@ export default defineEventHandler(async (event) => {
   const [found] = await db
     .select({ durationMin: service.durationMin })
     .from(service)
-    .where(and(
-      eq(service.id, parsed.data.serviceId),
-      eq(service.active, true)
-    ))
+    .where(and(eq(service.id, parsed.data.serviceId), eq(service.active, true)))
     .limit(1)
 
   if (!found) {

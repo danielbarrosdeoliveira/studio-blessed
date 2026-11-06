@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "@nuxt/ui";
+@import 'tailwindcss';
+@import '@nuxt/ui';
 
 @theme {
   --font-sans: 'Manrope', sans-serif;
@@ -16,12 +16,12 @@
 
   button:disabled,
   button[disabled],
-  [aria-disabled="true"] {
+  [aria-disabled='true'] {
     cursor: not-allowed;
     opacity: 0.6;
   }
 
-  [aria-disabled="true"] {
+  [aria-disabled='true'] {
     pointer-events: none;
   }
 }

@@ -33,8 +33,8 @@ export default defineEventHandler(async (event) => {
 
   const eventPayload: {
     summary: string
-    start: { dateTime: string, timeZone: string }
-    end: { dateTime: string, timeZone: string }
+    start: { dateTime: string; timeZone: string }
+    end: { dateTime: string; timeZone: string }
     extendedProperties: { private: { appointmentId: string } }
     attendees?: Array<{ email: string }>
   } = {
@@ -73,7 +73,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const data = await res.json() as { id?: string, htmlLink?: string }
+  const data = (await res.json()) as { id?: string; htmlLink?: string }
 
   return {
     ok: true,

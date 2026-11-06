@@ -10,14 +10,13 @@ export default defineEventHandler(async (event) => {
   const { period = 'month', from, to } = getQuery(event)
 
   const now = new Date()
-  const dateFrom = from ? new Date(from as string) : new Date(now.getFullYear(), now.getMonth() - 1, 1)
+  const dateFrom = from
+    ? new Date(from as string)
+    : new Date(now.getFullYear(), now.getMonth() - 1, 1)
   const dateTo = to ? new Date(to as string) : new Date(now.getFullYear(), now.getMonth() + 1, 0)
 
   // Modelo single-owner: todas as métricas são da dona única.
-  const baseWhere = and(
-    gte(appointment.startsAt, dateFrom),
-    lte(appointment.startsAt, dateTo)
-  )
+  const baseWhere = and(gte(appointment.startsAt, dateFrom), lte(appointment.startsAt, dateTo))
 
   const revenueResult = await db
     .select({

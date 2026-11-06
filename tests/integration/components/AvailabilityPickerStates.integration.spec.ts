@@ -20,7 +20,7 @@ const slotB = {
   label: '09:15'
 }
 
-function availability(slots: typeof slotA[]) {
+function availability(slots: (typeof slotA)[]) {
   return {
     date: '2026-10-29',
     timezone: 'America/Sao_Paulo',
@@ -70,8 +70,7 @@ describe('AvailabilityPicker — estados', () => {
 
     await flushPromises()
 
-    const min = (wrapper.vm as unknown as { minCalendarDate: CalendarDate })
-      .minCalendarDate
+    const min = (wrapper.vm as unknown as { minCalendarDate: CalendarDate }).minCalendarDate
 
     expect(min.year).toBe(2026)
     expect(min.month).toBe(10)
@@ -86,7 +85,7 @@ describe('AvailabilityPicker — estados', () => {
     const wrapper = await mountPicker()
     await flushPromises()
 
-    const slot = wrapper.findAll('button').find(button => button.text() === '09:00')
+    const slot = wrapper.findAll('button').find((button) => button.text() === '09:00')
 
     await slot!.trigger('click')
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([slotA.startsAt])
@@ -111,7 +110,10 @@ describe('AvailabilityPicker — estados', () => {
     const wrapper = await mountPicker()
     await flushPromises()
 
-    await wrapper.findAll('button').find(button => button.text() === '09:00')!.trigger('click')
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text() === '09:00')!
+      .trigger('click')
 
     await wrapper.setProps({ serviceId: 'service-2' })
     await flushPromises()

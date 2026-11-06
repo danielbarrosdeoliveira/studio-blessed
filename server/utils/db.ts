@@ -28,14 +28,15 @@ if (!connectionString) {
 type DatabaseDriver = 'neon' | 'pg'
 
 const forcedDriver = process.env.DB_DRIVER?.toLowerCase()
-const driver: DatabaseDriver = forcedDriver === 'neon' || forcedDriver === 'pg'
-  ? forcedDriver
-  : connectionString.startsWith('https://')
-    ? 'neon'
-    : 'pg'
+const driver: DatabaseDriver =
+  forcedDriver === 'neon' || forcedDriver === 'pg'
+    ? forcedDriver
+    : connectionString.startsWith('https://')
+      ? 'neon'
+      : 'pg'
 
-const db: NodePgDatabase<typeof schema> | ReturnType<typeof drizzleNeon>
-  = driver === 'neon'
+const db: NodePgDatabase<typeof schema> | ReturnType<typeof drizzleNeon> =
+  driver === 'neon'
     ? drizzleNeon(neon(connectionString), { schema })
     : drizzlePg(new Pool({ connectionString, max: 10 }), { schema })
 

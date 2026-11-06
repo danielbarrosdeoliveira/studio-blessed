@@ -31,6 +31,11 @@ function openReschedule() {
   rescheduleOpen.value = true
 }
 
+function openCancel() {
+  actionError.value = ''
+  cancelOpen.value = true
+}
+
 async function cancel() {
   cancelling.value = true
   actionError.value = ''
@@ -92,17 +97,12 @@ async function reschedule() {
           <h3 class="font-semibold text-highlighted">
             {{ appointment.serviceName }}
           </h3>
-          <UBadge
-            :color="statusMeta.color"
-            variant="subtle"
-          >
+          <UBadge :color="statusMeta.color" variant="subtle">
             {{ statusMeta.label }}
           </UBadge>
         </div>
 
-        <p class="text-sm text-muted">
-          {{ appointment.durationMin }} min
-        </p>
+        <p class="text-sm text-muted">{{ appointment.durationMin }} min</p>
 
         <p class="text-sm text-highlighted">
           {{ formatInstantLong(appointment.startsAt) }}
@@ -112,15 +112,12 @@ async function reschedule() {
           v-if="appointment.status === 'scheduled' && !appointment.canChange"
           class="text-xs text-muted"
         >
-          Alterações permitidas até {{ cancellation.hours }}h antes. Depois desse prazo,
-          aplica-se a política de taxa de {{ cancellation.feePercentage }}%.
+          Alterações permitidas até {{ cancellation.hours }}h antes. Depois desse prazo, aplica-se a
+          política de taxa de {{ cancellation.feePercentage }}%.
         </p>
       </div>
 
-      <div
-        v-if="appointment.canChange"
-        class="flex shrink-0 gap-2"
-      >
+      <div v-if="appointment.canChange" class="flex shrink-0 gap-2">
         <UButton
           label="Remarcar"
           icon="i-ri-calendar-line"
@@ -135,41 +132,27 @@ async function reschedule() {
           size="sm"
           color="error"
           variant="outline"
-          @click="actionError = ''; cancelOpen = true"
+          @click="openCancel"
         />
       </div>
     </div>
 
-    <UModal
-      v-model:open="cancelOpen"
-      title="Cancelar agendamento"
-    >
+    <UModal v-model:open="cancelOpen" title="Cancelar agendamento">
       <template #body>
         <div class="space-y-3">
           <p class="text-sm text-muted">
             Tem certeza que deseja cancelar
-            <strong class="text-highlighted">{{ appointment.serviceName }}</strong>?
+            <strong class="text-highlighted">{{ appointment.serviceName }}</strong
+            >?
           </p>
-          <p class="text-sm text-muted">
-            {{ formatInstantLong(appointment.startsAt) }}.
-          </p>
-          <UAlert
-            v-if="actionError"
-            color="error"
-            variant="subtle"
-            :description="actionError"
-          />
+          <p class="text-sm text-muted">{{ formatInstantLong(appointment.startsAt) }}.</p>
+          <UAlert v-if="actionError" color="error" variant="subtle" :description="actionError" />
         </div>
       </template>
 
       <template #footer>
         <div class="flex w-full justify-end gap-2">
-          <UButton
-            label="Voltar"
-            color="neutral"
-            variant="ghost"
-            @click="cancelOpen = false"
-          />
+          <UButton label="Voltar" color="neutral" variant="ghost" @click="cancelOpen = false" />
           <UButton
             label="Confirmar cancelamento"
             color="error"
@@ -180,10 +163,7 @@ async function reschedule() {
       </template>
     </UModal>
 
-    <UModal
-      v-model:open="rescheduleOpen"
-      title="Remarcar agendamento"
-    >
+    <UModal v-model:open="rescheduleOpen" title="Remarcar agendamento">
       <template #body>
         <div class="space-y-4">
           <p class="text-sm text-muted">
@@ -198,23 +178,13 @@ async function reschedule() {
             :min-date="minDate"
           />
 
-          <UAlert
-            v-if="actionError"
-            color="error"
-            variant="subtle"
-            :description="actionError"
-          />
+          <UAlert v-if="actionError" color="error" variant="subtle" :description="actionError" />
         </div>
       </template>
 
       <template #footer>
         <div class="flex w-full justify-end gap-2">
-          <UButton
-            label="Voltar"
-            color="neutral"
-            variant="ghost"
-            @click="rescheduleOpen = false"
-          />
+          <UButton label="Voltar" color="neutral" variant="ghost" @click="rescheduleOpen = false" />
           <UButton
             label="Confirmar novo horário"
             :loading="rescheduling"

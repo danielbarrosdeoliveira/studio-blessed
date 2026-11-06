@@ -7,13 +7,21 @@ const UButton = resolveComponent('UButton')
 
 const toast = useToast()
 
-const { data: services, status, refresh } = await useFetch<Service[]>('/api/services', {
+const {
+  data: services,
+  status,
+  refresh
+} = await useFetch<Service[]>('/api/services', {
   default: () => []
 })
 
 const formSchema = z.object({
   name: z.string().min(2, 'Informe o nome'),
-  durationMin: z.coerce.number().int().min(5, 'Duração mínima de 5 min').max(600, 'Duração máxima de 600 min'),
+  durationMin: z.coerce
+    .number()
+    .int()
+    .min(5, 'Duração mínima de 5 min')
+    .max(600, 'Duração máxima de 600 min'),
   bufferMin: z.coerce.number().int().min(0).max(240),
   price: z.coerce.number().min(0, 'Preço inválido'),
   active: z.boolean()
@@ -144,33 +152,35 @@ const columns = computed<TableColumn<Service>[]>(() => [
   {
     accessorKey: 'active',
     header: 'Status',
-    cell: ({ row }) => h(UBadge, {
-      color: row.original.active ? 'success' : 'neutral',
-      variant: 'subtle',
-      label: row.original.active ? 'Ativo' : 'Inativo'
-    })
+    cell: ({ row }) =>
+      h(UBadge, {
+        color: row.original.active ? 'success' : 'neutral',
+        variant: 'subtle',
+        label: row.original.active ? 'Ativo' : 'Inativo'
+      })
   },
   {
     id: 'actions',
     header: '',
-    cell: ({ row }) => h('div', { class: 'flex justify-end gap-2' }, [
-      h(UButton, {
-        label: 'Editar',
-        icon: 'i-ri-pencil-line',
-        size: 'xs',
-        color: 'neutral',
-        variant: 'ghost',
-        onClick: () => openEdit(row.original)
-      }),
-      h(UButton, {
-        label: row.original.active ? 'Desativar' : 'Ativar',
-        icon: 'i-ri-shut-down-line',
-        size: 'xs',
-        color: row.original.active ? 'error' : 'success',
-        variant: 'ghost',
-        onClick: () => toggleActive(row.original)
-      })
-    ])
+    cell: ({ row }) =>
+      h('div', { class: 'flex justify-end gap-2' }, [
+        h(UButton, {
+          label: 'Editar',
+          icon: 'i-ri-pencil-line',
+          size: 'xs',
+          color: 'neutral',
+          variant: 'ghost',
+          onClick: () => openEdit(row.original)
+        }),
+        h(UButton, {
+          label: row.original.active ? 'Desativar' : 'Ativar',
+          icon: 'i-ri-shut-down-line',
+          size: 'xs',
+          color: row.original.active ? 'error' : 'success',
+          variant: 'ghost',
+          onClick: () => toggleActive(row.original)
+        })
+      ])
   }
 ])
 </script>
@@ -192,31 +202,18 @@ const columns = computed<TableColumn<Service>[]>(() => [
             to="/agendamento"
             target="_blank"
           />
-          <UButton
-            label="Novo serviço"
-            icon="i-ri-add-line"
-            @click="openCreate"
-          />
+          <UButton label="Novo serviço" icon="i-ri-add-line" @click="openCreate" />
         </template>
       </UDashboardNavbar>
     </template>
 
     <template #body>
       <div class="overflow-x-auto">
-        <UTable
-          :data="services"
-          :columns="columns"
-          :loading="status === 'pending'"
-        />
+        <UTable :data="services" :columns="columns" :loading="status === 'pending'" />
       </div>
 
-      <UCard
-        v-if="status === 'success' && !services.length"
-        class="mt-4"
-      >
-        <p class="text-sm text-muted text-center">
-          Nenhum serviço cadastrado ainda.
-        </p>
+      <UCard v-if="status === 'success' && !services.length" class="mt-4">
+        <p class="text-center text-sm text-muted">Nenhum serviço cadastrado ainda.</p>
       </UCard>
     </template>
   </UDashboardPanel>
@@ -224,15 +221,14 @@ const columns = computed<TableColumn<Service>[]>(() => [
   <UModal
     v-model:open="formOpen"
     :title="editing ? 'Editar serviço' : 'Novo serviço'"
-    :description="editing ? undefined : 'O serviço pertence à dona do salão. Combos são serviços de duração maior.'"
+    :description="
+      editing
+        ? undefined
+        : 'O serviço pertence à dona do salão. Combos são serviços de duração maior.'
+    "
   >
     <template #body>
-      <UForm
-        :schema="formSchema"
-        :state="state"
-        class="space-y-4"
-        @submit="onSubmit"
-      >
+      <UForm :schema="formSchema" :state="state" class="space-y-4" @submit="onSubmit">
         <UFormField
           label="Nome"
           name="name"
@@ -247,11 +243,7 @@ const columns = computed<TableColumn<Service>[]>(() => [
         </UFormField>
 
         <div class="grid grid-cols-2 gap-4">
-          <UFormField
-            label="Duração (min)"
-            name="durationMin"
-            required
-          >
+          <UFormField label="Duração (min)" name="durationMin" required>
             <UInput
               v-model="state.durationMin"
               type="number"
@@ -262,11 +254,7 @@ const columns = computed<TableColumn<Service>[]>(() => [
             />
           </UFormField>
 
-          <UFormField
-            label="Buffer (min)"
-            name="bufferMin"
-            description="Tempo após o atendimento."
-          >
+          <UFormField label="Buffer (min)" name="bufferMin" description="Tempo após o atendimento.">
             <UInput
               v-model="state.bufferMin"
               type="number"
@@ -278,24 +266,11 @@ const columns = computed<TableColumn<Service>[]>(() => [
           </UFormField>
         </div>
 
-        <UFormField
-          label="Preço (R$)"
-          name="price"
-          required
-        >
-          <UInput
-            v-model="state.price"
-            type="number"
-            min="0"
-            step="0.01"
-            class="w-full"
-          />
+        <UFormField label="Preço (R$)" name="price" required>
+          <UInput v-model="state.price" type="number" min="0" step="0.01" class="w-full" />
         </UFormField>
 
-        <UFormField
-          label="Ativo"
-          name="active"
-        >
+        <UFormField label="Ativo" name="active">
           <USwitch v-model="state.active" />
         </UFormField>
 

@@ -25,11 +25,11 @@ Use esta skill quando a tarefa envolver:
 
 ## Convenções
 
-| Tipo | Sufixo | Local |
-| --- | --- | --- |
-| Unitário | `.unit.spec.ts` | Ao lado do código |
+| Tipo       | Sufixo                 | Local                  |
+| ---------- | ---------------------- | ---------------------- |
+| Unitário   | `.unit.spec.ts`        | Ao lado do código      |
 | Integração | `.integration.spec.ts` | `tests/integration/**` |
-| E2E | `.spec.ts` | `tests/e2e/**` |
+| E2E        | `.spec.ts`             | `tests/e2e/**`         |
 
 Helpers compartilhados ficam em `tests/helpers/` e `tests/e2e/helpers.ts`.
 

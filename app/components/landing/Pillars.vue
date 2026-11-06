@@ -1,39 +1,39 @@
 <template>
-  <section class="py-20 md:py-28 bg-zinc-950">
-    <div class="max-w-[1400px] mx-auto px-8 lg:px-12">
-      <div class="flex flex-col lg:flex-row lg:justify-between lg:items-start mb-16 gap-8">
+  <section class="bg-zinc-950 py-20 md:py-28">
+    <div class="mx-auto max-w-350 px-8 lg:px-12">
+      <div class="mb-16 flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
         <div class="max-w-lg">
-          <span class="font-sans text-xs uppercase tracking-[0.2em] text-orange-500 font-semibold">01 / Pilares</span>
-          <h2 class="font-serif text-4xl md:text-5xl text-zinc-50 mt-3 leading-tight">
-            Nossa Essência
-          </h2>
+          <span class="font-sans text-xs font-semibold tracking-[0.2em] text-orange-500 uppercase"
+            >01 / Pilares</span
+          >
+          <h2 class="mt-3 font-serif text-4xl/tight text-zinc-50 md:text-5xl">Nossa Essência</h2>
         </div>
-        <p class="font-sans text-zinc-400 text-base leading-relaxed max-w-xl lg:text-right">
-          No Studio Blessed, cada detalhe é pensado para oferecer uma experiência única de beleza e bem-estar.
-          Nossos pilares refletem o compromisso com a excelência.
+        <p class="max-w-xl font-sans text-base/relaxed text-zinc-400 lg:text-right">
+          No Studio Blessed, cada detalhe é pensado para oferecer uma experiência única de beleza e
+          bem-estar. Nossos pilares refletem o compromisso com a excelência.
         </p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="grid grid-cols-1 gap-8 md:grid-cols-3">
         <div
           v-for="pilar in pilares"
           :key="pilar.title"
-          class="text-center space-y-5 group rounded-2xl border border-zinc-800/80 bg-zinc-900/40 p-8 transition-colors duration-300 hover:border-orange-500/40"
+          class="group space-y-5 rounded-2xl border border-zinc-800/80 bg-zinc-900/40 p-8 text-center transition-colors duration-300 hover:border-orange-500/40"
         >
           <div
-            class="w-16 h-16 mx-auto rounded-2xl bg-zinc-800 flex items-center justify-center group-hover:bg-orange-500/10 transition-all duration-300"
+            class="mx-auto flex size-16 items-center justify-center rounded-2xl bg-zinc-800 transition-all duration-300 group-hover:bg-orange-500/10"
           >
-            <LandingIcon :icon="pilar.icon" class="w-8 h-8 text-orange-500" />
+            <LandingIcon :icon="pilar.icon" class="size-8 text-orange-500" />
           </div>
-          <h3 class="font-sans text-lg uppercase tracking-[0.15em] text-zinc-100 font-semibold">
+          <h3 class="font-sans text-lg font-semibold tracking-[0.15em] text-zinc-100 uppercase">
             {{ pilar.title }}
           </h3>
-          <p class="font-sans text-zinc-400 text-sm leading-relaxed max-w-xs mx-auto">
+          <p class="mx-auto max-w-xs font-sans text-sm/relaxed text-zinc-400">
             {{ pilar.description }}
           </p>
           <NuxtLink
             :to="pilar.link"
-            class="inline-block font-sans text-xs uppercase tracking-wider text-zinc-100 border border-zinc-700 rounded-full px-6 py-2 hover:border-orange-500 hover:text-orange-500 transition-all duration-300"
+            class="inline-block rounded-full border border-zinc-700 px-6 py-2 font-sans text-xs tracking-wider text-zinc-100 uppercase transition-all duration-300 hover:border-orange-500 hover:text-orange-500"
           >
             {{ pilar.cta }}
           </NuxtLink>

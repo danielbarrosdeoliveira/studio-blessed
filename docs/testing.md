@@ -6,12 +6,12 @@
 
 ## Stack de testes
 
-| Camada | Ferramenta | Escopo |
-| --- | --- | --- |
-| Unitário | Vitest 5 (`unit`) | Lógica pura de `app/utils/**` e `server/utils/**` |
-| Integração de API | Vitest 5 (`integration-api`) + Nuxt server real | Rotas HTTP em `server/api/**` e utilitários de servidor |
-| Integração de UI | Vitest 5 (`integration-nuxt`) + `@nuxt/test-utils` | Componentes Vue em ambiente Nuxt/happy-dom |
-| E2E | Playwright + Chromium (build de produção) | Fluxos críticos no browser + SSR/API do Nuxt 4 |
+| Camada            | Ferramenta                                         | Escopo                                                  |
+| ----------------- | -------------------------------------------------- | ------------------------------------------------------- |
+| Unitário          | Vitest 5 (`unit`)                                  | Lógica pura de `app/utils/**` e `server/utils/**`       |
+| Integração de API | Vitest 5 (`integration-api`) + Nuxt server real    | Rotas HTTP em `server/api/**` e utilitários de servidor |
+| Integração de UI  | Vitest 5 (`integration-nuxt`) + `@nuxt/test-utils` | Componentes Vue em ambiente Nuxt/happy-dom              |
+| E2E               | Playwright + Chromium (build de produção)          | Fluxos críticos no browser + SSR/API do Nuxt 4          |
 
 O projeto usa **Nuxt 4** (SSR, estrutura `app/`), **Vue 3** e **Nuxt UI 4**.
 Não há suporte a Nuxt 3 nesta base.
@@ -35,22 +35,22 @@ pnpm db:up
 
 ## Comandos
 
-| Comando | O que executa |
-| --- | --- |
-| `pnpm test` | Unitários + integração (API e UI) |
-| `pnpm test:unit` | Somente unitários |
-| `pnpm test:unit:watch` | Unitários em watch |
-| `pnpm test:integration` | Reset do banco + integração de API + UI |
-| `pnpm test:e2e` | Build de produção + Playwright nos fluxos críticos (Chromium) |
-| `pnpm test:e2e:ui` | Build de produção + Playwright em modo UI |
-| `pnpm test:db:setup` | Recria o banco de teste e o seed |
-| `pnpm test:all` | `pnpm test` + `pnpm test:e2e` |
-| `pnpm test:coverage` | Cobertura completa: unit + integração + E2E |
-| `pnpm test:coverage:unit` | Cobertura unitária |
-| `pnpm test:coverage:integration` | Cobertura de API + UI |
-| `pnpm test:coverage:integration-api` | Cobertura de `server/**` via c8 |
-| `pnpm test:coverage:integration-nuxt` | Cobertura dos componentes de UI |
-| `pnpm test:coverage:e2e` | Build de produção + E2E + cobertura SSR/API |
+| Comando                               | O que executa                                                 |
+| ------------------------------------- | ------------------------------------------------------------- |
+| `pnpm test`                           | Unitários + integração (API e UI)                             |
+| `pnpm test:unit`                      | Somente unitários                                             |
+| `pnpm test:unit:watch`                | Unitários em watch                                            |
+| `pnpm test:integration`               | Reset do banco + integração de API + UI                       |
+| `pnpm test:e2e`                       | Build de produção + Playwright nos fluxos críticos (Chromium) |
+| `pnpm test:e2e:ui`                    | Build de produção + Playwright em modo UI                     |
+| `pnpm test:db:setup`                  | Recria o banco de teste e o seed                              |
+| `pnpm test:all`                       | `pnpm test` + `pnpm test:e2e`                                 |
+| `pnpm test:coverage`                  | Cobertura completa: unit + integração + E2E                   |
+| `pnpm test:coverage:unit`             | Cobertura unitária                                            |
+| `pnpm test:coverage:integration`      | Cobertura de API + UI                                         |
+| `pnpm test:coverage:integration-api`  | Cobertura de `server/**` via c8                               |
+| `pnpm test:coverage:integration-nuxt` | Cobertura dos componentes de UI                               |
+| `pnpm test:coverage:e2e`              | Build de produção + E2E + cobertura SSR/API                   |
 
 Os relatórios HTML ficam em `coverage/unit`, `coverage/integration-api`,
 `coverage/integration-nuxt` e `coverage/e2e`. Esses diretórios, `.coverage/`,
@@ -58,23 +58,23 @@ Os relatórios HTML ficam em `coverage/unit`, `coverage/integration-api`,
 
 ## Convenções de arquivos
 
-| Sufixo | Camada | Exemplo |
-| --- | --- | --- |
-| `.unit.spec.ts` | Unitário | `server/utils/time.unit.spec.ts` |
-| `.integration.spec.ts` | Integração | `tests/integration/api/api.integration.spec.ts` |
-| `.spec.ts` em `tests/e2e` | E2E | `tests/e2e/public-booking.spec.ts` |
+| Sufixo                    | Camada     | Exemplo                                         |
+| ------------------------- | ---------- | ----------------------------------------------- |
+| `.unit.spec.ts`           | Unitário   | `server/utils/time.unit.spec.ts`                |
+| `.integration.spec.ts`    | Integração | `tests/integration/api/api.integration.spec.ts` |
+| `.spec.ts` em `tests/e2e` | E2E        | `tests/e2e/public-booking.spec.ts`              |
 
 Os testes unitários ficam ao lado do código testado. Os testes de integração e
 E2E ficam em `tests/`, com helpers compartilhados em `tests/helpers/`.
 
 ## Metas de cobertura
 
-| Suíte | Escopo medido | Meta |
-| --- | --- | --- |
-| Unitário | Arquivos puros de `app/utils/**` e `server/utils/**` | 75% linhas, statements, funções e branches |
-| Integração de API | `server/**` | 75% linhas, statements, funções e branches |
-| Integração de UI | `AvailabilityPicker.vue` e `StaffAppointmentCard.vue` | 75% linhas, statements, funções e branches |
-| E2E | Código de servidor/SSR executado pelos fluxos críticos (sem o DDL de `server/database/schema.ts`) | 50% linhas, statements e funções |
+| Suíte             | Escopo medido                                                                                     | Meta                                       |
+| ----------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| Unitário          | Arquivos puros de `app/utils/**` e `server/utils/**`                                              | 75% linhas, statements, funções e branches |
+| Integração de API | `server/**`                                                                                       | 75% linhas, statements, funções e branches |
+| Integração de UI  | `AvailabilityPicker.vue` e `StaffAppointmentCard.vue`                                             | 75% linhas, statements, funções e branches |
+| E2E               | Código de servidor/SSR executado pelos fluxos críticos (sem o DDL de `server/database/schema.ts`) | 50% linhas, statements e funções           |
 
 O runner de cobertura está em `scripts/coverage.ts` e falha com exit code
 diferente de zero quando a meta não é atingida. O `vitest.config.ts` também
@@ -84,12 +84,12 @@ declara os thresholds de 75% para as suítes Vitest.
 
 Execução local em 2026-11-06, com os fluxos atuais:
 
-| Suíte | Testes | Linhas | Branches | Funções |
-| --- | ---: | ---: | ---: | ---: |
-| Unitário | 44 | 98,19% | 92,64% | 97,05% |
-| Integração de API | 17 | 96,01% | 76,41% | 94,11% |
-| Integração de UI | 14 | 92,59% | 88,23% | 81,81% |
-| E2E (SSR/API) | 10 | 87,23% | 42,99% | 70,58% |
+| Suíte             | Testes | Linhas | Branches | Funções |
+| ----------------- | -----: | -----: | -------: | ------: |
+| Unitário          |     44 | 98,19% |   92,64% |  97,05% |
+| Integração de API |     17 | 96,01% |   76,41% |  94,11% |
+| Integração de UI  |     14 | 92,59% |   88,23% |  81,81% |
+| E2E (SSR/API)     |     10 | 87,23% |   42,99% |  70,58% |
 
 A cobertura E2E mede os módulos de servidor/SSR carregados durante os fluxos.
 Os asserts do Playwright validam o comportamento no browser; a instrumentação
@@ -97,16 +97,16 @@ do bundle cliente é uma evolução futura, não um requisito para o gate atual.
 
 ## Caminhos críticos cobertos por E2E
 
-| Fluxo | Spec | O que valida |
-| --- | --- | --- |
-| Cliente agenda e cancela | `tests/e2e/public-booking.spec.ts` | Stepper em `/agendamento`, escolha de serviço/data/horário, nome + WhatsApp, confirmação, “Meus agendamentos” e cancelamento |
-| Link com serviço pré-selecionado | `tests/e2e/public-booking.spec.ts` | `/agendamento?serviceId=…` abre direto no stepper de data/horário |
-| Catálogo público sem profissionais | `tests/e2e/public-booking.spec.ts` | O catálogo lista cada serviço uma vez, sem "profissional responsável" |
-| Dona cria, conclui e corrige | `tests/e2e/staff-agenda.spec.ts` | Login da dona, criação de agendamento para amanhã, conclusão, no-show e correção de status |
-| Agenda sem filtro de profissional | `tests/e2e/staff-agenda.spec.ts` | A agenda não exibe seleção de profissional nem filtro por papel |
-| Navegação lateral | `tests/e2e/staff-agenda.spec.ts` | A sidebar leva a Jornada e Serviços |
-| Bloqueios de horário | `tests/e2e/staff-blocks.spec.ts` | A dona cria bloqueio semanal pela jornada, vê o item na lista e remove |
-| Gestão de serviços | `tests/e2e/staff-services.spec.ts` | A dona cadastra, edita e desativa um serviço; o nome é único entre os serviços ativos |
+| Fluxo                              | Spec                               | O que valida                                                                                                                 |
+| ---------------------------------- | ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Cliente agenda e cancela           | `tests/e2e/public-booking.spec.ts` | Stepper em `/agendamento`, escolha de serviço/data/horário, nome + WhatsApp, confirmação, “Meus agendamentos” e cancelamento |
+| Link com serviço pré-selecionado   | `tests/e2e/public-booking.spec.ts` | `/agendamento?serviceId=…` abre direto no stepper de data/horário                                                            |
+| Catálogo público sem profissionais | `tests/e2e/public-booking.spec.ts` | O catálogo lista cada serviço uma vez, sem "profissional responsável"                                                        |
+| Dona cria, conclui e corrige       | `tests/e2e/staff-agenda.spec.ts`   | Login da dona, criação de agendamento para amanhã, conclusão, no-show e correção de status                                   |
+| Agenda sem filtro de profissional  | `tests/e2e/staff-agenda.spec.ts`   | A agenda não exibe seleção de profissional nem filtro por papel                                                              |
+| Navegação lateral                  | `tests/e2e/staff-agenda.spec.ts`   | A sidebar leva a Jornada e Serviços                                                                                          |
+| Bloqueios de horário               | `tests/e2e/staff-blocks.spec.ts`   | A dona cria bloqueio semanal pela jornada, vê o item na lista e remove                                                       |
+| Gestão de serviços                 | `tests/e2e/staff-services.spec.ts` | A dona cadastra, edita e desativa um serviço; o nome é único entre os serviços ativos                                        |
 
 Fluxos que ainda entram no E2E conforme os épicos forem concluídos:
 
@@ -133,7 +133,7 @@ interagir, evitando cliques antes do Vue montar.
 ### Por que o E2E roda contra o build de produção
 
 O E2E **não** usa `nuxt dev`. Durante a navegação, o otimizador de dependências
-do Vite re-otimiza pacotes e dispara um *full reload* no meio do teste, o que
+do Vite re-otimiza pacotes e dispara um _full reload_ no meio do teste, o que
 desmonta dropdowns abertos e deixa a suíte instável. O build de produção
 (`.output/server/index.mjs`) elimina HMR e mede exatamente o artefato que é
 publicado — por isso `pnpm test:e2e` faz `pnpm build` antes de subir o servidor.
@@ -161,6 +161,7 @@ o gate é local:
 
 ```bash
 pnpm lint
+pnpm format:check
 pnpm typecheck
 pnpm build
 pnpm test:coverage

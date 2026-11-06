@@ -57,7 +57,8 @@ export async function writeAuditLog({
  */
 export function extractRequestMeta(event: H3Event) {
   return {
-    ipAddress: event.node.req.socket?.remoteAddress ?? event.node.req.headers['x-forwarded-for'] ?? null,
+    ipAddress:
+      event.node.req.socket?.remoteAddress ?? event.node.req.headers['x-forwarded-for'] ?? null,
     userAgent: event.node.req.headers['user-agent'] ?? null
   }
 }

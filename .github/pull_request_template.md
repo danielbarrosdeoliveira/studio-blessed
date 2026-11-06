@@ -16,6 +16,7 @@
 ## Checklist
 
 - [ ] `pnpm lint` passa
+- [ ] `pnpm format:check` passa
 - [ ] `pnpm typecheck` passa
 - [ ] `pnpm build` passa
 - [ ] Critérios de aceite atendidos

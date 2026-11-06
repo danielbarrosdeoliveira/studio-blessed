@@ -1,26 +1,30 @@
 <template>
-  <footer class="bg-zinc-950 border-t border-zinc-800/80 px-8 lg:px-12 pt-16 pb-8">
-    <div class="max-w-[1400px] mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10 mb-12 items-start">
-      <div class="sm:col-span-2 lg:col-span-1 space-y-5">
-        <a href="#" class="inline-block hover:opacity-80 transition-opacity duration-300">
+  <footer class="border-t border-zinc-800/80 bg-zinc-950 px-8 pt-16 pb-8 lg:px-12">
+    <div
+      class="mx-auto mb-12 grid max-w-350 grid-cols-1 items-start gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-10"
+    >
+      <div class="space-y-5 sm:col-span-2 lg:col-span-1">
+        <a href="#" class="inline-block transition-opacity duration-300 hover:opacity-80">
           <img
             src="/images/logo-studio-blessed-white.svg"
             alt="Studio Blessed"
-            class="h-16 sm:h-20 w-auto"
+            class="h-16 w-auto sm:h-20"
           />
         </a>
-        <p class="font-sans text-sm text-zinc-400 leading-relaxed max-w-xs">
+        <p class="max-w-xs font-sans text-sm/relaxed text-zinc-400">
           Beleza, cuidado e bem-estar em um espaço feito para você.
         </p>
       </div>
 
       <div class="space-y-4">
-        <h4 class="font-sans text-xs uppercase tracking-[0.15em] text-zinc-500 font-semibold">Studio</h4>
+        <h4 class="font-sans text-xs font-semibold tracking-[0.15em] text-zinc-500 uppercase">
+          Studio
+        </h4>
         <ul class="space-y-2">
           <li v-for="link in studioLinks" :key="link.label">
             <a
               :href="link.href"
-              class="font-sans text-sm text-zinc-400 hover:text-orange-500 transition-colors duration-300"
+              class="font-sans text-sm text-zinc-400 transition-colors duration-300 hover:text-orange-500"
             >
               {{ link.label }}
             </a>
@@ -29,7 +33,9 @@
       </div>
 
       <div class="space-y-4">
-        <h4 class="font-sans text-xs uppercase tracking-[0.15em] text-zinc-500 font-semibold">Serviços</h4>
+        <h4 class="font-sans text-xs font-semibold tracking-[0.15em] text-zinc-500 uppercase">
+          Serviços
+        </h4>
         <ul class="space-y-2">
           <li v-for="s in servicos" :key="s">
             <span class="font-sans text-sm text-zinc-400">{{ s }}</span>
@@ -38,21 +44,23 @@
       </div>
 
       <div>
-        <h3 class="font-sans text-xs uppercase tracking-[0.15em] text-zinc-500 font-semibold mb-8">Horários</h3>
+        <h3 class="mb-8 font-sans text-xs font-semibold tracking-[0.15em] text-zinc-500 uppercase">
+          Horários
+        </h3>
         <div class="space-y-4 font-sans text-sm">
           <div class="flex justify-between border-b border-zinc-800/60 pb-3">
             <span class="text-zinc-400">Seg a Sex</span>
-            <span class="text-zinc-200 font-medium">08h às 18h</span>
+            <span class="font-medium text-zinc-200">08h às 18h</span>
           </div>
           <div class="flex justify-between border-b border-zinc-800/60 pb-3">
             <span class="text-zinc-400">Sábado</span>
-            <span class="text-zinc-200 font-medium">08h às 15h</span>
+            <span class="font-medium text-zinc-200">08h às 15h</span>
           </div>
           <div class="flex justify-between">
             <span class="text-zinc-400 italic">Domingo</span>
-            <span class="text-orange-500 font-semibold uppercase tracking-tighter">Fechado</span>
+            <span class="font-semibold tracking-tighter text-orange-500 uppercase">Fechado</span>
           </div>
-          <p class="text-[10px] text-zinc-500 pt-3 uppercase tracking-[0.2em]">
+          <p class="pt-3 text-[10px] tracking-[0.2em] text-zinc-500 uppercase">
             *Atendemos somente com agendamento prévio.
           </p>
         </div>
@@ -64,23 +72,23 @@
           target="_blank"
           rel="noopener noreferrer"
           aria-label="WhatsApp"
-          class="w-11 h-11 rounded-full bg-zinc-900 flex items-center justify-center text-zinc-300 hover:bg-orange-500 hover:text-zinc-950 transition-all duration-300"
+          class="flex size-11 items-center justify-center rounded-full bg-zinc-900 text-zinc-300 transition-all duration-300 hover:bg-orange-500 hover:text-zinc-950"
         >
-          <LandingIcon icon="mdi:whatsapp" class="w-5 h-5" />
+          <LandingIcon icon="mdi:whatsapp" class="size-5" />
         </a>
         <a
           href="https://instagram.com/studio.bles"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Instagram"
-          class="w-11 h-11 rounded-full bg-zinc-900 flex items-center justify-center text-zinc-300 hover:bg-orange-500 hover:text-zinc-950 transition-all duration-300"
+          class="flex size-11 items-center justify-center rounded-full bg-zinc-900 text-zinc-300 transition-all duration-300 hover:bg-orange-500 hover:text-zinc-950"
         >
-          <LandingIcon icon="lucide:instagram" class="w-5 h-5" />
+          <LandingIcon icon="lucide:instagram" class="size-5" />
         </a>
       </div>
     </div>
 
-    <div class="max-w-[1400px] mx-auto border-t border-zinc-800/60 pt-8 text-center">
+    <div class="mx-auto max-w-350 border-t border-zinc-800/60 pt-8 text-center">
       <p class="font-sans text-[10px] tracking-[0.3em] text-zinc-500 uppercase">
         &copy; 2026 Studio Blessed. Todos os direitos reservados.
       </p>

@@ -1,48 +1,56 @@
 <template>
-  <section id="testimonials" class="py-20 md:py-28 bg-zinc-900/40">
-    <div class="max-w-[1400px] mx-auto px-8 lg:px-12">
-      <div class="text-center mb-16 space-y-2">
-        <span class="font-sans text-xs uppercase tracking-[0.2em] text-orange-500 font-semibold">Depoimentos</span>
-        <h2 class="font-serif text-4xl md:text-5xl text-zinc-50 leading-tight">
+  <section id="testimonials" class="bg-zinc-900/40 py-20 md:py-28">
+    <div class="mx-auto max-w-350 px-8 lg:px-12">
+      <div class="mb-16 space-y-2 text-center">
+        <span class="font-sans text-xs font-semibold tracking-[0.2em] text-orange-500 uppercase"
+          >Depoimentos</span
+        >
+        <h2 class="font-serif text-4xl/tight text-zinc-50 md:text-5xl">
           O que nossas clientes dizem
         </h2>
-        <p class="font-sans text-zinc-400 text-base max-w-xl mx-auto">
+        <p class="mx-auto max-w-xl font-sans text-base text-zinc-400">
           A satisfação de quem vive a experiência Studio Blessed.
         </p>
       </div>
 
-      <div class="relative max-w-5xl mx-auto">
+      <div class="relative mx-auto max-w-5xl">
         <div class="overflow-hidden">
           <div
             class="flex items-stretch"
             :class="{ 'transition-transform duration-500 ease-in-out': transitionEnabled }"
             :style="{ transform: `translateX(-${currentIndex * slideWidth}%)` }"
           >
-            <div v-for="(depo, i) in displayItems" :key="i" class="flex min-w-full md:min-w-[50%] px-3">
+            <div
+              v-for="(depo, i) in displayItems"
+              :key="i"
+              class="flex min-w-full px-3 md:min-w-[50%]"
+            >
               <div
-                class="flex flex-col h-full min-h-[280px] w-full rounded-2xl border border-zinc-800/80 bg-zinc-900/60 p-8 shadow-sm"
+                class="flex size-full min-h-70 flex-col rounded-2xl border border-zinc-800/80 bg-zinc-900/60 p-8 shadow-sm"
               >
-                <LandingIcon icon="lucide:quote" class="w-8 h-8 text-orange-500/70 mb-4" />
-                <p class="font-sans text-zinc-300 italic leading-relaxed flex-grow mb-6">
+                <LandingIcon icon="lucide:quote" class="mb-4 size-8 text-orange-500/70" />
+                <p class="mb-6 grow font-sans leading-relaxed text-zinc-300 italic">
                   “{{ depo.text }}”
                 </p>
-                <div class="flex items-center gap-3 mt-auto">
+                <div class="mt-auto flex items-center gap-3">
                   <img
                     v-if="depo.photo"
                     :src="depo.photo"
                     :alt="depo.name"
-                    class="w-10 h-10 rounded-full object-cover"
+                    class="size-10 rounded-full object-cover"
                   />
                   <div
                     v-else
-                    class="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center font-serif font-bold text-orange-500"
+                    class="flex size-10 items-center justify-center rounded-full bg-zinc-800 font-serif font-bold text-orange-500"
                   >
                     {{ depo.name.charAt(0) }}
                   </div>
                   <div>
-                    <p class="font-sans font-semibold text-zinc-100 text-sm">{{ depo.name }}</p>
+                    <p class="font-sans text-sm font-semibold text-zinc-100">{{ depo.name }}</p>
                     <div class="flex gap-0.5">
-                      <span v-for="s in depo.rating" :key="s" class="text-orange-500 text-xs">★</span>
+                      <span v-for="s in depo.rating" :key="s" class="text-xs text-orange-500"
+                        >★</span
+                      >
                     </div>
                   </div>
                 </div>
@@ -52,18 +60,18 @@
         </div>
 
         <button
-          class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-10 h-10 rounded-full bg-zinc-900 border border-zinc-700 shadow-md flex items-center justify-center text-zinc-100 hover:text-orange-500 hover:border-orange-500 transition-all duration-300"
+          class="absolute top-1/2 left-0 flex size-10 -translate-x-4 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-700 bg-zinc-900 text-zinc-100 shadow-md transition-all duration-300 hover:border-orange-500 hover:text-orange-500"
           aria-label="Depoimento anterior"
           @click="prev"
         >
-          <LandingIcon icon="lucide:chevron-left" class="w-5 h-5" />
+          <LandingIcon icon="lucide:chevron-left" class="size-5" />
         </button>
         <button
-          class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 w-10 h-10 rounded-full bg-zinc-900 border border-zinc-700 shadow-md flex items-center justify-center text-zinc-100 hover:text-orange-500 hover:border-orange-500 transition-all duration-300"
+          class="absolute top-1/2 right-0 flex size-10 translate-x-4 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-700 bg-zinc-900 text-zinc-100 shadow-md transition-all duration-300 hover:border-orange-500 hover:text-orange-500"
           aria-label="Próximo depoimento"
           @click="next"
         >
-          <LandingIcon icon="lucide:chevron-right" class="w-5 h-5" />
+          <LandingIcon icon="lucide:chevron-right" class="size-5" />
         </button>
       </div>
     </div>

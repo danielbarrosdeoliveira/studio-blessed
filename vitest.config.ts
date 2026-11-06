@@ -1,10 +1,6 @@
 import { defineVitestProject } from '@nuxt/test-utils/config'
 import { defineConfig } from 'vitest/config'
-import {
-  INTEGRATION_BASE_URL,
-  TEST_AUTH_SECRET,
-  TEST_DATABASE_URL
-} from './tests/env.ts'
+import { INTEGRATION_BASE_URL, TEST_AUTH_SECRET, TEST_DATABASE_URL } from './tests/env.ts'
 
 export default defineConfig({
   test: {

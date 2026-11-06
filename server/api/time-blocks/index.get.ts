@@ -8,10 +8,7 @@ import { serializeTimeBlock } from '../../utils/time-blocks'
 export default defineEventHandler(async (event) => {
   await requireUser(event)
 
-  const rows = await db
-    .select()
-    .from(timeBlock)
-    .orderBy(asc(timeBlock.startsAt))
+  const rows = await db.select().from(timeBlock).orderBy(asc(timeBlock.startsAt))
 
   setResponseHeader(event, 'Cache-Control', 'no-store')
 

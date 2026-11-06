@@ -11,7 +11,7 @@ import { requireUser } from '../../utils/auth-guard'
 
 const bodySchema = z.object({
   serviceId: z.string().min(1, 'Serviço não informado'),
-  startsAt: z.string().refine(value => !Number.isNaN(Date.parse(value)), 'Horário inválido'),
+  startsAt: z.string().refine((value) => !Number.isNaN(Date.parse(value)), 'Horário inválido'),
   clientName: z.string().trim().min(2, 'Informe o nome da cliente').max(120),
   clientPhone: z.string().trim().min(10, 'Informe o WhatsApp da cliente').max(20),
   notes: z.string().trim().max(500, 'Observações muito longas').optional()
@@ -41,10 +41,7 @@ export default defineEventHandler(async (event) => {
   const [found] = await db
     .select({ durationMin: service.durationMin })
     .from(service)
-    .where(and(
-      eq(service.id, parsed.data.serviceId),
-      eq(service.active, true)
-    ))
+    .where(and(eq(service.id, parsed.data.serviceId), eq(service.active, true)))
     .limit(1)
 
   if (!found) {

@@ -42,32 +42,19 @@ async function onSubmit() {
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-default px-4">
+  <div class="flex min-h-screen items-center justify-center bg-default px-4">
     <div class="w-full max-w-sm">
-      <div class="flex flex-col items-center gap-1 mb-8">
-        <div class="size-12 rounded-xl bg-primary flex items-center justify-center">
-          <UIcon
-            name="i-ri-scissors-line"
-            class="size-6 text-white"
-          />
+      <div class="mb-8 flex flex-col items-center gap-1">
+        <div class="flex size-12 items-center justify-center rounded-xl bg-primary">
+          <UIcon name="i-ri-scissors-line" class="size-6 text-white" />
         </div>
-        <h1 class="text-xl font-semibold text-highlighted">
-          Studio Blessed
-        </h1>
-        <p class="text-sm text-muted">
-          Entre para gerenciar a agenda
-        </p>
+        <h1 class="text-xl font-semibold text-highlighted">Studio Blessed</h1>
+        <p class="text-sm text-muted">Entre para gerenciar a agenda</p>
       </div>
 
       <UCard>
-        <form
-          class="space-y-4"
-          @submit.prevent="onSubmit"
-        >
-          <UFormField
-            label="E-mail"
-            name="email"
-          >
+        <form class="space-y-4" @submit.prevent="onSubmit">
+          <UFormField label="E-mail" name="email">
             <UInput
               v-model="email"
               type="email"
@@ -79,10 +66,7 @@ async function onSubmit() {
             />
           </UFormField>
 
-          <UFormField
-            label="Senha"
-            name="password"
-          >
+          <UFormField label="Senha" name="password">
             <UInput
               v-model="password"
               type="password"
@@ -113,9 +97,7 @@ async function onSubmit() {
         </form>
       </UCard>
 
-      <p class="text-center text-xs text-muted mt-6">
-        Acesso restrito à equipe do Studio Blessed.
-      </p>
+      <p class="mt-6 text-center text-xs text-muted">Acesso restrito à equipe do Studio Blessed.</p>
     </div>
   </div>
 </template>

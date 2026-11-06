@@ -56,7 +56,7 @@ function vitestCoverage(project: string, includes: string[], reportsDirectory: s
     '--project',
     project,
     '--coverage',
-    ...includes.map(file => `--coverage.include=${file}`),
+    ...includes.map((file) => `--coverage.include=${file}`),
     `--coverage.reportsDirectory=${reportsDirectory}`
   ])
 }
@@ -165,6 +165,8 @@ switch (command) {
     coverageE2E()
     break
   default:
-    console.error('Uso: tsx scripts/coverage.ts <unit|integration-api|integration-nuxt|e2e|integration|all>')
+    console.error(
+      'Uso: tsx scripts/coverage.ts <unit|integration-api|integration-nuxt|e2e|integration|all>'
+    )
     process.exit(1)
 }

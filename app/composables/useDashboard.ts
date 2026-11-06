@@ -11,12 +11,15 @@ const _useDashboard = () => {
     'g-j': () => router.push('/jornada'),
     'g-v': () => router.push('/servicos'),
     'g-c': () => router.push('/configuracoes'),
-    'n': () => isNotificationsSlideoverOpen.value = !isNotificationsSlideoverOpen.value
+    n: () => (isNotificationsSlideoverOpen.value = !isNotificationsSlideoverOpen.value)
   })
 
-  watch(() => route.fullPath, () => {
-    isNotificationsSlideoverOpen.value = false
-  })
+  watch(
+    () => route.fullPath,
+    () => {
+      isNotificationsSlideoverOpen.value = false
+    }
+  )
 
   return {
     isNotificationsSlideoverOpen

@@ -16,14 +16,14 @@ financeiro de repasse nem comissão, pois há apenas uma usuária.
 
 ## 2. Stack (corrigida)
 
-| Item | Decisão |
-| --- | --- |
-| Frontend / Backend | Nuxt 4 (SSR, estrutura `app/`) + Nuxt UI 4 Dashboard + Tailwind CSS |
-| Gerenciador de pacotes | **pnpm** (decidido após setup; store global + links) |
-| Banco de dados | PostgreSQL (OCI) |
-| Autenticação | Better Auth — **Google OAuth** ou **e-mail/senha** |
-| Interface | **Web responsivo, pt-BR** — ~~PWA~~ (removido do MVP) |
-| Fuso horário | `America/Sao_Paulo` |
+| Item                   | Decisão                                                             |
+| ---------------------- | ------------------------------------------------------------------- |
+| Frontend / Backend     | Nuxt 4 (SSR, estrutura `app/`) + Nuxt UI 4 Dashboard + Tailwind CSS |
+| Gerenciador de pacotes | **pnpm** (decidido após setup; store global + links)                |
+| Banco de dados         | PostgreSQL (OCI)                                                    |
+| Autenticação           | Better Auth — **Google OAuth** ou **e-mail/senha**                  |
+| Interface              | **Web responsivo, pt-BR** — ~~PWA~~ (removido do MVP)               |
+| Fuso horário           | `America/Sao_Paulo`                                                 |
 
 ## 3. Papéis e permissões
 
@@ -69,17 +69,21 @@ A rota antiga `/agendar` redireciona para `/agendamento`, preservando os parâme
   - **Dona:** pode agendar para **hoje/amanhã** e fazer **encaixes**.
 
 ### Granularidade dos horários
+
 - Inícios de horário a cada **15 minutos** dentro da jornada.
 
 ### Bloqueios
+
 - A dona **pode** criar bloqueios pontuais ou semanais.
 - Suportam **recorrência** (ex.: semanal), além de bloqueios pontuais.
 
 ### Concorrência
+
 - Sem lock distribuído no MVP. Estratégia: **revalidar a disponibilidade imediatamente antes de gravar**; se ocupou, o cliente escolhe outro horário.
 - Risco residual aceito: double-booking é improvável (salão pequeno, baixo volume).
 
 ### Cancelamento / reagendamento (cliente)
+
 - Permitido **até 24h antes**.
 - Dentro de 24h **não** é possível (vira **no-show**).
 - Reagendamento segue a mesma regra.
@@ -88,6 +92,7 @@ A rota antiga `/agendar` redireciona para `/agendamento`, preservando os parâme
 ## 7. Métricas (dashboard da dona)
 
 Períodos: **dia, semana, mês e ano**.
+
 - **Faturamento** = soma dos preços dos serviços **concluídos** (mede movimento, não receita recebida por terceiros, pois não há profissionais).
 - **Total de atendimentos**.
 - **Ranking de serviços** mais realizados.

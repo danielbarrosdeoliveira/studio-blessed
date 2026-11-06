@@ -35,10 +35,12 @@ describe('time', () => {
   it('ignora intervalos fora do dia', () => {
     const bounds = dayBounds('2026-10-27')
 
-    expect(toMinuteInterval(
-      new Date('2026-10-26T10:00:00.000Z'),
-      new Date('2026-10-26T11:00:00.000Z'),
-      bounds
-    )).toBeNull()
+    expect(
+      toMinuteInterval(
+        new Date('2026-10-26T10:00:00.000Z'),
+        new Date('2026-10-26T11:00:00.000Z'),
+        bounds
+      )
+    ).toBeNull()
   })
 })

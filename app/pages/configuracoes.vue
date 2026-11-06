@@ -15,27 +15,19 @@ useHead({
     </template>
 
     <template #body>
-      <div class="flex flex-col gap-4 sm:gap-6 w-full lg:max-w-2xl">
+      <div class="flex w-full flex-col gap-4 sm:gap-6 lg:max-w-2xl">
         <UCard>
           <template #header>
-            <h2 class="font-semibold text-highlighted">
-              Studio Blessed
-            </h2>
+            <h2 class="font-semibold text-highlighted">Studio Blessed</h2>
           </template>
 
           <dl class="space-y-3 text-sm">
             <div class="flex items-center justify-between gap-4">
-              <dt class="text-muted">
-                Modelo de agenda
-              </dt>
-              <dd class="font-medium text-highlighted">
-                Dona única
-              </dd>
+              <dt class="text-muted">Modelo de agenda</dt>
+              <dd class="font-medium text-highlighted">Dona única</dd>
             </div>
             <div class="flex items-center justify-between gap-4">
-              <dt class="text-muted">
-                Jornada e bloqueios
-              </dt>
+              <dt class="text-muted">Jornada e bloqueios</dt>
               <dd>
                 <UButton
                   to="/jornada"
@@ -47,9 +39,7 @@ useHead({
               </dd>
             </div>
             <div class="flex items-center justify-between gap-4">
-              <dt class="text-muted">
-                Serviços
-              </dt>
+              <dt class="text-muted">Serviços</dt>
               <dd>
                 <UButton
                   to="/servicos"

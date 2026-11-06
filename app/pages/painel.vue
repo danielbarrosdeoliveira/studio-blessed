@@ -1,15 +1,7 @@
 <script setup lang="ts">
-import type {
-  Service,
-  StaffAgendaResponse,
-  StaffAppointmentResponse
-} from '~/types/domain'
+import type { Service, StaffAgendaResponse, StaffAppointmentResponse } from '~/types/domain'
 import { CalendarDate } from '@internationalized/date'
-import {
-  formatIsoDateLong,
-  isoDateOfInstant,
-  todayInTimeZone
-} from '~/utils/date'
+import { formatIsoDateLong, isoDateOfInstant, todayInTimeZone } from '~/utils/date'
 import { getApiErrorMessage } from '~/utils/error'
 import { normalizePhoneDigits } from '~/utils/phone'
 
@@ -54,7 +46,11 @@ const calendarDate = computed<CalendarDate | undefined>({
 
 const query = computed(() => ({ date: date.value }))
 
-const { data: agenda, status, refresh } = await useFetch<StaffAgendaResponse>('/api/appointments', {
+const {
+  data: agenda,
+  status,
+  refresh
+} = await useFetch<StaffAgendaResponse>('/api/appointments', {
   query,
   default: () => ({
     date: date.value,
@@ -116,19 +112,18 @@ const form = reactive({
 
 const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
 
-const serviceItems = computed(() => services.value.map(service => ({
-  label: `${service.name} · ${service.durationMin} min · ${brl.format(service.priceCents / 100)}`,
-  value: service.id
-})))
+const serviceItems = computed(() =>
+  services.value.map((service) => ({
+    label: `${service.name} · ${service.durationMin} min · ${brl.format(service.priceCents / 100)}`,
+    value: service.id
+  }))
+)
 
 const phoneValid = computed(() => normalizePhoneDigits(form.phone) !== null)
 
-const canSubmit = computed(() => (
-  !!form.serviceId
-  && !!form.startsAt
-  && form.name.trim().length >= 2
-  && phoneValid.value
-))
+const canSubmit = computed(
+  () => !!form.serviceId && !!form.startsAt && form.name.trim().length >= 2 && phoneValid.value
+)
 
 async function loadServices() {
   const current = ++servicesRequest
@@ -248,15 +243,19 @@ async function submit() {
           <UPopover :modal="false">
             <template #default>
               <UButton
-color="neutral" variant="outline" icon="i-ri-calendar-line"
-                class="data-[state=open]:bg-elevated group">
-                <span class="hidden sm:inline truncate">
+                color="neutral"
+                variant="outline"
+                icon="i-ri-calendar-line"
+                class="group data-[state=open]:bg-elevated"
+              >
+                <span class="hidden truncate sm:inline">
                   {{ formatIsoDateLong(date) }}
                 </span>
                 <template #trailing>
                   <UIcon
-name="i-ri-arrow-down-s-line"
-                    class="shrink-0 text-dimmed size-5 group-data-[state=open]:rotate-180 transition-transform duration-200" />
+                    name="i-ri-arrow-down-s-line"
+                    class="size-5 shrink-0 text-dimmed transition-transform duration-200 group-data-[state=open]:rotate-180"
+                  />
                 </template>
               </UButton>
             </template>
@@ -280,12 +279,8 @@ name="i-ri-arrow-down-s-line"
             <UIcon name="i-ri-calendar-line" class="size-6 text-muted" />
           </div>
           <div>
-            <p class="font-medium text-highlighted">
-              Nenhum agendamento neste dia
-            </p>
-            <p class="text-sm text-muted">
-              Crie um agendamento para hoje, amanhã ou um encaixe.
-            </p>
+            <p class="font-medium text-highlighted">Nenhum agendamento neste dia</p>
+            <p class="text-sm text-muted">Crie um agendamento para hoje, amanhã ou um encaixe.</p>
           </div>
           <UButton label="Novo agendamento" icon="i-ri-add-line" size="sm" @click="openCreate" />
         </div>
@@ -293,37 +288,63 @@ name="i-ri-arrow-down-s-line"
 
       <div v-else class="mt-6 space-y-3">
         <StaffAppointmentCard
-v-for="item in appointments" :key="item.id" :appointment="item" @changed="refresh" />
+          v-for="item in appointments"
+          :key="item.id"
+          :appointment="item"
+          @changed="refresh"
+        />
       </div>
     </template>
   </UDashboardPanel>
 
   <UModal
-v-model:open="createOpen" title="Novo agendamento"
+    v-model:open="createOpen"
+    title="Novo agendamento"
     description="Hoje, amanhã ou encaixe. A antecedência de 3 dias vale apenas para a cliente."
-    :ui="{ body: 'max-h-[75vh] overflow-y-auto' }">
+    :ui="{ body: 'max-h-[75vh] overflow-y-auto' }"
+  >
     <template #body>
       <form class="space-y-4" @submit.prevent="submit">
         <UFormField label="Serviço" required>
           <USelect
-v-model="form.serviceId" :items="serviceItems" :loading="loadingServices"
+            v-model="form.serviceId"
+            :items="serviceItems"
+            :loading="loadingServices"
             :disabled="!serviceItems.length"
-            :placeholder="serviceItems.length ? 'Selecione' : 'Nenhum serviço ativo'" class="w-full" />
+            :placeholder="serviceItems.length ? 'Selecione' : 'Nenhum serviço ativo'"
+            class="w-full"
+          />
         </UFormField>
 
         <div v-if="form.serviceId" class="rounded-lg border border-default p-3">
           <AvailabilityPicker
-:key="pickerKey" v-model="form.startsAt"
-            :service-id="form.serviceId" :min-date="date" endpoint="/api/availability" :client-lead="false" />
+            :key="pickerKey"
+            v-model="form.startsAt"
+            :service-id="form.serviceId"
+            :min-date="date"
+            endpoint="/api/availability"
+            :client-lead="false"
+          />
         </div>
 
         <div class="grid gap-4 sm:grid-cols-2">
           <UFormField label="Nome da cliente" required>
-            <UInput v-model="form.name" placeholder="Como devemos chamar?" autocomplete="off" class="w-full" />
+            <UInput
+              v-model="form.name"
+              placeholder="Como devemos chamar?"
+              autocomplete="off"
+              class="w-full"
+            />
           </UFormField>
 
           <UFormField label="WhatsApp" required>
-            <UInput v-model="form.phone" type="tel" placeholder="(11) 99999-9999" autocomplete="off" class="w-full" />
+            <UInput
+              v-model="form.phone"
+              type="tel"
+              placeholder="(11) 99999-9999"
+              autocomplete="off"
+              class="w-full"
+            />
             <p v-if="form.phone && !phoneValid" class="mt-1 text-xs text-error">
               Informe um WhatsApp válido com DDD.
             </p>
@@ -332,13 +353,22 @@ v-model="form.serviceId" :items="serviceItems" :loading="loadingServices"
 
         <UFormField label="Observações">
           <UTextarea
-v-model="form.notes" :rows="2" placeholder="Preferências, encaixe, observações do atendimento..."
-            class="w-full" />
+            v-model="form.notes"
+            :rows="2"
+            placeholder="Preferências, encaixe, observações do atendimento..."
+            class="w-full"
+          />
         </UFormField>
 
         <UAlert v-if="formError" color="error" variant="subtle" :description="formError" />
 
-        <UButton type="submit" label="Confirmar agendamento" :loading="creating" :disabled="!canSubmit" block />
+        <UButton
+          type="submit"
+          label="Confirmar agendamento"
+          :loading="creating"
+          :disabled="!canSubmit"
+          block
+        />
       </form>
     </template>
   </UModal>

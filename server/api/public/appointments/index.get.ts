@@ -2,10 +2,7 @@ import { desc, eq } from 'drizzle-orm'
 import * as z from 'zod'
 import { db } from '../../../database'
 import { appointment, client, service } from '../../../database/schema'
-import {
-  cancellationPolicy,
-  serializeAppointment
-} from '../../../utils/appointment-serialization'
+import { cancellationPolicy, serializeAppointment } from '../../../utils/appointment-serialization'
 import { appointmentColumns } from '../../../utils/appointments'
 import { normalizePhone } from '../../../utils/phone'
 
@@ -44,6 +41,6 @@ export default defineEventHandler(async (event) => {
   return {
     phone,
     cancellation: cancellationPolicy,
-    appointments: rows.map(row => serializeAppointment(row))
+    appointments: rows.map((row) => serializeAppointment(row))
   }
 })

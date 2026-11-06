@@ -24,7 +24,7 @@ export async function login(page: Page, email: string) {
   await page.getByLabel('E-mail').fill(email)
   await page.getByLabel('Senha').fill(E2E_PASSWORD)
   await page.getByRole('button', { name: 'Entrar' }).click()
-  await page.waitForURL(url => url.pathname === '/')
+  await page.waitForURL((url) => url.pathname === '/')
 }
 
 export async function expectToast(page: Page, title: string) {

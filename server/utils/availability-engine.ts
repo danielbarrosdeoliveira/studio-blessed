@@ -73,7 +73,9 @@ export function computeAvailability(input: AvailabilityEngineInput): Availabilit
       }
 
       const busyEnd = start + occupiedMinutes
-      const conflict = busyIntervals.some(interval => start < interval.end && busyEnd > interval.start)
+      const conflict = busyIntervals.some(
+        (interval) => start < interval.end && busyEnd > interval.start
+      )
 
       if (conflict) {
         continue
@@ -86,7 +88,7 @@ export function computeAvailability(input: AvailabilityEngineInput): Availabilit
 
   minutes.sort((a, b) => a - b)
 
-  return minutes.map(minute => ({
+  return minutes.map((minute) => ({
     startsAt: toInstant(minute).toISOString(),
     endsAt: toInstant(minute + durationMin).toISOString(),
     label: formatMinute(minute)
