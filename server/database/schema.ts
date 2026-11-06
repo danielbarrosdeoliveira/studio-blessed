@@ -31,13 +31,7 @@ export const user = pgTable('user', {
   email: text('email').notNull().unique(),
   emailVerified: boolean('email_verified').notNull().default(false),
   image: text('image'),
-  /**
-   * `admin` | `partner`
-   * Não é aceito como input no cadastro (ver `server/lib/auth.ts`).
-   */
-  role: text('role').notNull().default('partner'),
-  /** `internal` | `google` — na Fase 1 sempre `internal`. */
-  agendaProvider: text('agenda_provider').notNull().default('internal'),
+  // Modelo single-owner: apenas a dona do salão
   createdAt: createdAt(),
   updatedAt: updatedAt()
 })
@@ -83,7 +77,7 @@ export const verification = pgTable('verification', {
 }, t => [index('verification_identifier_idx').on(t.identifier)])
 
 /* -------------------------------------------------------------------------- */
-/*  Domínio                                                                    */
+/*  Domínio - Single Owner                                                   */
 /* -------------------------------------------------------------------------- */
 
 export const appointmentStatus = pgEnum('appointment_status', [
@@ -105,14 +99,11 @@ export const client = pgTable('client', {
   phone: text('phone').notNull(),
   createdAt: createdAt(),
   updatedAt: updatedAt()
-}, t => [uniqueIndex('client_phone_unique').on(t.phone)])
+}, t => uniqueIndex('client_phone_unique').on(t.phone))
 
-/** Serviço pertence a uma profissional (`user.id`). */
+/** Serviço — pertence à dona do salão (sem professionalId). */
 export const service = pgTable('service', {
   id: id(),
-  professionalId: text('professional_id')
-    .notNull()
-    .references(() => user.id, { onDelete: 'cascade' }),
   name: text('name').notNull(),
   durationMin: integer('duration_min').notNull(),
   bufferMin: integer('buffer_min').notNull().default(0),
@@ -121,46 +112,37 @@ export const service = pgTable('service', {
   createdAt: createdAt(),
   updatedAt: updatedAt()
 }, t => [
-  index('service_professional_idx').on(t.professionalId),
   index('service_name_idx').on(t.name),
   uniqueIndex('service_active_name_unique')
     .on(sql`lower(btrim(${t.name}))`)
     .where(sql`${t.active}`)
 ])
 
-/** Jornada: `weekday` 0 = domingo … 6 = sábado. Minutos desde 00:00. */
+/** Jornada da dona do salão - dias da semana com horário de trabalho. */
 export const workingHours = pgTable('working_hours', {
   id: id(),
-  professionalId: text('professional_id')
-    .notNull()
-    .references(() => user.id, { onDelete: 'cascade' }),
   weekday: integer('weekday').notNull(),
   startMinute: integer('start_minute').notNull(),
   endMinute: integer('end_minute').notNull(),
   createdAt: createdAt()
-}, t => [index('working_hours_professional_idx').on(t.professionalId, t.weekday)])
+}, t => [index('working_hours_weekday_idx').on(t.weekday)])
 
-/** Bloqueio pontual ou recorrente (ex.: `weekly`). */
+/** Bloqueio pontual ou recorrente (ex.: `weekly`) da dona do salão. */
 export const timeBlock = pgTable('time_block', {
   id: id(),
-  professionalId: text('professional_id')
-    .notNull()
-    .references(() => user.id, { onDelete: 'cascade' }),
   startsAt: timestamp('starts_at', { withTimezone: true }).notNull(),
   endsAt: timestamp('ends_at', { withTimezone: true }).notNull(),
   reason: text('reason'),
   recurrence: text('recurrence'),
   createdAt: createdAt()
-}, t => [index('time_block_professional_idx').on(t.professionalId, t.startsAt)])
+}, t => [index('time_block_starts_at_idx').on(t.startsAt)])
 
+/** Agendamento público (cliente) ou de staff. */
 export const appointment = pgTable('appointment', {
   id: id(),
   clientId: text('client_id')
     .notNull()
     .references(() => client.id, { onDelete: 'restrict' }),
-  professionalId: text('professional_id')
-    .notNull()
-    .references(() => user.id, { onDelete: 'restrict' }),
   serviceId: text('service_id')
     .notNull()
     .references(() => service.id, { onDelete: 'restrict' }),
@@ -172,12 +154,12 @@ export const appointment = pgTable('appointment', {
   createdAt: createdAt(),
   updatedAt: updatedAt()
 }, t => [
-  index('appointment_professional_starts_idx').on(t.professionalId, t.startsAt),
-  index('appointment_client_idx').on(t.clientId)
+  index('appointment_client_idx').on(t.clientId),
+  index('appointment_service_starts_idx').on(t.serviceId, t.startsAt)
 ])
 
 /* -------------------------------------------------------------------------- */
-/*  Auditoria                                                                  */
+/*  Auditoria                                                               */
 /* -------------------------------------------------------------------------- */
 
 export const auditLog = pgTable('audit_log', {
@@ -198,7 +180,7 @@ export const auditLog = pgTable('audit_log', {
 ])
 
 /* -------------------------------------------------------------------------- */
-/*  Tipos                                                                      */
+/*  Tipos                                                                   */
 /* -------------------------------------------------------------------------- */
 
 export type User = typeof user.$inferSelect
