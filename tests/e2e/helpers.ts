@@ -3,8 +3,8 @@ import { addDays, todayIso } from '../helpers/date'
 
 export { addDays, todayIso }
 
-export const ADMIN_EMAIL = 'admin@studioblessed.test'
-export const MARIA_EMAIL = 'maria@studioblessed.test'
+/** Modelo single-owner: a dona do salão é a única usuária autenticada. */
+export const OWNER_EMAIL = 'owner@studioblessed.test'
 export const E2E_PASSWORD = 'senha123456'
 
 /** Espera o Vue montar para não clicar antes da hidratação do SSR. */

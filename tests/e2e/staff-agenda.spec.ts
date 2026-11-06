@@ -1,13 +1,13 @@
 import { expect, test } from '@playwright/test'
-import { addDays, ADMIN_EMAIL, login, MARIA_EMAIL, todayIso, waitForHydration } from './helpers'
+import { addDays, login, OWNER_EMAIL, todayIso, waitForHydration } from './helpers'
 
 const clientName = 'Cliente Staff E2E'
 
-test('staff cria, conclui e corrige um agendamento', async ({ page }) => {
+test('dona cria, conclui e corrige um agendamento', async ({ page }) => {
   const tomorrow = addDays(todayIso(), 1)
 
-  await login(page, ADMIN_EMAIL)
-  await page.goto('/agenda')
+  await login(page, OWNER_EMAIL)
+  await page.goto(`/painel?date=${tomorrow}`)
   await waitForHydration(page)
   await expect(page.getByRole('heading', { name: 'Agenda' })).toBeVisible()
 
@@ -16,14 +16,8 @@ test('staff cria, conclui e corrige um agendamento', async ({ page }) => {
   const dialog = page.getByRole('dialog')
   await expect(dialog).toBeVisible()
 
-  await dialog.getByLabel('Profissional').click()
-  await page.getByRole('option', { name: 'Maria', exact: true }).click()
-
-  await expect(dialog.getByLabel('Serviço')).toBeEnabled()
   await dialog.getByLabel('Serviço').click()
   await page.getByRole('option', { name: /Corte feminino/ }).click()
-
-  await dialog.getByLabel('Escolha a data').fill(tomorrow)
 
   const slot = dialog.getByRole('button', { name: '09:00', exact: true })
   await expect(slot).toBeVisible()
@@ -47,19 +41,25 @@ test('staff cria, conclui e corrige um agendamento', async ({ page }) => {
   await expect(card.getByText('Concluído')).toBeVisible()
 })
 
-test('partner vê a própria agenda sem o filtro de admin', async ({ page }) => {
-  const tomorrow = addDays(todayIso(), 1)
-
-  await login(page, MARIA_EMAIL)
-  await page.goto('/agenda')
+test('a agenda não tem filtro de profissional', async ({ page }) => {
+  await login(page, OWNER_EMAIL)
+  await page.goto('/painel')
   await waitForHydration(page)
+
   await expect(page.getByRole('heading', { name: 'Agenda' })).toBeVisible()
-
   await expect(page.getByText('Todas as profissionais')).toHaveCount(0)
+  await expect(page.getByText('Profissionais', { exact: true })).toHaveCount(0)
+})
 
-  await page.getByLabel('Dia da agenda').fill(tomorrow)
+test('a navegação lateral leva às páginas da dona', async ({ page }) => {
+  await login(page, OWNER_EMAIL)
+  await page.goto('/painel')
+  await waitForHydration(page)
 
-  const card = page.getByTestId('staff-appointment').filter({ hasText: clientName })
-  await expect(card).toBeVisible()
-  await expect(card.getByText('Concluído')).toBeVisible()
+  await page.getByRole('link', { name: 'Jornada' }).first().click()
+  await expect(page).toHaveURL(/\/jornada/)
+  await expect(page.getByRole('heading', { name: 'Jornada' })).toBeVisible()
+
+  await page.getByRole('link', { name: 'Serviços' }).first().click()
+  await expect(page).toHaveURL(/\/servicos/)
 })

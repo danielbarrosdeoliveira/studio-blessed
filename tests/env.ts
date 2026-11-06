@@ -9,10 +9,12 @@ export const TEST_AUTH_SECRET = 'studio-blessed-test-secret-nao-use-em-producao'
 
 export const TEST_PASSWORD = 'senha123456'
 
+/**
+ * Modelo single-owner: existe apenas a dona do salão.
+ * Qualquer usuário autenticado gerencia a agenda, os serviços e a jornada.
+ */
 export const TEST_USERS = {
-  admin: { email: 'admin@studioblessed.test', name: 'Admin Studio', role: 'admin' as const },
-  maria: { email: 'maria@studioblessed.test', name: 'Maria', role: 'partner' as const },
-  ana: { email: 'ana@studioblessed.test', name: 'Ana', role: 'partner' as const }
+  owner: { email: 'owner@studioblessed.test', name: 'Dona Studio' }
 }
 
 export const INTEGRATION_PORT = 3101

@@ -1,11 +1,9 @@
 import { $fetch, setup } from '@nuxt/test-utils/e2e'
 import { describe, expect, it } from 'vitest'
 import type {
-  Professional,
   PublicAppointmentResponse,
   PublicAppointmentsResponse,
   PublicAvailability,
-  PublicServiceGroup,
   Service,
   StaffAgendaResponse,
   StaffAppointmentResponse,
@@ -61,7 +59,6 @@ async function getSession(email: string) {
 }
 
 function createStaffAppointment(cookie: string, body: {
-  professionalId?: string
   serviceId: string
   startsAt: string
   clientName: string
@@ -76,35 +73,30 @@ function createStaffAppointment(cookie: string, body: {
 }
 
 describe('API pública de agendamento', () => {
-  it('lista o catálogo ativo agrupado por serviço', async () => {
-    const groups = await $fetch<PublicServiceGroup[]>('/api/public/services')
-    const corte = groups.find(group => group.name === 'Corte feminino')
-    const corteMasculino = groups.find(group => group.name === 'Corte masculino')
+  it('lista o catálogo ativo do salão', async () => {
+    const services = await $fetch<Service[]>('/api/public/services')
 
-    expect(corte).toBeDefined()
-    expect(corte?.professionals).toEqual([
-      expect.objectContaining({ id: seed.users.maria.id, name: 'Maria' })
-    ])
-    expect(corteMasculino?.professionals).toEqual([
-      expect.objectContaining({ id: seed.users.ana.id, name: 'Ana' })
-    ])
-    expect(groups.every(group => group.professionals.length === 1)).toBe(true)
+    expect(services.map(service => service.name)).toEqual(
+      expect.arrayContaining(['Corte feminino', 'Escova'])
+    )
+    expect(services.every(service => !('professionalId' in service))).toBe(true)
   })
 
   it('aplica a antecedência de 3 dias somente no fluxo da cliente', async () => {
-    const query = {
-      professionalId: seed.users.maria.id,
-      serviceId: seed.services.mariaCorte
-    }
-
     const available = await $fetch<PublicAvailability>('/api/public/availability', {
-      query: { ...query, date: addDays(todayIso(), 4) }
+      query: { serviceId: seed.services.corte, date: addDays(todayIso(), 4) }
+    })
+    // O 3º dia é o limite: o primeiro horário do dia já está liberado.
+    const boundary = await $fetch<PublicAvailability>('/api/public/availability', {
+      query: { serviceId: seed.services.corte, date: addDays(todayIso(), 3) }
     })
     const tooSoon = await $fetch<PublicAvailability>('/api/public/availability', {
-      query: { ...query, date: addDays(todayIso(), 1) }
+      query: { serviceId: seed.services.corte, date: addDays(todayIso(), 1) }
     })
 
     expect(available.slots.length).toBeGreaterThan(0)
+    expect(boundary.slots.length).toBeGreaterThan(0)
+    expect(boundary.slots.some(slot => slot.label === '09:00')).toBe(true)
     expect(tooSoon.slots).toHaveLength(0)
   })
 
@@ -113,8 +105,7 @@ describe('API pública de agendamento', () => {
     const startsAt = instantAt(date, '09:00')
     const phone = '11999990010'
     const body = {
-      professionalId: seed.users.maria.id,
-      serviceId: seed.services.mariaCorte,
+      serviceId: seed.services.corte,
       startsAt,
       clientName: 'Cliente Integração',
       clientPhone: phone
@@ -166,8 +157,7 @@ describe('API pública de agendamento', () => {
 
     const reopened = await $fetch<PublicAvailability>('/api/public/availability', {
       query: {
-        professionalId: seed.users.maria.id,
-        serviceId: seed.services.mariaCorte,
+        serviceId: seed.services.corte,
         date
       }
     })
@@ -177,9 +167,9 @@ describe('API pública de agendamento', () => {
 })
 
 describe('API da agenda do staff', () => {
-  it('protege a agenda e aplica o escopo de cada papel', async () => {
+  it('protege a agenda e gerencia todos os agendamentos da dona', async () => {
     const date = addDays(todayIso(), 6)
-    const admin = await getSession(TEST_USERS.admin.email)
+    const owner = await getSession(TEST_USERS.owner.email)
 
     const unauthenticated = await $fetch('/api/appointments', {
       query: { date }
@@ -187,18 +177,13 @@ describe('API da agenda do staff', () => {
 
     expect(errorStatus(unauthenticated)).toBe(401)
 
-    const professionals = await $fetch<Professional[]>('/api/professionals', {
-      headers: authHeaders(admin.cookie)
-    })
-    const maria = professionals.find(item => item.id === seed.users.maria.id)!
     const services = await $fetch<Service[]>('/api/services', {
-      headers: authHeaders(admin.cookie),
-      query: { professionalId: maria.id, active: 'true' }
+      headers: authHeaders(owner.cookie),
+      query: { active: 'true' }
     })
     const corte = services.find(item => item.name === 'Corte feminino')!
 
-    const appointment = await createStaffAppointment(admin.cookie, {
-      professionalId: maria.id,
+    const appointment = await createStaffAppointment(owner.cookie, {
       serviceId: corte.id,
       startsAt: instantAt(date, '10:00'),
       clientName: 'Cliente Staff',
@@ -208,18 +193,18 @@ describe('API da agenda do staff', () => {
 
     expect(appointment.appointment.origin).toBe('staff')
     expect(appointment.appointment.notes).toBe('Teste de integração')
+    expect(appointment.appointment.clientPhone).toBe('11999990020')
 
     const agenda = await $fetch<StaffAgendaResponse>('/api/appointments', {
-      headers: authHeaders(admin.cookie),
-      query: { date, professionalId: maria.id }
+      headers: authHeaders(owner.cookie),
+      query: { date }
     })
 
     expect(agenda.appointments).toEqual(expect.arrayContaining([
-      expect.objectContaining({ id: appointment.appointment.id, professionalName: 'Maria' })
+      expect.objectContaining({ id: appointment.appointment.id, serviceName: 'Corte feminino' })
     ]))
 
-    const duplicated = await createStaffAppointment(admin.cookie, {
-      professionalId: maria.id,
+    const duplicated = await createStaffAppointment(owner.cookie, {
       serviceId: corte.id,
       startsAt: instantAt(date, '10:00'),
       clientName: 'Outra Cliente',
@@ -232,7 +217,7 @@ describe('API da agenda do staff', () => {
       `/api/appointments/${appointment.appointment.id}`,
       {
         method: 'PATCH',
-        headers: authHeaders(admin.cookie),
+        headers: authHeaders(owner.cookie),
         body: { action: 'status', status: 'completed' }
       }
     )
@@ -243,7 +228,7 @@ describe('API da agenda do staff', () => {
       `/api/appointments/${appointment.appointment.id}`,
       {
         method: 'PATCH',
-        headers: authHeaders(admin.cookie),
+        headers: authHeaders(owner.cookie),
         body: { action: 'status', status: 'no_show' }
       }
     )
@@ -252,54 +237,27 @@ describe('API da agenda do staff', () => {
 
     const cancelFinished = await $fetch(`/api/appointments/${appointment.appointment.id}`, {
       method: 'PATCH',
-      headers: authHeaders(admin.cookie),
+      headers: authHeaders(owner.cookie),
       body: { action: 'cancel' }
     }).catch(error => error)
 
     expect(errorStatus(cancelFinished)).toBe(409)
 
-    const ana = professionals.find(item => item.id === seed.users.ana.id)!
-    const anaAppointment = await createStaffAppointment(admin.cookie, {
-      professionalId: ana.id,
-      serviceId: seed.services.anaCorte,
+    const second = await createStaffAppointment(owner.cookie, {
+      serviceId: seed.services.escova,
       startsAt: instantAt(date, '11:00'),
-      clientName: 'Cliente da Ana',
+      clientName: 'Cliente da Casa',
       clientPhone: '11999990021'
     })
 
-    const partner = await getSession(TEST_USERS.maria.email)
-
-    const crossProfessionalRead = await $fetch('/api/appointments', {
-      headers: authHeaders(partner.cookie),
-      query: { date, professionalId: ana.id }
-    }).catch(error => error)
-
-    expect(errorStatus(crossProfessionalRead)).toBe(403)
-
-    const crossProfessionalWrite = await $fetch(`/api/appointments/${anaAppointment.appointment.id}`, {
-      method: 'PATCH',
-      headers: authHeaders(partner.cookie),
-      body: { action: 'cancel' }
-    }).catch(error => error)
-
-    expect(errorStatus(crossProfessionalWrite)).toBe(403)
-
-    const partnerCorrection = await $fetch(`/api/appointments/${appointment.appointment.id}`, {
-      method: 'PATCH',
-      headers: authHeaders(partner.cookie),
-      body: { action: 'status', status: 'completed' }
-    }).catch(error => error)
-
-    expect(errorStatus(partnerCorrection)).toBe(409)
-
-    const ownAgenda = await $fetch<StaffAgendaResponse>('/api/appointments', {
-      headers: authHeaders(partner.cookie),
+    const agendaAfter = await $fetch<StaffAgendaResponse>('/api/appointments', {
+      headers: authHeaders(owner.cookie),
       query: { date }
     })
 
-    expect(ownAgenda.professionalId).toBe(maria.id)
-    expect(ownAgenda.appointments.every(item => item.professionalId === maria.id)).toBe(true)
-    expect(ownAgenda.appointments.some(item => item.id === anaAppointment.appointment.id)).toBe(false)
+    expect(agendaAfter.appointments).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: second.appointment.id })
+    ]))
   })
 })
 
@@ -307,12 +265,11 @@ describe('validações da API', () => {
   it('valida os parâmetros da disponibilidade pública', async () => {
     const missing = await $fetch('/api/public/availability').catch(error => error)
     const missingService = await $fetch('/api/public/availability', {
-      query: { professionalId: seed.users.maria.id }
+      query: { date: todayIso() }
     }).catch(error => error)
     const invalidDate = await $fetch('/api/public/availability', {
       query: {
-        professionalId: seed.users.maria.id,
-        serviceId: seed.services.mariaCorte,
+        serviceId: seed.services.corte,
         date: '2026-02-30'
       }
     }).catch(error => error)
@@ -334,8 +291,7 @@ describe('validações da API', () => {
 
   it('rejeita criação pública inválida, serviço divergente e antecedência curta', async () => {
     const base = {
-      professionalId: seed.users.maria.id,
-      serviceId: seed.services.mariaCorte,
+      serviceId: seed.services.corte,
       startsAt: instantAt(addDays(todayIso(), 9), '09:00'),
       clientName: 'Cliente Inválida',
       clientPhone: '11999990030'
@@ -351,7 +307,7 @@ describe('validações da API', () => {
     }).catch(error => error)
     const wrongService = await $fetch('/api/public/appointments', {
       method: 'POST',
-      body: { ...base, serviceId: seed.services.anaCorte }
+      body: { ...base, serviceId: '00000000-0000-0000-0000-000000000000' }
     }).catch(error => error)
     const tooSoon = await $fetch('/api/public/appointments', {
       method: 'POST',
@@ -374,8 +330,7 @@ describe('validações da API', () => {
     const created = await $fetch<PublicAppointmentResponse>('/api/public/appointments', {
       method: 'POST',
       body: {
-        professionalId: seed.users.maria.id,
-        serviceId: seed.services.mariaCorte,
+        serviceId: seed.services.corte,
         startsAt: instantAt(date, '09:00'),
         clientName: 'Cliente Remarcação',
         clientPhone: phone
@@ -396,8 +351,7 @@ describe('validações da API', () => {
     await $fetch('/api/public/appointments', {
       method: 'POST',
       body: {
-        professionalId: seed.users.maria.id,
-        serviceId: seed.services.mariaCorte,
+        serviceId: seed.services.corte,
         startsAt: instantAt(date, '11:00'),
         clientName: 'Cliente Conflito',
         clientPhone: '11999990033'
@@ -413,11 +367,10 @@ describe('validações da API', () => {
   })
 
   it('bloqueia alteração pública dentro das 24h', async () => {
-    const admin = await getSession(TEST_USERS.admin.email)
+    const owner = await getSession(TEST_USERS.owner.email)
     const phone = '11999990034'
-    const appointment = await createStaffAppointment(admin.cookie, {
-      professionalId: seed.users.maria.id,
-      serviceId: seed.services.mariaCorte,
+    const appointment = await createStaffAppointment(owner.cookie, {
+      serviceId: seed.services.corte,
       startsAt: instantAt(addDays(todayIso(), 1), '09:00'),
       clientName: 'Cliente 24h',
       clientPhone: phone
@@ -432,178 +385,76 @@ describe('validações da API', () => {
   })
 
   it('valida criação e atualização pelo staff', async () => {
-    const admin = await getSession(TEST_USERS.admin.email)
+    const owner = await getSession(TEST_USERS.owner.email)
     const date = addDays(todayIso(), 10)
     const base = {
-      serviceId: seed.services.mariaCorte,
+      serviceId: seed.services.corte,
       startsAt: instantAt(date, '09:00'),
       clientName: 'Cliente Staff Inválida',
       clientPhone: '11999990035'
     }
 
-    const missingProfessional = await $fetch('/api/appointments', {
+    const invalidBody = await $fetch('/api/appointments', {
       method: 'POST',
-      headers: authHeaders(admin.cookie),
-      body: base
-    }).catch(error => error)
-    const unknownProfessional = await $fetch('/api/appointments', {
-      method: 'POST',
-      headers: authHeaders(admin.cookie),
-      body: { ...base, professionalId: '00000000-0000-0000-0000-000000000000' }
+      headers: authHeaders(owner.cookie),
+      body: {}
     }).catch(error => error)
     const invalidPhone = await $fetch('/api/appointments', {
       method: 'POST',
-      headers: authHeaders(admin.cookie),
-      body: { ...base, professionalId: seed.users.maria.id, clientPhone: '123' }
+      headers: authHeaders(owner.cookie),
+      body: { ...base, clientPhone: '123' }
     }).catch(error => error)
     const wrongService = await $fetch('/api/appointments', {
       method: 'POST',
-      headers: authHeaders(admin.cookie),
-      body: {
-        ...base,
-        professionalId: seed.users.maria.id,
-        serviceId: seed.services.anaCorte
-      }
+      headers: authHeaders(owner.cookie),
+      body: { ...base, serviceId: '00000000-0000-0000-0000-000000000000' }
     }).catch(error => error)
 
-    expect(errorStatus(missingProfessional)).toBe(400)
-    expect(errorStatus(unknownProfessional)).toBe(404)
+    expect(errorStatus(invalidBody)).toBe(400)
     expect(errorStatus(invalidPhone)).toBe(400)
     expect(errorStatus(wrongService)).toBe(404)
 
-    const created = await createStaffAppointment(admin.cookie, {
+    const created = await createStaffAppointment(owner.cookie, {
       ...base,
-      professionalId: seed.users.maria.id,
       startsAt: instantAt(date, '10:00')
     })
 
-    const invalidBody = await $fetch(`/api/appointments/${created.appointment.id}`, {
+    const invalidBodyPatch = await $fetch(`/api/appointments/${created.appointment.id}`, {
       method: 'PATCH',
-      headers: authHeaders(admin.cookie),
+      headers: authHeaders(owner.cookie),
       body: { action: 'status', status: 'invalid' }
     }).catch(error => error)
     const notFound = await $fetch('/api/appointments/00000000-0000-0000-0000-000000000000', {
       method: 'PATCH',
-      headers: authHeaders(admin.cookie),
+      headers: authHeaders(owner.cookie),
       body: { action: 'cancel' }
     }).catch(error => error)
     const sameStatus = await $fetch(`/api/appointments/${created.appointment.id}`, {
       method: 'PATCH',
-      headers: authHeaders(admin.cookie),
+      headers: authHeaders(owner.cookie),
       body: { action: 'status', status: 'scheduled' }
     }).catch(error => error)
 
-    expect(errorStatus(invalidBody)).toBe(400)
+    expect(errorStatus(invalidBodyPatch)).toBe(400)
     expect(errorStatus(notFound)).toBe(404)
     expect(errorStatus(sameStatus)).toBe(400)
   })
 
-  it('impede a profissional de criar para outra e valida filtros da agenda', async () => {
-    const partner = await getSession(TEST_USERS.maria.email)
-    const date = addDays(todayIso(), 11)
+  it('valida o filtro de data da agenda', async () => {
+    const owner = await getSession(TEST_USERS.owner.email)
 
-    const crossProfessional = await $fetch('/api/appointments', {
-      method: 'POST',
-      headers: authHeaders(partner.cookie),
-      body: {
-        professionalId: seed.users.ana.id,
-        serviceId: seed.services.anaCorte,
-        startsAt: instantAt(date, '09:00'),
-        clientName: 'Cliente Bloqueada',
-        clientPhone: '11999990036'
-      }
-    }).catch(error => error)
     const invalidDate = await $fetch('/api/appointments', {
-      headers: authHeaders(partner.cookie),
+      headers: authHeaders(owner.cookie),
       query: { date: '2026-02-30' }
     }).catch(error => error)
-    const ownFilter = await $fetch<StaffAgendaResponse>('/api/appointments', {
-      headers: authHeaders(partner.cookie),
-      query: { date, professionalId: seed.users.maria.id }
-    })
-    const admin = await getSession(TEST_USERS.admin.email)
-    const adminAll = await $fetch<StaffAgendaResponse>('/api/appointments', {
-      headers: authHeaders(admin.cookie),
-      query: { date }
-    })
 
-    expect(errorStatus(crossProfessional)).toBe(403)
     expect(errorStatus(invalidDate)).toBe(400)
-    expect(ownFilter.professionalId).toBe(seed.users.maria.id)
-    expect(adminAll.professionalId).toBeNull()
   })
 })
 
-describe('gestão de profissionais e serviços', () => {
-  it('lê e atualiza a profissional e consulta a agenda interna', async () => {
-    const admin = await getSession(TEST_USERS.admin.email)
-    const maria = await getSession(TEST_USERS.maria.email)
-    const professional = await $fetch<Professional>(
-      `/api/professionals/${seed.users.maria.id}`,
-      { headers: authHeaders(admin.cookie) }
-    )
-    const ownProfessional = await $fetch<Professional>(
-      `/api/professionals/${seed.users.maria.id}`,
-      { headers: authHeaders(maria.cookie) }
-    )
-    const otherProfessional = await $fetch(
-      `/api/professionals/${seed.users.ana.id}`,
-      { headers: authHeaders(maria.cookie) }
-    ).catch(error => error)
-    const hours = await $fetch<WorkingHour[]>(
-      `/api/professionals/${seed.users.maria.id}/working-hours`,
-      { headers: authHeaders(admin.cookie) }
-    )
-    const availability = await $fetch<PublicAvailability>('/api/availability', {
-      headers: authHeaders(admin.cookie),
-      query: {
-        professionalId: seed.users.maria.id,
-        serviceId: seed.services.mariaCorte,
-        date: todayIso()
-      }
-    })
-    const unauthenticated = await $fetch('/api/availability', {
-      query: {
-        professionalId: seed.users.maria.id,
-        serviceId: seed.services.mariaCorte,
-        date: todayIso()
-      }
-    }).catch(error => error)
-
-    expect(professional.name).toBe('Maria')
-    expect(ownProfessional.id).toBe(seed.users.maria.id)
-    expect(errorStatus(otherProfessional)).toBe(403)
-    expect(hours).toHaveLength(7)
-    expect(availability.origin).toBe('staff')
-    expect(errorStatus(unauthenticated)).toBe(401)
-
-    const renamed = await $fetch<Professional>(
-      `/api/professionals/${seed.users.maria.id}`,
-      {
-        method: 'PATCH',
-        headers: authHeaders(admin.cookie),
-        body: { name: 'Maria Integração' }
-      }
-    )
-    const invalidName = await $fetch(`/api/professionals/${seed.users.maria.id}`, {
-      method: 'PATCH',
-      headers: authHeaders(admin.cookie),
-      body: { name: 'A' }
-    }).catch(error => error)
-    const crossRename = await $fetch(`/api/professionals/${seed.users.ana.id}`, {
-      method: 'PATCH',
-      headers: authHeaders(maria.cookie),
-      body: { name: 'Ana Bloqueada' }
-    }).catch(error => error)
-
-    expect(renamed.name).toBe('Maria Integração')
-    expect(errorStatus(invalidName)).toBe(400)
-    expect(errorStatus(crossRename)).toBe(403)
-  })
-
-  it('cria e atualiza serviços com escopo de acesso', async () => {
-    const admin = await getSession(TEST_USERS.admin.email)
-    const maria = await getSession(TEST_USERS.maria.email)
+describe('gestão de serviços', () => {
+  it('cria e atualiza serviços do salão', async () => {
+    const owner = await getSession(TEST_USERS.owner.email)
     const base = {
       name: 'Serviço Integração',
       durationMin: 30,
@@ -614,170 +465,97 @@ describe('gestão de profissionais e serviços', () => {
 
     const created = await $fetch<Service>('/api/services', {
       method: 'POST',
-      headers: authHeaders(admin.cookie),
-      body: { ...base, professionalId: seed.users.maria.id }
+      headers: authHeaders(owner.cookie),
+      body: base
     })
     const duplicate = await $fetch('/api/services', {
       method: 'POST',
-      headers: authHeaders(admin.cookie),
-      body: { ...base, professionalId: seed.users.maria.id }
-    }).catch(error => error)
-    const duplicateOtherProfessional = await $fetch('/api/services', {
-      method: 'POST',
-      headers: authHeaders(admin.cookie),
-      body: { ...base, professionalId: seed.users.ana.id }
+      headers: authHeaders(owner.cookie),
+      body: base
     }).catch(error => error)
     const duplicateCase = await $fetch('/api/services', {
       method: 'POST',
-      headers: authHeaders(admin.cookie),
-      body: { ...base, name: 'serviço integração', professionalId: seed.users.ana.id }
+      headers: authHeaders(owner.cookie),
+      body: { ...base, name: 'serviço integração' }
     }).catch(error => error)
     const inactiveDuplicate = await $fetch<Service>('/api/services', {
       method: 'POST',
-      headers: authHeaders(admin.cookie),
-      body: { ...base, professionalId: seed.users.ana.id, active: false }
+      headers: authHeaders(owner.cookie),
+      body: { ...base, name: 'Serviço Integração', active: false }
     })
-    const missingProfessional = await $fetch('/api/services', {
-      method: 'POST',
-      headers: authHeaders(admin.cookie),
-      body: base
-    }).catch(error => error)
     const invalidDuration = await $fetch('/api/services', {
       method: 'POST',
-      headers: authHeaders(admin.cookie),
-      body: { ...base, professionalId: seed.users.maria.id, durationMin: 1 }
+      headers: authHeaders(owner.cookie),
+      body: { ...base, durationMin: 1 }
     }).catch(error => error)
-    const partnerCreated = await $fetch<Service>('/api/services', {
+    const unauthenticated = await $fetch('/api/services', {
       method: 'POST',
-      headers: authHeaders(maria.cookie),
-      body: { ...base, name: 'Serviço da Maria' }
-    })
-    const partnerCross = await $fetch('/api/services', {
-      method: 'POST',
-      headers: authHeaders(maria.cookie),
-      body: { ...base, name: 'Serviço da Ana', professionalId: seed.users.ana.id }
+      body: base
     }).catch(error => error)
 
-    expect(created.professionalId).toBe(seed.users.maria.id)
     expect(created.bufferMin).toBe(0)
     expect(errorStatus(duplicate)).toBe(409)
-    expect(errorStatus(duplicateOtherProfessional)).toBe(409)
     expect(errorStatus(duplicateCase)).toBe(409)
     expect(inactiveDuplicate.active).toBe(false)
-    expect(errorStatus(missingProfessional)).toBe(400)
     expect(errorStatus(invalidDuration)).toBe(400)
-    expect(partnerCreated.professionalId).toBe(seed.users.maria.id)
-    expect(errorStatus(partnerCross)).toBe(403)
+    expect(errorStatus(unauthenticated)).toBe(401)
 
     const patched = await $fetch<Service>(`/api/services/${created.id}`, {
       method: 'PATCH',
-      headers: authHeaders(admin.cookie),
+      headers: authHeaders(owner.cookie),
       body: { priceCents: 2000 }
     })
-    const duplicateName = await $fetch(`/api/services/${partnerCreated.id}`, {
+    const duplicateName = await $fetch(`/api/services/${created.id}`, {
       method: 'PATCH',
-      headers: authHeaders(maria.cookie),
-      body: { name: 'serviço integração' }
+      headers: authHeaders(owner.cookie),
+      body: { name: 'corte feminino' }
     }).catch(error => error)
     const reactivateDuplicate = await $fetch(`/api/services/${inactiveDuplicate.id}`, {
       method: 'PATCH',
-      headers: authHeaders(admin.cookie),
+      headers: authHeaders(owner.cookie),
       body: { active: true }
-    }).catch(error => error)
-    const partnerOther = await $fetch(`/api/services/${seed.services.anaCorte}`, {
-      method: 'PATCH',
-      headers: authHeaders(maria.cookie),
-      body: { active: false }
     }).catch(error => error)
     const notFound = await $fetch('/api/services/00000000-0000-0000-0000-000000000000', {
       method: 'PATCH',
-      headers: authHeaders(admin.cookie),
+      headers: authHeaders(owner.cookie),
       body: { active: false }
     }).catch(error => error)
-    const partnerList = await $fetch<Service[]>('/api/services', {
-      headers: authHeaders(maria.cookie)
-    })
-    const adminList = await $fetch<Service[]>('/api/services', {
-      headers: authHeaders(admin.cookie)
+    const list = await $fetch<Service[]>('/api/services', {
+      headers: authHeaders(owner.cookie)
     })
     const activeList = await $fetch<Service[]>('/api/services', {
-      headers: authHeaders(admin.cookie),
+      headers: authHeaders(owner.cookie),
       query: { active: 'true' }
     })
 
     expect(patched.priceCents).toBe(2000)
     expect(errorStatus(duplicateName)).toBe(409)
     expect(errorStatus(reactivateDuplicate)).toBe(409)
-    expect(errorStatus(partnerOther)).toBe(403)
     expect(errorStatus(notFound)).toBe(404)
-    expect(partnerList.every(service => service.professionalId === seed.users.maria.id)).toBe(true)
-    expect(adminList.length).toBeGreaterThan(partnerList.length)
+    expect(list.length).toBeGreaterThan(activeList.length)
     expect(activeList.every(service => service.active)).toBe(true)
-  })
-
-  it('valida e salva a jornada de trabalho', async () => {
-    const admin = await getSession(TEST_USERS.admin.email)
-    const maria = await getSession(TEST_USERS.maria.email)
-    const route = `/api/professionals/${seed.users.maria.id}/working-hours`
-
-    const overlapping = await $fetch(route, {
-      method: 'PUT',
-      headers: authHeaders(admin.cookie),
-      body: {
-        hours: [
-          { weekday: 1, startMinute: 540, endMinute: 600 },
-          { weekday: 1, startMinute: 570, endMinute: 660 }
-        ]
-      }
-    }).catch(error => error)
-    const inverted = await $fetch(route, {
-      method: 'PUT',
-      headers: authHeaders(admin.cookie),
-      body: { hours: [{ weekday: 1, startMinute: 600, endMinute: 540 }] }
-    }).catch(error => error)
-    const crossSave = await $fetch(`/api/professionals/${seed.users.ana.id}/working-hours`, {
-      method: 'PUT',
-      headers: authHeaders(maria.cookie),
-      body: { hours: [] }
-    }).catch(error => error)
-    const saved = await $fetch<WorkingHour[]>(route, {
-      method: 'PUT',
-      headers: authHeaders(admin.cookie),
-      body: { hours: [{ weekday: 0, startMinute: 540, endMinute: 600 }] }
-    })
-    const read = await $fetch<WorkingHour[]>(route, {
-      headers: authHeaders(admin.cookie)
-    })
-
-    expect(errorStatus(overlapping)).toBe(400)
-    expect(errorStatus(inverted)).toBe(400)
-    expect(errorStatus(crossSave)).toBe(403)
-    expect(saved).toHaveLength(1)
-    expect(read).toHaveLength(1)
   })
 })
 
 describe('bloqueios de horário', () => {
   it('cria bloqueio pontual, lista e devolve o horário ao remover', async () => {
-    const admin = await getSession(TEST_USERS.admin.email)
+    const owner = await getSession(TEST_USERS.owner.email)
     const date = addDays(todayIso(), 20)
-    const route = `/api/professionals/${seed.users.ana.id}/blocks`
     const query = {
-      professionalId: seed.users.ana.id,
-      serviceId: seed.services.anaCorte,
+      serviceId: seed.services.escova,
       date
     }
     const startsAt = instantAt(date, '12:00')
     const endsAt = instantAt(date, '13:00')
 
     const before = await $fetch<PublicAvailability>('/api/availability', {
-      headers: authHeaders(admin.cookie),
+      headers: authHeaders(owner.cookie),
       query
     })
 
-    const created = await $fetch<TimeBlockResponse>(route, {
+    const created = await $fetch<TimeBlockResponse>('/api/time-blocks', {
       method: 'POST',
-      headers: authHeaders(admin.cookie),
+      headers: authHeaders(owner.cookie),
       body: { startsAt, endsAt, reason: 'Almoço' }
     })
 
@@ -785,7 +563,7 @@ describe('bloqueios de horário', () => {
     expect(created.conflicts).toEqual([])
 
     const after = await $fetch<PublicAvailability>('/api/availability', {
-      headers: authHeaders(admin.cookie),
+      headers: authHeaders(owner.cookie),
       query
     })
 
@@ -793,20 +571,20 @@ describe('bloqueios de horário', () => {
     expect(after.slots.some(slot => slot.startsAt === startsAt)).toBe(false)
     expect(after.slots.some(slot => slot.startsAt === instantAt(date, '11:00'))).toBe(true)
 
-    const list = await $fetch<TimeBlock[]>(route, {
-      headers: authHeaders(admin.cookie)
+    const list = await $fetch<TimeBlock[]>('/api/time-blocks', {
+      headers: authHeaders(owner.cookie)
     })
 
     expect(list).toEqual(expect.arrayContaining([
       expect.objectContaining({ id: created.block.id, reason: 'Almoço' })
     ]))
 
-    const removed = await $fetch<{ id: string }>(`${route}/${created.block.id}`, {
+    const removed = await $fetch<{ id: string }>(`/api/time-blocks/${created.block.id}`, {
       method: 'DELETE',
-      headers: authHeaders(admin.cookie)
+      headers: authHeaders(owner.cookie)
     })
     const reopened = await $fetch<PublicAvailability>('/api/availability', {
-      headers: authHeaders(admin.cookie),
+      headers: authHeaders(owner.cookie),
       query
     })
 
@@ -815,54 +593,37 @@ describe('bloqueios de horário', () => {
   })
 
   it('aplica bloqueio semanal em todas as ocorrências e valida recorrência', async () => {
-    const admin = await getSession(TEST_USERS.admin.email)
+    const owner = await getSession(TEST_USERS.owner.email)
     const date = addDays(todayIso(), 30)
     const nextWeek = addDays(date, 7)
     const previousWeek = addDays(date, -7)
     const otherDay = addDays(date, 1)
-    const route = `/api/professionals/${seed.users.ana.id}/blocks`
     const startsAt = instantAt(date, '12:00')
     const endsAt = instantAt(date, '13:00')
 
-    const created = await $fetch<TimeBlockResponse>(route, {
+    const created = await $fetch<TimeBlockResponse>('/api/time-blocks', {
       method: 'POST',
-      headers: authHeaders(admin.cookie),
+      headers: authHeaders(owner.cookie),
       body: { startsAt, endsAt, reason: 'Almoço semanal', recurrence: 'weekly' }
     })
 
     expect(created.block.recurrence).toBe('weekly')
 
     const sameWeek = await $fetch<PublicAvailability>('/api/availability', {
-      headers: authHeaders(admin.cookie),
-      query: {
-        professionalId: seed.users.ana.id,
-        serviceId: seed.services.anaCorte,
-        date
-      }
+      headers: authHeaders(owner.cookie),
+      query: { serviceId: seed.services.escova, date }
     })
     const followingWeek = await $fetch<PublicAvailability>('/api/availability', {
-      headers: authHeaders(admin.cookie),
-      query: {
-        professionalId: seed.users.ana.id,
-        serviceId: seed.services.anaCorte,
-        date: nextWeek
-      }
+      headers: authHeaders(owner.cookie),
+      query: { serviceId: seed.services.escova, date: nextWeek }
     })
     const otherWeekday = await $fetch<PublicAvailability>('/api/availability', {
-      headers: authHeaders(admin.cookie),
-      query: {
-        professionalId: seed.users.ana.id,
-        serviceId: seed.services.anaCorte,
-        date: otherDay
-      }
+      headers: authHeaders(owner.cookie),
+      query: { serviceId: seed.services.escova, date: otherDay }
     })
     const beforeStart = await $fetch<PublicAvailability>('/api/availability', {
-      headers: authHeaders(admin.cookie),
-      query: {
-        professionalId: seed.users.ana.id,
-        serviceId: seed.services.anaCorte,
-        date: previousWeek
-      }
+      headers: authHeaders(owner.cookie),
+      query: { serviceId: seed.services.escova, date: previousWeek }
     })
 
     expect(sameWeek.slots.some(slot => slot.startsAt === startsAt)).toBe(false)
@@ -870,27 +631,27 @@ describe('bloqueios de horário', () => {
     expect(otherWeekday.slots.some(slot => slot.startsAt === instantAt(otherDay, '12:00'))).toBe(true)
     expect(beforeStart.slots.some(slot => slot.startsAt === instantAt(previousWeek, '12:00'))).toBe(true)
 
-    const crossDay = await $fetch(route, {
+    const crossDay = await $fetch('/api/time-blocks', {
       method: 'POST',
-      headers: authHeaders(admin.cookie),
+      headers: authHeaders(owner.cookie),
       body: {
         startsAt: instantAt(date, '23:00'),
         endsAt: instantAt(addDays(date, 1), '01:00'),
         recurrence: 'weekly'
       }
     }).catch(error => error)
-    const invalidRecurrence = await $fetch(route, {
+    const invalidRecurrence = await $fetch('/api/time-blocks', {
       method: 'POST',
-      headers: authHeaders(admin.cookie),
+      headers: authHeaders(owner.cookie),
       body: {
         startsAt: instantAt(addDays(date, 2), '12:00'),
         endsAt: instantAt(addDays(date, 2), '13:00'),
         recurrence: 'daily'
       }
     }).catch(error => error)
-    const inverted = await $fetch(route, {
+    const inverted = await $fetch('/api/time-blocks', {
       method: 'POST',
-      headers: authHeaders(admin.cookie),
+      headers: authHeaders(owner.cookie),
       body: {
         startsAt: instantAt(addDays(date, 3), '13:00'),
         endsAt: instantAt(addDays(date, 3), '12:00')
@@ -903,20 +664,18 @@ describe('bloqueios de horário', () => {
   })
 
   it('avisa sobre agendamento existente sem cancelá-lo', async () => {
-    const admin = await getSession(TEST_USERS.admin.email)
+    const owner = await getSession(TEST_USERS.owner.email)
     const date = addDays(todayIso(), 40)
-    const route = `/api/professionals/${seed.users.ana.id}/blocks`
-    const appointment = await createStaffAppointment(admin.cookie, {
-      professionalId: seed.users.ana.id,
-      serviceId: seed.services.anaCorte,
+    const appointment = await createStaffAppointment(owner.cookie, {
+      serviceId: seed.services.escova,
       startsAt: instantAt(date, '10:00'),
       clientName: 'Cliente Bloqueio',
       clientPhone: '11999990040'
     })
 
-    const conflict = await $fetch(route, {
+    const conflict = await $fetch('/api/time-blocks', {
       method: 'POST',
-      headers: authHeaders(admin.cookie),
+      headers: authHeaders(owner.cookie),
       body: {
         startsAt: instantAt(date, '09:45'),
         endsAt: instantAt(date, '10:15'),
@@ -942,8 +701,8 @@ describe('bloqueios de horário', () => {
     ])
 
     const beforeConfirmation = await $fetch<StaffAgendaResponse>('/api/appointments', {
-      headers: authHeaders(admin.cookie),
-      query: { date, professionalId: seed.users.ana.id }
+      headers: authHeaders(owner.cookie),
+      query: { date }
     })
 
     expect(beforeConfirmation.appointments).toEqual(expect.arrayContaining([
@@ -953,9 +712,9 @@ describe('bloqueios de horário', () => {
       })
     ]))
 
-    const confirmed = await $fetch<TimeBlockResponse>(route, {
+    const confirmed = await $fetch<TimeBlockResponse>('/api/time-blocks', {
       method: 'POST',
-      headers: authHeaders(admin.cookie),
+      headers: authHeaders(owner.cookie),
       body: {
         startsAt: instantAt(date, '09:45'),
         endsAt: instantAt(date, '10:15'),
@@ -965,8 +724,8 @@ describe('bloqueios de horário', () => {
     })
 
     const afterConfirmation = await $fetch<StaffAgendaResponse>('/api/appointments', {
-      headers: authHeaders(admin.cookie),
-      query: { date, professionalId: seed.users.ana.id }
+      headers: authHeaders(owner.cookie),
+      query: { date }
     })
 
     expect(confirmed.conflicts).toHaveLength(1)
@@ -978,20 +737,13 @@ describe('bloqueios de horário', () => {
     ]))
   })
 
-  it('aplica o escopo de acesso e valida os dados do bloqueio', async () => {
-    const admin = await getSession(TEST_USERS.admin.email)
-    const maria = await getSession(TEST_USERS.maria.email)
+  it('exige autenticação e valida a remoção do bloqueio', async () => {
+    const owner = await getSession(TEST_USERS.owner.email)
     const date = addDays(todayIso(), 50)
-    const anaRoute = `/api/professionals/${seed.users.ana.id}/blocks`
-    const mariaRoute = `/api/professionals/${seed.users.maria.id}/blocks`
 
-    const unauthenticated = await $fetch(anaRoute).catch(error => error)
-    const mariaReadsAna = await $fetch(anaRoute, {
-      headers: authHeaders(maria.cookie)
-    }).catch(error => error)
-    const mariaWritesAna = await $fetch(anaRoute, {
+    const unauthenticated = await $fetch('/api/time-blocks').catch(error => error)
+    const unauthenticatedCreate = await $fetch('/api/time-blocks', {
       method: 'POST',
-      headers: authHeaders(maria.cookie),
       body: {
         startsAt: instantAt(date, '15:00'),
         endsAt: instantAt(date, '16:00')
@@ -999,45 +751,82 @@ describe('bloqueios de horário', () => {
     }).catch(error => error)
 
     expect(errorStatus(unauthenticated)).toBe(401)
-    expect(errorStatus(mariaReadsAna)).toBe(403)
-    expect(errorStatus(mariaWritesAna)).toBe(403)
+    expect(errorStatus(unauthenticatedCreate)).toBe(401)
 
-    const anaBlock = await $fetch<TimeBlockResponse>(anaRoute, {
+    const block = await $fetch<TimeBlockResponse>('/api/time-blocks', {
       method: 'POST',
-      headers: authHeaders(admin.cookie),
+      headers: authHeaders(owner.cookie),
       body: {
         startsAt: instantAt(date, '15:00'),
         endsAt: instantAt(date, '16:00')
       }
     })
-    const mariaDeletesAna = await $fetch(`${anaRoute}/${anaBlock.block.id}`, {
+
+    const notFound = await $fetch('/api/time-blocks/00000000-0000-0000-0000-000000000000', {
       method: 'DELETE',
-      headers: authHeaders(maria.cookie)
+      headers: authHeaders(owner.cookie)
     }).catch(error => error)
 
-    expect(errorStatus(mariaDeletesAna)).toBe(403)
-
-    const ownBlock = await $fetch<TimeBlockResponse>(mariaRoute, {
-      method: 'POST',
-      headers: authHeaders(maria.cookie),
-      body: {
-        startsAt: instantAt(addDays(date, 1), '15:00'),
-        endsAt: instantAt(addDays(date, 1), '16:00')
-      }
-    })
-    const notFound = await $fetch(`${mariaRoute}/00000000-0000-0000-0000-000000000000`, {
-      method: 'DELETE',
-      headers: authHeaders(maria.cookie)
-    }).catch(error => error)
-
-    expect(ownBlock.block.professionalId).toBe(seed.users.maria.id)
     expect(errorStatus(notFound)).toBe(404)
 
-    const removed = await $fetch<{ id: string }>(`${anaRoute}/${anaBlock.block.id}`, {
+    const removed = await $fetch<{ id: string }>(`/api/time-blocks/${block.block.id}`, {
       method: 'DELETE',
-      headers: authHeaders(admin.cookie)
+      headers: authHeaders(owner.cookie)
     })
 
-    expect(removed.id).toBe(anaBlock.block.id)
+    expect(removed.id).toBe(block.block.id)
+  })
+})
+
+describe('jornada de trabalho', () => {
+  it('valida e salva a jornada da dona do salão', async () => {
+    const owner = await getSession(TEST_USERS.owner.email)
+    const route = '/api/working-hours'
+
+    const unauthenticated = await $fetch(route).catch(error => error)
+    const overlapping = await $fetch(route, {
+      method: 'PUT',
+      headers: authHeaders(owner.cookie),
+      body: {
+        hours: [
+          { weekday: 1, startMinute: 540, endMinute: 600 },
+          { weekday: 1, startMinute: 570, endMinute: 660 }
+        ]
+      }
+    }).catch(error => error)
+    const inverted = await $fetch(route, {
+      method: 'PUT',
+      headers: authHeaders(owner.cookie),
+      body: { hours: [{ weekday: 1, startMinute: 600, endMinute: 540 }] }
+    }).catch(error => error)
+
+    expect(errorStatus(unauthenticated)).toBe(401)
+    expect(errorStatus(overlapping)).toBe(400)
+    expect(errorStatus(inverted)).toBe(400)
+
+    const saved = await $fetch<WorkingHour[]>(route, {
+      method: 'PUT',
+      headers: authHeaders(owner.cookie),
+      body: { hours: [{ weekday: 0, startMinute: 540, endMinute: 600 }] }
+    })
+    const read = await $fetch<WorkingHour[]>(route, {
+      headers: authHeaders(owner.cookie)
+    })
+
+    expect(saved).toHaveLength(1)
+    expect(read).toHaveLength(1)
+
+    // Restaura a jornada padrão usada pelos demais testes.
+    await $fetch<WorkingHour[]>(route, {
+      method: 'PUT',
+      headers: authHeaders(owner.cookie),
+      body: {
+        hours: [0, 1, 2, 3, 4, 5, 6].map(weekday => ({
+          weekday,
+          startMinute: 540,
+          endMinute: 1080
+        }))
+      }
+    })
   })
 })

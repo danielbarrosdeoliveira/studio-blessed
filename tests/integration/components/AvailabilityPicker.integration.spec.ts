@@ -25,7 +25,6 @@ describe('AvailabilityPicker', () => {
   it('carrega os horários e emite o slot selecionado', async () => {
     const wrapper = await mountSuspended(AvailabilityPicker, {
       props: {
-        professionalId: 'maria-1',
         serviceId: 'service-1',
         minDate: '2026-10-29'
       }
