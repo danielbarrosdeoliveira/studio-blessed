@@ -1,56 +1,50 @@
 <template>
-  <section id="about" class="py-20 md:py-28 bg-muted">
+  <section id="about" class="py-20 md:py-28 bg-zinc-950">
     <div class="max-w-[1400px] mx-auto px-8 lg:px-12">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
         <div class="relative">
           <div class="relative grid grid-cols-5 gap-4">
             <div class="col-span-3">
-              <img
-                src="/images/ceo-caroline-silva.jpg"
-                alt="Studio Blessed"
-                class="w-full h-[400px] object-cover rounded-lg shadow-xl"
-                loading="lazy"
-              />
+              <img src="/images/ceo-caroline-silva.jpg" alt="Studio Blessed"
+                class="w-full h-[400px] object-cover rounded-lg shadow-lg" loading="lazy" />
             </div>
             <div class="col-span-2 mt-12">
-              <img
-                src="/images/about-2.jpeg"
-                alt="Cuidados capilares"
-                class="w-full h-[300px] object-cover rounded-lg shadow-xl"
-                loading="lazy"
-              />
+              <img src="/images/about-2.jpeg" alt="Cuidados capilares"
+                class="w-full h-[300px] object-cover rounded-lg shadow-lg" loading="lazy" />
             </div>
           </div>
         </div>
 
         <div class="space-y-6">
-          <span class="font-sans text-xs uppercase tracking-[0.2em] text-primary font-semibold">02 / Quem Somos</span>
-          <h2 class="font-serif text-4xl md:text-5xl text-primary-foreground leading-tight">
+          <span class="font-sans text-xs uppercase tracking-[0.2em] text-zinc-400 font-semibold">02 / Quem Somos</span>
+          <h2 class="font-serif text-4xl md:text-5xl text-zinc-100 leading-tight">
             Um espaço feito para você
           </h2>
-          <div class="space-y-5 font-sans text-primary-foreground/80 text-base leading-relaxed">
+          <div class="space-y-5 font-sans text-zinc-100/80 text-base leading-relaxed">
             <p class="indent-8">
               A história do Studio Blessed é, acima de tudo, uma jornada de resiliência. O sonho
-              começou na sala da casa da mãe de <strong class="text-primary-foreground">Caroline</strong>,
+              começou na sala da casa da mãe de <strong class="text-zinc-100">Caroline</strong>,
               onde ela e a irmã deram os primeiros passos. Entre quartos improvisados e a conquista
               do primeiro espaço comercial, Caroline viu sua estrutura mudar e parcerias ficarem pelo
               caminho, mas sua paixão pela beleza e seu propósito nunca vacilaram.
             </p>
             <p class="indent-8">
               Hoje, sob a liderança exclusiva de Caroline, o
-              <em class="font-cursive text-2xl text-primary not-italic mx-1">Studio Blessed</em>
+              <em class="font-cursive text-2xl text-zinc-100 not-italic mx-1">Studio Blessed</em>
               reflete a força de uma mulher que escolheu continuar. Cada detalhe do atendimento
               personalizado carrega sua essência e dedicação total. Aqui, seu momento de
               autocuidado é sagrado.
             </p>
           </div>
-          <a
-            href="https://agenda.studioblessed.com.br"
-            class="inline-block rounded-full bg-primary text-primary-foreground text-sm uppercase tracking-wider px-8 py-4 font-medium hover:bg-primary/90 transition-all duration-300 shadow-lg">
-            Agende Seu Horário
-          </a>
+          <NuxtLink to="/agendamento"
+            class="rounded-full bg-orange-500 text-zinc-950 text-sm uppercase tracking-wider px-8 py-4 font-semibold hover:bg-orange-500/90 transition-all duration-300 shadow-lg whitespace-nowrap">
+            Agendar Agora
+          </NuxtLink>
         </div>
       </div>
     </div>
   </section>
 </template>
+
+<script lang="ts" setup>
+</script>
