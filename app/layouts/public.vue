@@ -51,7 +51,7 @@
             class="sm:hidden"
           />
           <UButton
-            label="Equipe"
+            label="Área da dona"
             icon="i-ri-login-box-line"
             color="neutral"
             variant="outline"
@@ -62,7 +62,7 @@
           <UButton
             to="/login"
             icon="i-ri-login-box-line"
-            aria-label="Equipe"
+            aria-label="Área da dona"
             color="neutral"
             variant="outline"
             size="sm"

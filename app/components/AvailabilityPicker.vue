@@ -5,7 +5,6 @@ import { addDaysToIsoDate, formatIsoDateLong, todayInTimeZone } from '~/utils/da
 import { getApiErrorMessage } from '~/utils/error'
 
 const props = withDefaults(defineProps<{
-  professionalId: string
   serviceId: string
   /** Primeira data permitida (`YYYY-MM-DD`). */
   minDate: string
@@ -56,7 +55,7 @@ const minCalendarDate = computed(() => {
 })
 
 async function load() {
-  if (!props.professionalId || !props.serviceId) {
+  if (!props.serviceId) {
     availability.value = null
     pending.value = false
     return
@@ -69,7 +68,6 @@ async function load() {
   try {
     const result = await $fetch<PublicAvailability>(props.endpoint, {
       query: {
-        professionalId: props.professionalId,
         serviceId: props.serviceId,
         date: selectedDate.value
       }
@@ -101,7 +99,7 @@ async function load() {
 onMounted(load)
 watch(selectedDate, load)
 watch(
-  [() => props.professionalId, () => props.serviceId],
+  () => props.serviceId,
   () => {
     selected.value = null
     void load()

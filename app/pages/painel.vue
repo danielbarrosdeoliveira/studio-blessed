@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type {
-  Professional,
   Service,
   StaffAgendaResponse,
   StaffAppointmentResponse
@@ -18,11 +17,28 @@ useHead({
   title: 'Agenda · Studio Blessed'
 })
 
-const { user, isAdmin } = await useUserSession()
 const toast = useToast()
+const route = useRoute()
+const router = useRouter()
 
 const today = todayInTimeZone()
-const date = ref(today)
+
+/** A data da agenda pode vir da URL (`/painel?date=2026-11-26`) para ser compartilhável. */
+function dateFromQuery(value: unknown): string {
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return today
+  }
+
+  const [, month, day] = value.split('-').map(Number)
+
+  if (month! < 1 || month! > 12 || day! < 1 || day! > 31) {
+    return today
+  }
+
+  return value
+}
+
+const date = ref(dateFromQuery(route.query.date))
 
 const calendarDate = computed<CalendarDate | undefined>({
   get: () => {
@@ -36,29 +52,13 @@ const calendarDate = computed<CalendarDate | undefined>({
   }
 })
 
-const professionalFilter = ref('all')
-
-const { data: professionals } = await useFetch<Professional[]>('/api/professionals', {
-  immediate: isAdmin.value,
-  default: () => []
-})
-
-const query = computed(() => {
-  const params: Record<string, string> = { date: date.value }
-
-  if (isAdmin.value && professionalFilter.value !== 'all') {
-    params.professionalId = professionalFilter.value
-  }
-
-  return params
-})
+const query = computed(() => ({ date: date.value }))
 
 const { data: agenda, status, refresh } = await useFetch<StaffAgendaResponse>('/api/appointments', {
   query,
   default: () => ({
     date: date.value,
     timezone: 'America/Sao_Paulo',
-    professionalId: null,
     appointments: []
   })
 })
@@ -81,14 +81,6 @@ const summary = computed(() => {
   return result
 })
 
-const professionalItems = computed(() => [
-  { label: 'Todas as clientes', value: 'all' },
-  ...(professionals.value ?? []).map(professional => ({
-    label: professional.name,
-    value: professional.id
-  }))
-])
-
 function goToday() {
   date.value = todayInTimeZone()
 }
@@ -96,6 +88,11 @@ function goToday() {
 watch(date, (value) => {
   if (!value) {
     date.value = todayInTimeZone()
+    return
+  }
+
+  if (route.query.date !== value) {
+    void router.replace({ query: { ...route.query, date: value } })
   }
 })
 
@@ -110,7 +107,6 @@ const pickerKey = ref(0)
 let servicesRequest = 0
 
 const form = reactive({
-  professionalId: '',
   serviceId: '',
   startsAt: null as string | null,
   name: '',
@@ -128,8 +124,7 @@ const serviceItems = computed(() => services.value.map(service => ({
 const phoneValid = computed(() => normalizePhoneDigits(form.phone) !== null)
 
 const canSubmit = computed(() => (
-  !!form.professionalId
-  && !!form.serviceId
+  !!form.serviceId
   && !!form.startsAt
   && form.name.trim().length >= 2
   && phoneValid.value
@@ -140,17 +135,11 @@ async function loadServices() {
   form.serviceId = ''
   form.startsAt = null
   pickerKey.value += 1
-
-  if (!form.professionalId) {
-    services.value = []
-    return
-  }
-
   loadingServices.value = true
 
   try {
     const rows = await $fetch<Service[]>('/api/services', {
-      query: { professionalId: form.professionalId, active: 'true' }
+      query: { active: 'true' }
     })
 
     if (current === servicesRequest) {
@@ -168,14 +157,7 @@ async function loadServices() {
   }
 }
 
-watch(() => form.professionalId, () => {
-  void loadServices()
-})
-
 function openCreate() {
-  form.professionalId = isAdmin.value
-    ? (professionalFilter.value !== 'all' ? professionalFilter.value : '')
-    : (user.value?.id ?? '')
   form.serviceId = ''
   form.startsAt = null
   form.name = ''
@@ -184,11 +166,7 @@ function openCreate() {
   formError.value = ''
   pickerKey.value += 1
 
-  if (form.professionalId) {
-    void loadServices()
-  } else {
-    services.value = []
-  }
+  void loadServices()
 
   createOpen.value = true
 }
@@ -205,7 +183,6 @@ async function submit() {
     const response = await $fetch<StaffAppointmentResponse>('/api/appointments', {
       method: 'POST',
       body: {
-        professionalId: form.professionalId,
         serviceId: form.serviceId,
         startsAt: form.startsAt,
         clientName: form.name.trim(),
@@ -215,10 +192,6 @@ async function submit() {
     })
 
     createOpen.value = false
-
-    if (isAdmin.value) {
-      professionalFilter.value = response.appointment.professionalId
-    }
 
     date.value = isoDateOfInstant(response.appointment.startsAt)
 
@@ -295,10 +268,6 @@ name="i-ri-arrow-down-s-line"
           </UPopover>
           <UButton label="Hoje" color="neutral" variant="ghost" @click="goToday" />
         </div>
-
-        <USelect
-v-if="isAdmin" v-model="professionalFilter" :items="professionalItems" icon="i-ri-user-line"
-          class="w-full lg:w-64" />
       </div>
 
       <div v-if="status === 'pending'" class="mt-6 space-y-3">
@@ -324,8 +293,7 @@ v-if="isAdmin" v-model="professionalFilter" :items="professionalItems" icon="i-r
 
       <div v-else class="mt-6 space-y-3">
         <StaffAppointmentCard
-v-for="item in appointments" :key="item.id" :appointment="item" :is-admin="isAdmin"
-          :current-user-id="user?.id" @changed="refresh" />
+v-for="item in appointments" :key="item.id" :appointment="item" @changed="refresh" />
       </div>
     </template>
   </UDashboardPanel>
@@ -336,29 +304,17 @@ v-model:open="createOpen" title="Novo agendamento"
     :ui="{ body: 'max-h-[75vh] overflow-y-auto' }">
     <template #body>
       <form class="space-y-4" @submit.prevent="submit">
-        <UFormField v-if="isAdmin" label="Profissional" required>
-          <USelect
-v-model="form.professionalId"
-            :items="(professionals ?? []).map(p => ({ label: p.name, value: p.id }))" placeholder="Selecione"
-            class="w-full" />
-        </UFormField>
-
-        <p v-else class="text-sm text-muted">
-          Profissional: <strong class="text-highlighted">{{ user?.name }}</strong>
-        </p>
-
         <UFormField label="Serviço" required>
           <USelect
 v-model="form.serviceId" :items="serviceItems" :loading="loadingServices"
-            :disabled="!form.professionalId || !serviceItems.length" :placeholder="form.professionalId
-              ? (serviceItems.length ? 'Selecione' : 'Nenhum serviço ativo')
-              : 'Selecione o serviço'" class="w-full" />
+            :disabled="!serviceItems.length"
+            :placeholder="serviceItems.length ? 'Selecione' : 'Nenhum serviço ativo'" class="w-full" />
         </UFormField>
 
-        <div v-if="form.professionalId && form.serviceId" class="rounded-lg border border-default p-3">
+        <div v-if="form.serviceId" class="rounded-lg border border-default p-3">
           <AvailabilityPicker
-:key="pickerKey" v-model="form.startsAt" :professional-id="form.professionalId"
-            :service-id="form.serviceId" :min-date="today" endpoint="/api/availability" :client-lead="false" />
+:key="pickerKey" v-model="form.startsAt"
+            :service-id="form.serviceId" :min-date="date" endpoint="/api/availability" :client-lead="false" />
         </div>
 
         <div class="grid gap-4 sm:grid-cols-2">

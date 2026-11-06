@@ -6,7 +6,6 @@ const UBadge = resolveComponent('UBadge')
 const UButton = resolveComponent('UButton')
 
 const toast = useToast()
-const { user, isAdmin } = await useUserSession()
 
 const { data: services, status, refresh } = await useFetch<Service[]>('/api/services', {
   default: () => []
@@ -125,12 +124,7 @@ const columns = computed<TableColumn<Service>[]>(() => [
   {
     accessorKey: 'name',
     header: 'Serviço',
-    cell: ({ row }) => h('div', undefined, [
-      h('p', { class: 'font-medium text-highlighted' }, row.original.name),
-      ...(isAdmin.value
-        ? [h('p', { class: 'text-sm text-muted' }, row.original.name)]
-        : [])
-    ])
+    cell: ({ row }) => h('p', { class: 'font-medium text-highlighted' }, row.original.name)
   },
   {
     accessorKey: 'durationMin',
@@ -208,15 +202,6 @@ const columns = computed<TableColumn<Service>[]>(() => [
     </template>
 
     <template #body>
-      <div
-        v-if="isAdmin"
-        class="flex flex-col sm:flex-row sm:items-center gap-3 mb-4"
-      >
-        <p class="text-sm text-muted">
-          Serviços cadastrados pela dona do salão.
-        </p>
-      </div>
-
       <div class="overflow-x-auto">
         <UTable
           :data="services"

@@ -1,18 +1,5 @@
-export type Role = 'admin' | 'partner'
-export type AgendaProvider = 'internal' | 'google'
-
-export interface Professional {
-  id: string
-  name: string
-  email: string
-  role: Role
-  agendaProvider: AgendaProvider
-  createdAt: string
-}
-
 export interface WorkingHour {
   id: string
-  professionalId: string
   weekday: number
   startMinute: number
   endMinute: number
@@ -21,8 +8,6 @@ export interface WorkingHour {
 
 export interface Service {
   id: string
-  professionalId: string
-  professionalName: string
   name: string
   durationMin: number
   bufferMin: number
@@ -31,29 +16,12 @@ export interface Service {
   createdAt: string
 }
 
-export interface PublicServiceProfessional {
-  /** `user.id` da profissional. */
-  id: string
-  serviceId: string
-  name: string
-  durationMin: number
-  bufferMin: number
-  priceCents: number
-}
-
-export interface PublicServiceGroup {
-  name: string
-  minPriceCents: number
-  professionals: PublicServiceProfessional[]
-}
-
 export type AppointmentStatus = 'scheduled' | 'completed' | 'cancelled' | 'no_show'
 export type AppointmentOrigin = 'client' | 'staff'
 export type TimeBlockRecurrence = 'weekly'
 
 export interface TimeBlock {
   id: string
-  professionalId: string
   startsAt: string
   endsAt: string
   reason: string | null
@@ -101,9 +69,7 @@ export interface PublicAppointment {
   status: AppointmentStatus
   origin: AppointmentOrigin
   serviceId: string
-  professionalId: string
   serviceName: string
-  professionalName: string
   durationMin: number
   priceCents: number
   clientName: string
@@ -128,9 +94,7 @@ export interface StaffAppointment {
   status: AppointmentStatus
   origin: AppointmentOrigin
   serviceId: string
-  professionalId: string
   serviceName: string
-  professionalName: string
   durationMin: number
   priceCents: number
   clientName: string
@@ -141,7 +105,6 @@ export interface StaffAppointment {
 export interface StaffAgendaResponse {
   date: string
   timezone: string
-  professionalId: string | null
   appointments: StaffAppointment[]
 }
 

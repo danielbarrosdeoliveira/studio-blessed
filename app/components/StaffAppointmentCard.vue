@@ -7,8 +7,6 @@ import { formatPhone } from '~/utils/phone'
 
 const props = defineProps<{
   appointment: StaffAppointment
-  isAdmin: boolean
-  currentUserId?: string
 }>()
 
 const emit = defineEmits<{ changed: [] }>()
@@ -19,17 +17,12 @@ const working = ref(false)
 const cancelError = ref('')
 
 const statusMeta = computed(() => appointmentStatusMeta[props.appointment.status])
-const canManage = computed(() => (
-  props.isAdmin || props.appointment.professionalId === props.currentUserId
-))
 const isScheduled = computed(() => props.appointment.status === 'scheduled')
-const canCancel = computed(() => canManage.value && isScheduled.value)
+const canCancel = computed(() => isScheduled.value)
 const canMarkStatus = computed(() => (
-  canManage.value
-  && (
-    isScheduled.value
-    || (props.isAdmin && (props.appointment.status === 'completed' || props.appointment.status === 'no_show'))
-  )
+  isScheduled.value
+  || props.appointment.status === 'completed'
+  || props.appointment.status === 'no_show'
 ))
 
 const timeRange = computed(() => (
@@ -41,7 +34,6 @@ const whatsappUrl = computed(() => `https://wa.me/55${props.appointment.clientPh
 async function setStatus(status: 'completed' | 'no_show') {
   working.value = true
 
-  // @ts-ignore - Nuxt $fetch PATCH method type
   try {
     await $fetch(`/api/appointments/${props.appointment.id}`, {
       method: 'PATCH',
@@ -71,7 +63,6 @@ async function cancel() {
   working.value = true
   cancelError.value = ''
 
-  // @ts-ignore - Nuxt $fetch PATCH method type
   try {
     await $fetch(`/api/appointments/${props.appointment.id}`, {
       method: 'PATCH',
@@ -122,9 +113,6 @@ async function cancel() {
           </h3>
           <p class="text-sm text-muted">
             {{ appointment.clientName }} · {{ appointment.durationMin }} min
-            <template v-if="isAdmin">
-              · {{ appointment.professionalName }}
-            </template>
           </p>
         </div>
 
@@ -176,7 +164,7 @@ async function cancel() {
           />
         </template>
 
-        <template v-else-if="isAdmin">
+        <template v-else>
           <UButton
             v-if="appointment.status === 'completed'"
             label="Corrigir para no-show"
@@ -223,8 +211,7 @@ async function cancel() {
             de {{ appointment.clientName }}?
           </p>
           <p class="text-sm text-muted">
-            {{ timeRange }} com {{ appointment.professionalName }}. O horário volta a ficar
-            disponível.
+            {{ timeRange }}. O horário volta a ficar disponível.
           </p>
           <UAlert
             v-if="cancelError"

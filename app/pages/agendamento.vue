@@ -220,12 +220,6 @@ function bookAnother() {
                 {{ service.name }}
               </h3>
               <p class="mt-1 text-sm text-muted">
-                Profissional responsável
-              </p>
-              <p class="text-sm text-highlighted">
-                {{ service.professionalName }}
-              </p>
-              <p class="text-sm text-muted">
                 {{ service.durationMin }} min
               </p>
             </div>
@@ -268,7 +262,7 @@ function bookAnother() {
       </div>
     </UCard>
 
-    <template v-else-if="step === 1 && selectedService && selectedSlot">
+    <template v-else-if="step === 1 && selectedService">
       <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
         <UCard>
           <template #header>
@@ -298,7 +292,6 @@ function bookAnother() {
           <AvailabilityPicker
             :key="pickerKey"
             v-model="selectedSlot"
-            :professional-id="selectedService.service.id"
             :service-id="selectedService.service.id"
             :min-date="minDate"
           />
@@ -333,12 +326,6 @@ function bookAnother() {
             </dt>
             <dd class="text-right font-medium text-neutral-100">
               {{ selectedService.service.name }}
-            </dd>
-            <dt class="text-neutral-500 dark:text-neutral-400">
-              Profissional
-            </dt>
-            <dd class="text-right font-medium text-neutral-100">
-              {{ selectedService.service.professionalName }}
             </dd>
             <dt class="text-neutral-500 dark:text-neutral-400">
               Duração
@@ -404,7 +391,6 @@ function bookAnother() {
             <UFormField
               label="Nome"
               required
-              class="label-container"
             >
               <UInput
                 v-model="form.name"
@@ -486,12 +472,6 @@ function bookAnother() {
             <dd class="text-right font-medium text-highlighted">
               {{ selectedService.service.name }}
             </dd>
-            <dt class="text-muted">
-              Profissional
-            </dt>
-            <dd class="text-right font-medium text-highlighted">
-              {{ selectedService.service.professionalName }}
-            </dd>
             <dt class="text-neutral-500 dark:text-neutral-400">
               Duração
             </dt>
@@ -540,12 +520,6 @@ function bookAnother() {
         </dt>
         <dd class="text-right font-medium text-neutral-100">
           {{ created.serviceName }}
-        </dd>
-        <dt class="text-neutral-500 dark:text-neutral-400">
-          Profissional
-        </dt>
-        <dd class="text-right font-medium text-neutral-100">
-          {{ created.professionalName }}
         </dd>
         <dt class="text-neutral-500 dark:text-neutral-400">
           Data e horário

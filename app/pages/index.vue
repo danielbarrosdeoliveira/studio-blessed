@@ -1,20 +1,20 @@
 <template>
   <div>
-    <LHero />
-    <LPillars />
-    <LMosaic />
-    <LServices />
-    <LArtists />
-    <LCTABanner />
-    <LWhyChooseUs />
-    <LTestimonials />
-    <LGallery />
-    <LLocation />
+    <LandingHero />
+    <LandingPillars />
+    <LandingMosaic />
+    <LandingServices />
+    <LandingOwner />
+    <LandingCTABanner />
+    <LandingWhyChooseUs />
+    <LandingTestimonials />
+    <LandingGallery />
+    <LandingLocation />
   </div>
 </template>
 
 <script setup lang="ts">
 definePageMeta({
-  layout: "landing",
-});
+  layout: 'landing'
+})
 </script>
