@@ -21,7 +21,7 @@
 
 ## Regras de negócio
 
-- [x] Nome de serviço único entre os serviços ativos e uma profissional responsável por serviço
+- [x] Nome de serviço único entre os serviços ativos do salão (todos pertencem à dona única)
 
 ## Experiência pública
 
@@ -35,8 +35,7 @@
 
 ## Dívidas conhecidas
 
-- [ ] E1 — Fluxo de convite de profissional
-- [ ] E1 — Desabilitar auto-cadastro público de staff
+- [ ] E1 — Restringir o cadastro público de contas (apenas a dona do salão entra)
 - [ ] E9 — Remover páginas de template sem uso (`/inbox`, `/customers`, `/settings/*`)
 - [ ] E9 — Substituir o dashboard de demonstração da rota `/`
 

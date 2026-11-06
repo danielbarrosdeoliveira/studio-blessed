@@ -105,10 +105,16 @@ pnpm db:migrate
 
 ## Driver do Drizzle ORM (híbrido)
 
-O projeto usa um driver híbrido em `server/utils/db.ts`:
+O projeto usa um driver híbrido em `server/utils/db.ts`. A escolha é feita pelo
+**esquema da URL**, nunca por `NODE_ENV`:
 
-- **Desenvolvimento** (`localhost` / Docker): `drizzle-orm/node-postgres` com o driver tradicional `pg` (Pool).
-- **Produção** (Neon): `drizzle-orm/neon-http` com o driver HTTP/serverless `@neondatabase/serverless`.
+- **`postgres://` / `postgresql://`** → `drizzle-orm/node-postgres` com o driver
+  tradicional `pg` (Pool). Usado em desenvolvimento, self-hosting e testes.
+- **`https://`** → `drizzle-orm/neon-http` com o driver HTTP/serverless
+  `@neondatabase/serverless`. Usado em produção na Vercel/Neon.
+
+Assim, um build de produção apontado para um PostgreSQL local continua
+funcionando. `DB_DRIVER=neon|pg` força o driver explicitamente.
 
 A variável `DATABASE_URL` é a referência única para ambos os ambientes.
 
@@ -120,9 +126,13 @@ um banco PostgreSQL dedicado, `studio_blessed_test`.
 ```bash
 pnpm db:up
 pnpm test              # unitários + integração
-pnpm test:e2e          # fluxos críticos no browser
+pnpm test:e2e          # build de produção + fluxos críticos no browser
 pnpm test:coverage     # cobertura completa com os thresholds do MVP
 ```
+
+O E2E roda contra o **build de produção** (`.output/server`), não contra
+`nuxt dev`: o otimizador de dependências do Vite dispara *full reloads* no meio
+do teste e deixa a suíte instável.
 
 Metas: **75%** para unitário e integração, **50%** para os fluxos E2E. Veja
 [`docs/testing.md`](docs/testing.md) para escopos, comandos e solução de
@@ -132,11 +142,11 @@ problemas.
 
 ```
 app/                  # Frontend Nuxt 4
-├── components/       # Componentes (dashboard, customers, inbox, settings…)
+├── components/       # Componentes (dashboard, landing/, public/, inbox…)
 ├── composables/
 ├── layouts/
 ├── lib/auth-client.ts
-└── pages/
+└── pages/            # Landing + área da dona (/painel, /jornada, /servicos…)
 
 server/               # Backend (Nitro)
 ├── api/auth/[...all].ts   # Handler do Better Auth
@@ -156,7 +166,7 @@ docs/                 # Discovery, spec, arquitetura, backlog e testes
 
 - **Fase 1 (atual):** agenda **local** (PostgreSQL). Sem Google Calendar.
 - **Fase final do MVP:** integração com **Google Calendar** (provider `google`),
-  via OAuth individual por profissional.
+  via OAuth individual da dona do salão.
 
 ## Documentação
 
@@ -167,19 +177,17 @@ docs/                 # Discovery, spec, arquitetura, backlog e testes
 - [`docs/testing.md`](docs/testing.md) — estratégia de testes e cobertura
 - [`docs/tasks.md`](docs/tasks.md) — checklist vivo do MVP
 
-## Criar o primeiro admin
+## Criar a dona do salão
+
+O modelo é **single-owner**: qualquer usuário autenticado é a dona do salão e
+gerencia agenda, serviços e jornada. Não existem papéis ou hierarquia de acesso.
 
 Com o banco no ar e o app rodando:
 
 ```bash
 curl -X POST http://localhost:3000/api/auth/sign-up/email \
   -H 'Content-Type: application/json' \
-  -d '{"name":"Admin","email":"admin@studioblessed.local","password":"senha123456"}'
+  -d '{"name":"Dona","email":"dona@studioblessed.local","password":"senha123456"}'
 ```
 
-Depois promova o usuário:
-
-```bash
-docker exec studio-blessed-db psql -U studio -d studio_blessed \
-  -c "update \"user\" set role='admin' where email='admin@studioblessed.local';"
-```
+Depois é só entrar em `http://localhost:3000/login` com essas credenciais.

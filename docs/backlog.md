@@ -22,29 +22,29 @@
 
 ## E1 — Fundação & Autenticação (P0)
 
-**Objetivo:** base do app, contas e controle de acesso por papel.
+**Objetivo:** base do app, contas e sessão da dona do salão.
 
-### US1.1 — Login do staff
+### US1.1 — Login da dona
 
-**Como** admin (dona), **quero** entrar no sistema com Google ou e-mail/senha,
+**Como** dona do salão, **quero** entrar no sistema com Google ou e-mail/senha,
 **para** acessar minha área.
 
-- **CA1:** Dado um usuário convidado, quando autentica via provedor válido, então
-  é redirecionado ao dashboard conforme seu `role`.
-- **CA2:** Dado um e-mail não convidado, quando tenta autenticar, então recebe
-  acesso negado (não há auto-cadastro público de staff).
+- **CA1:** Dado um usuário cadastrado, quando autentica via provedor válido, então
+  é redirecionado ao dashboard.
+- **CA2:** Dado login bem-sucedido, quando a sessão é criada, então a API autenticada
+  responde `200`; sem sessão, responde `401`.
 - **CA3:** Dado login bem-sucedido com Google, quando autoriza os escopos de
   Calendar, então o `refreshToken` é persistido para a dona.
 
 ### US1.2 — (Semelhante ao antigo US1.2, adaptado)
 
-### US1.3 — Roteamento por papel
+### US1.3 — Proteção das rotas internas
 
-**Como** sistema, **quero** proteger rotas por papel, **para** garantir isolamento.
+**Como** sistema, **quero** proteger as rotas internas por sessão, **para** garantir isolamento.
 
-- **CA1:** Dado `role=admin`, quando acessa qualquer recurso, então é permitido.
-- **CA2:** Dado `role=partner` ou profissional, quando acessa recurso alheio, então
-  recebe 403. *(Não se aplica no MVP, mas mantido para consistência de API).*
+- **CA1:** Dado uma sessão válida, quando acessa uma rota interna, então é permitido.
+- **CA2:** Dado uma requisição sem sessão, quando acessa uma rota interna, então
+  recebe `401`. *(Não há papéis: qualquer usuário autenticado é a dona do salão.)*
 
 ### US1.4 — Acesso da cliente sem login
 
@@ -61,7 +61,7 @@
 
 ### US2.1 — Cadastro de jornada
 
-**Como** admin (dona), **quero** definir meus horários por dia da semana com intervalos,
+**Como** dona do salão, **quero** definir meus horários por dia da semana com intervalos,
 **para** que o sistema calcule os slots corretamente.
 
 - **CA1:** Dada segunda 09:00–18:00 com intervalo 12:00–13:00, quando o dia é
@@ -72,7 +72,7 @@
 
 ### US2.2 — Configurar blocos
 
-**Como** admin (dona), **quero** bloquear períodos do dia,
+**Como** dona do salão, **quero** bloquear períodos do dia,
 **para** deixá-los indisponíveis.
 
 - **CA1:** Dado um bloco `13:00–14:00`, quando calculo disponibilidade, então
@@ -88,7 +88,7 @@
 
 ### US3.1 — Cadastrar serviço
 
-**Como** admin (dona), **quero** criar serviços com nome, duração, buffer e preço,
+**Como** dona do salão, **quero** criar serviços com nome, duração, buffer e preço,
 **para** oferecê-los aos clientes.
 
 - **CA1:** Dado nome, duração (ex.: 40/90/120 min), buffer e preço válidos, quando
@@ -98,14 +98,14 @@
 - **CA3:** Dado um nome já usado por serviço ativo — quando salvo, então a API
   responde `409`.
 
-### US3.2 — Editar apenas os próprios serviços
+### US3.2 — Editar serviços
 
-**Como** admin (dona), **quero** editar os meus serviços,
+**Como** dona do salão, **quero** editar meus serviços,
 **para** manter o catálogo atualizado.
 
-- **CA1:** Dado `role=admin`, quando edita qualquer serviço, então é permitido.
+- **CA1:** Dado uma sessão válida, quando edita um serviço, então é permitido.
 
-### US3.3 — Catálogo com profissional responsável
+### US3.3 — Catálogo do salão
 
 **Como** cliente, **quero** ver cada serviço uma vez com a informação de que pertence à dona do salão,
 **para** escolher o serviço e saber quem o executa.
@@ -113,7 +113,7 @@
 - **CA1:** Dado um serviço ativo, quando a cliente vê o catálogo, então aparece
   **uma única** entrada do serviço.
 - **CA2:** Dado o serviço escolhido, quando avança, então vê a duração e o preço.
-- **Nota:** Não há mais "profissional responsável" como campo separado — o serviço
+- **Nota:** "Profissional responsável" não existe como campo separado — o serviço
   pertence à dona do salão por definição do modelo single-owner.
 
 ---
@@ -124,7 +124,7 @@
 
 ### US4.1 — Bloquear slots por eventos externos
 
-**Como** admin, **quero** que eventos fora do sistema contem como ocupados,
+**Como** dona do salão, **quero** que eventos fora do sistema contem como ocupados,
 **para** não vender horário indisponível.
 
 - **CA1:** Dado um evento criado direto no Google da dona, quando calculo
@@ -155,7 +155,7 @@
 
 ### US5.1 — Criar bloqueio
 
-**Como** admin (dona), **quero** bloquear um período,
+**Como** dona do salão, **quero** bloquear um período,
 **para** deixá-lo indisponível.
 
 - **CA1:** Dado um bloqueio `13:00–14:00`, quando calculo disponibilidade, então
@@ -163,7 +163,7 @@
 
 ### US5.2 — Bloqueio recorrente
 
-**Como** admin (dona), **quero** bloqueios recorrentes (ex.: semanal),
+**Como** dona do salão, **quero** bloqueios recorrentes (ex.: semanal),
 **para** não recriar o almoço todos os dias.
 
 - **CA1:** Dado um bloqueio semanal, quando o dia da semana coincide, então o
@@ -171,7 +171,7 @@
 
 ### US5.3 — Bloqueio sobre agendamento
 
-**Como** admin (dona), **quero** ser avisada ao tentar bloquear sobre um
+**Como** dona do salão, **quero** ser avisada ao tentar bloquear sobre um
 agendamento existente, **para** não perder o compromisso.
 
 - **CA1:** Dado conflito com agendamento `scheduled`, quando tento salvar o bloqueio,
@@ -182,7 +182,7 @@ agendamento existente, **para** não perder o compromisso.
 
 ## E6 — Motor de Disponibilidade (P0)
 
-**Objetivo:** calcular os horários oferecidos ao cliente e ao staff.
+**Objetivo:** calcular os horários oferecidos ao cliente e à dona do salão.
 
 ### US6.1 — Gerar slots a cada 15 minutos
 
@@ -201,7 +201,8 @@ agendamento existente, **para** não perder o compromisso.
 **para** respeitar a política do salão.
 
 - **CA1:** Dado hoje, quando a cliente consulta, então nenhum slot com menos de
-  3 dias é oferecido.
+  3 dias é oferecido. A regra conta **datas locais**, não horas: no 3º dia, o
+  primeiro horário já está liberado.
 
 ### US6.3 — Revalidar antes de gravar
 
@@ -264,42 +265,45 @@ do agendamento.
 
 ---
 
-## E8 — Operação de Agendamentos (Staff) (P0)
+## E8 — Operação de Agendamentos (Dona) (P0)
 
-**Objetivo:** operação do dia a dia pela dona (antigamente staff).
+**Objetivo:** operação do dia a dia pela dona do salão.
 
 ### US8.1 — Visão de agenda
 
-**Como** dona (admin), **quero** ver minha agenda, **para** me organizar.
+**Como** dona do salão, **quero** ver minha agenda, **para** me organizar.
 
-- **CA1:** Dado `role=admin`, quando abro a agenda, então vejo todos os agendamentos.
+- **CA1:** Dado uma sessão válida, quando abro a agenda, então vejo todos os agendamentos.
 - **CA2:** Filtros por data e status (opcional).
 
 ### US8.2 — Agendar pela dona
 
-**Como** dona (admin), **quero** criar agendamentos hoje/amanhã e encaixes,
+**Como** dona do salão, **quero** criar agendamentos hoje/amanhã e encaixes,
 **para** atender pedidos presenciais.
 
 - **CA1:** Dado `origin=staff`, quando crio para hoje, então não há o bloqueio de
   3 dias.
+- **CA2:** Dado `origin=client`, quando a cliente cria, então a antecedência mínima
+  de 3 dias é exigida.
 
 ### US8.3 — Marcar concluído/no-show
 
-**Como** dona (admin), **quero** marcar o resultado do atendimento,
+**Como** dona do salão, **quero** marcar o resultado do atendimento,
 **para** alimentar as métricas.
 
 - **CA1:** Dado um agendamento `scheduled`, quando marco, então vira `completed`
   ou `no_show`.
-- **CA2:** Dado `role=admin`, quando corrijo um status já marcado, então é permitido.
+- **CA2:** Dado um status já marcado, quando corrijo, então é permitido.
 - **CA3:** Dado um status `completed`, quando o faturamento é calculado, então o
   valor do serviço entra na soma.
 
 ### US8.4 — Cancelar como dona
 
-**Como** dona (admin), **quero** cancelar agendamentos,
+**Como** dona do salão, **quero** cancelar agendamentos,
 **para** lidar com imprevistos.
 
-- **CA1:** Dado `role=admin`, quando cancela, então pode cancelar qualquer agendamento.
+- **CA1:** Dado um agendamento `scheduled`, quando cancelo, então o status vira
+  `cancelled` e a agenda é liberada.
 
 ---
 
@@ -309,18 +313,18 @@ do agendamento.
 
 ### US9.1 — Faturamento por período
 
-**Como** admin (dona), **quero** ver o faturamento por dia/semana/mês/ano,
+**Como** dona do salão, **quero** ver o faturamento por dia/semana/mês/ano,
 **para** acompanhar o movimento.
 
 - **CA1:** Dado serviços `completed`, quando o período é selecionado, então mostro
-  a soma dos preços, **sem quebra por profissional** (não há profissionais, o faturamento
-  é total do movimento do salão).
+  a soma dos preços, **sem quebra por agenda** (o faturamento é total do movimento
+  do salão).
 - **CA2:** Dado agendamentos `cancelled`/`no_show`, quando somo, então **não**
   entram no faturamento.
 
 ### US9.2 — Atendimentos, ranking e no-show
 
-**Como** admin (dona), **quero** ver atendimentos, ranking de serviços e no-show,
+**Como** dona do salão, **quero** ver atendimentos, ranking de serviços e no-show,
 **para** entender a operação.
 
 - **CA1:** Dado o período, quando carrego, então vejo o total de atendimentos
@@ -331,11 +335,11 @@ do agendamento.
 
 ### US9.3 — Faturamento próprio (consolidado)
 
-**Como** dona (admin), **quero** ver o faturamento consolidado do salão,
+**Como** dona do salão, **quero** ver o faturamento consolidado do salão,
 **para** acompanhar o movimento total.
 
-- **CA1:** Dado `role=admin`, quando abro o dashboard, então vejo **apenas** o
+- **CA1:** Dado uma sessão válida, quando abro o dashboard, então vejo **apenas** o
   faturamento total (soma de todos os serviços concluídos), sem separação por
-  profissional (não há profissionais no modelo).
+  agenda (o modelo é single-owner).
 
 ---

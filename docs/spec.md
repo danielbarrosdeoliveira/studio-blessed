@@ -26,10 +26,13 @@
 
 ## 3. Papéis e Permissões
 
-- **Admin (dona):** acesso total. Cadastra serviços, jornadas e bloqueios para todos.
-  Cria agendamentos para hoje/amanhã e encaixes. Vê todas as métricas e corrige status.
-- **Profissional:** **Não aplica no MVP**. Todas as funcionalidades antes atribuídas
-  a profissionais agora pertencem à dona única.
+O modelo é **single-owner**: não existem papéis, `role` ou hierarquia de acesso.
+
+- **Dona do salão:** qualquer usuário autenticado tem acesso total. Cadastra
+  serviços, jornadas e bloqueios. Cria agendamentos para hoje/amanhã e encaixes.
+  Vê todas as métricas e corrige status.
+- **Profissional:** **não existe** como entidade ou papel. Todas as
+  funcionalidades antes atribuídas a profissionais agora pertencem à dona única.
 - **Cliente (público):** **sem login**, identificada por **nome + WhatsApp**;
   consulta histórico apenas informando o telefone.
 
@@ -43,7 +46,7 @@
 - **Sincronização:**
   - Dona (agenda interna): apenas os registros do sistema contam.
   - Quando Google Calendar for ativado: qualquer evento na agenda da dona conta como `busy`.
-- **Bloqueios manuais:** admin (dona) pode criar bloqueios pontuais ou semanais.
+- **Bloqueios manuais:** a dona pode criar bloqueios pontuais ou semanais.
   Podem sobrepor agendamento `scheduled` somente com **confirmação explícita**; o
   agendamento não é cancelado.
 
@@ -53,8 +56,8 @@
   serviço → data/horário → nome + WhatsApp → confirmação. Cada serviço exibe a
   informação de que pertence à dona do salão. A rota antiga `/agendar` redireciona
   para `/agendamento`.
-- **Profissional:** **Não aplica** — não há profissionais no MVP.
-- **Admin (dona):** gerencia jornadas, serviços, bloqueios e operadores; opera
+- **Profissional:** **não existe** — não há profissionais no MVP.
+- **Dona:** gerencia jornadas, serviços, bloqueios e agenda; opera
   agendamentos de todos; dashboard de métricas.
 - **Pagamentos:** **nenhum**. Não há gateway, cobrança ou repasse no MVP.
 
@@ -67,8 +70,10 @@
   maiúsculas nem espaços nas pontas. O catálogo lista cada serviço **uma vez**.
 - **Granularidade:** inícios de horário a cada **15 minutos** dentro da jornada.
 - **Antecedência:**
-  - Cliente: mínimo de **3 dias**.
-  - Staff (dona): pode agendar para **hoje/amanhã** e fazer **encaixes**.
+  - Cliente: mínimo de **3 dias**, contados por **data local** — a
+    cliente agenda qualquer horário a partir do 3º dia (inclusive o primeiro
+    slot do dia limite).
+  - Dona: pode agendar para **hoje/amanhã** e fazer **encaixes**.
 - **Cancelamento / reagendamento (cliente):** permitido **até 24h antes**; dentro
   de 24h não é possível (vira **no-show**). A **taxa de 50%** é **apenas exibida**
   como política — não calculada nem registrada.
@@ -76,30 +81,29 @@
   gravar**; se ocupou, o cliente escolhe outro horário.
 - **Notificações:** **nenhuma** no MVP (só tela de sucesso). Automação futura
   (WAHA/WAWA + N8N) fica pós-MVP.
-- **Bloqueios:** admin (dona) e a própria dona podem criar/remover bloqueios
+- **Bloqueios:** a dona pode criar/remover bloqueios
   pontuais ou semanais. Podem sobrepor agendamento `scheduled` somente com
   **confirmação explícita**; o agendamento não é cancelado.
 - **Status do agendamento:** `scheduled` → `completed` | `cancelled` | `no_show`.
-  O admin (dona) pode corrigir o status a qualquer momento.
+  A dona pode corrigir o status a qualquer momento.
 
-## 7. Métricas (dashboard do admin)
+## 7. Métricas (dashboard da dona)
 
 Períodos: **dia, semana, mês e ano**.
 
 - **Faturamento** = soma dos preços dos serviços **concluídos** (mede movimento,
-  não receita recebida por profissional, pois não há profissionais).
+  não receita recebida por terceiros, pois não há profissionais).
 - **Total de atendimentos**.
 - **Ranking de serviços** mais realizados.
 
-A dona (admin) vê **o faturamento total** do salão.
+A dona vê **o faturamento total** do salão.
 
 ## 8. O que NÃO FAZ PARTE do MVP
 
 - Multi-tenant (múltiplos salões).
 - Pagamento online / gateway.
 - Engine fiscal ou demonstrativos financeiros avançados.
-- Controle de recebimento da mensalidade (não há profissionais a quem repassar).
-- Notificações automáticas (e-mail, SMS, WhatsApp).
+- Controle de recebimento da mensalidade (não há profissionais a quem repassar).- Notificações automáticas (e-mail, SMS, WhatsApp).
 - PWA / suporte offline.
 - Reserva multi-serviço atômica.
 - Suporte a outros idiomas.
