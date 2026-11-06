@@ -21,7 +21,7 @@ Sempre que o usuário solicitar uma das etapas abaixo, ative obrigatoriamente a 
 
 ## 4. Testes e Cobertura
 
-- Gate local: `pnpm lint && pnpm typecheck && pnpm build && pnpm test:coverage`.
+- Gate local: `pnpm lint && pnpm format:check && pnpm typecheck && pnpm build && pnpm test:coverage`.
 - Metas: unitário **75%**, integração **75%**, E2E **50%** dos fluxos críticos.
 - Nomes: `.unit.spec.ts`, `.integration.spec.ts` e `.spec.ts` em `tests/e2e`.
 - Banco de teste dedicado: `studio_blessed_test`; rode `pnpm db:up` antes.

@@ -92,6 +92,8 @@ pnpm db:migrate
 | `pnpm build`         | Build de produção                               |
 | `pnpm preview`       | Preview do build                                |
 | `pnpm lint`          | ESLint                                          |
+| `pnpm format`        | Prettier (escreve)                              |
+| `pnpm format:check`  | Prettier (verifica sem escrever)                |
 | `pnpm typecheck`     | Checagem de tipos                               |
 | `pnpm test`          | Testes unitários + integração                   |
 | `pnpm test:e2e`      | Testes E2E com Playwright                       |

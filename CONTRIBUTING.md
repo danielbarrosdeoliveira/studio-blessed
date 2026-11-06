@@ -28,6 +28,7 @@ main
    ```bash
    pnpm db:up
    pnpm lint
+   pnpm format:check
    pnpm typecheck
    pnpm build
    pnpm test:coverage   # unit + integração + E2E com thresholds
@@ -79,6 +80,7 @@ se o épico for grande). Exemplos:
 Um PR só está pronto quando:
 
 - [ ] `pnpm lint` passa
+- [ ] `pnpm format:check` passa
 - [ ] `pnpm typecheck` passa
 - [ ] `pnpm build` passa
 - [ ] `pnpm test:coverage` passa com as metas: unit **75%**, integração **75%** e E2E **50%**

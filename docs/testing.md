@@ -161,6 +161,7 @@ o gate é local:
 
 ```bash
 pnpm lint
+pnpm format:check
 pnpm typecheck
 pnpm build
 pnpm test:coverage
