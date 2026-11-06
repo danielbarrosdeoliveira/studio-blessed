@@ -40,7 +40,7 @@ export function serializeTimeBlock(row: TimeBlockRecord) {
     startsAt: row.startsAt.toISOString(),
     endsAt: row.endsAt.toISOString(),
     reason: row.reason,
-    recurrence: row.recurrence === 'weekly' ? 'weekly' as const : null,
+    recurrence: row.recurrence === 'weekly' ? ('weekly' as const) : null,
     createdAt: row.createdAt.toISOString()
   }
 }
@@ -62,7 +62,7 @@ export function serializeBlockConflict(row: BlockConflictCandidate): BlockConfli
  *   dos minutos locais.
  */
 export function appointmentOverlapsBlock(
-  appointment: { startsAt: Date, endsAt: Date },
+  appointment: { startsAt: Date; endsAt: Date },
   block: BlockRange
 ): boolean {
   if (block.recurrence !== 'weekly') {
@@ -84,15 +84,17 @@ export function appointmentOverlapsBlock(
   }
 
   const blockStartMinute = blockStart.hour * 60 + blockStart.minute
-  const blockEndMinute = localDateOf(block.endsAt) === blockStartDate
-    ? blockEnd.hour * 60 + blockEnd.minute
-    : MINUTES_PER_DAY
+  const blockEndMinute =
+    localDateOf(block.endsAt) === blockStartDate
+      ? blockEnd.hour * 60 + blockEnd.minute
+      : MINUTES_PER_DAY
 
-  const appointmentStartMinute = localPartsOf(appointment.startsAt).hour * 60
-    + localPartsOf(appointment.startsAt).minute
-  const appointmentEndMinute = localDateOf(appointment.endsAt) === appointmentStartDate
-    ? localPartsOf(appointment.endsAt).hour * 60 + localPartsOf(appointment.endsAt).minute
-    : MINUTES_PER_DAY
+  const appointmentStartMinute =
+    localPartsOf(appointment.startsAt).hour * 60 + localPartsOf(appointment.startsAt).minute
+  const appointmentEndMinute =
+    localDateOf(appointment.endsAt) === appointmentStartDate
+      ? localPartsOf(appointment.endsAt).hour * 60 + localPartsOf(appointment.endsAt).minute
+      : MINUTES_PER_DAY
 
   return appointmentStartMinute < blockEndMinute && appointmentEndMinute > blockStartMinute
 }
@@ -102,6 +104,6 @@ export function findBlockConflicts(
   appointments: BlockConflictCandidate[]
 ): BlockConflict[] {
   return appointments
-    .filter(appointment => appointmentOverlapsBlock(appointment, block))
+    .filter((appointment) => appointmentOverlapsBlock(appointment, block))
     .map(serializeBlockConflict)
 }

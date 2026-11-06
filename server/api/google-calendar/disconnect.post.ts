@@ -6,9 +6,7 @@ import { eq } from 'drizzle-orm'
 export default defineEventHandler(async (event) => {
   const current = await requireUser(event)
 
-  await db
-    .delete(account)
-    .where(eq(account.userId, current.id))
+  await db.delete(account).where(eq(account.userId, current.id))
 
   return { ok: true }
 })

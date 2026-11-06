@@ -8,9 +8,7 @@ test('cliente agenda pelo stepper e cancela em Meus agendamentos', async ({ page
   await waitForHydration(page)
   await expect(page.getByRole('heading', { name: 'Agendamento', exact: true })).toBeVisible()
 
-  const corte = page.getByTestId('service-option')
-    .filter({ hasText: 'Corte feminino' })
-    .first()
+  const corte = page.getByTestId('service-option').filter({ hasText: 'Corte feminino' }).first()
 
   await expect(corte).toBeVisible()
   await corte.getByRole('button', { name: 'Selecionar' }).click()
@@ -30,7 +28,8 @@ test('cliente agenda pelo stepper e cancela em Meus agendamentos', async ({ page
   await page.getByRole('link', { name: 'Ver meus agendamentos' }).click()
   await expect(page).toHaveURL(/\/meus-agendamentos/)
 
-  const card = page.getByTestId('public-appointment')
+  const card = page
+    .getByTestId('public-appointment')
     .filter({ hasText: 'Corte feminino' })
     .filter({ hasText: '09:00' })
     .first()
@@ -46,8 +45,8 @@ test('cliente agenda pelo stepper e cancela em Meus agendamentos', async ({ page
 
 test('link com serviceId abre o stepper no horário', async ({ page }) => {
   const response = await page.request.get('/api/public/services')
-  const services = await response.json() as Array<{ id: string, name: string }>
-  const corte = services.find(item => item.name === 'Corte feminino')
+  const services = (await response.json()) as Array<{ id: string; name: string }>
+  const corte = services.find((item) => item.name === 'Corte feminino')
 
   if (!corte) {
     throw new Error('Serviço Corte feminino não encontrado no seed')

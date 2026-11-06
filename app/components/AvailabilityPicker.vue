@@ -4,20 +4,23 @@ import { CalendarDate } from '@internationalized/date'
 import { addDaysToIsoDate, formatIsoDateLong, todayInTimeZone } from '~/utils/date'
 import { getApiErrorMessage } from '~/utils/error'
 
-const props = withDefaults(defineProps<{
-  serviceId: string
-  /** Primeira data permitida (`YYYY-MM-DD`). */
-  minDate: string
-  label?: string
-  /** Rota de disponibilidade (pública ou do staff). */
-  endpoint?: string
-  /** Aplica a antecedência mínima de 3 dias da cliente. */
-  clientLead?: boolean
-}>(), {
-  label: undefined,
-  endpoint: '/api/public/availability',
-  clientLead: true
-})
+const props = withDefaults(
+  defineProps<{
+    serviceId: string
+    /** Primeira data permitida (`YYYY-MM-DD`). */
+    minDate: string
+    label?: string
+    /** Rota de disponibilidade (pública ou do staff). */
+    endpoint?: string
+    /** Aplica a antecedência mínima de 3 dias da cliente. */
+    clientLead?: boolean
+  }>(),
+  {
+    label: undefined,
+    endpoint: '/api/public/availability',
+    clientLead: true
+  }
+)
 
 const selected = defineModel<string | null>({ default: null })
 
@@ -79,7 +82,7 @@ async function load() {
 
     availability.value = result
 
-    if (selected.value && !result.slots.some(slot => slot.startsAt === selected.value)) {
+    if (selected.value && !result.slots.some((slot) => slot.startsAt === selected.value)) {
       selected.value = null
     }
   } catch (fetchError) {
@@ -109,32 +112,15 @@ watch(
 
 <template>
   <div class="space-y-4">
-    <UFormField
-      :label="label ?? 'Escolha a data'"
-      :help="`Horários no fuso de São Paulo`"
-    >
-      <UCalendar
-        v-model="calendarDate"
-        :min-value="minCalendarDate"
-        class="w-full"
-      />
+    <UFormField :label="label ?? 'Escolha a data'" :help="`Horários no fuso de São Paulo`">
+      <UCalendar v-model="calendarDate" :min-value="minCalendarDate" class="w-full" />
     </UFormField>
 
-    <div
-      v-if="pending"
-      class="grid grid-cols-3 gap-2 sm:grid-cols-4"
-    >
-      <USkeleton
-        v-for="index in 8"
-        :key="index"
-        class="h-9"
-      />
+    <div v-if="pending" class="grid grid-cols-3 gap-2 sm:grid-cols-4">
+      <USkeleton v-for="index in 8" :key="index" class="h-9" />
     </div>
 
-    <p
-      v-else-if="error"
-      class="text-sm text-error"
-    >
+    <p v-else-if="error" class="text-sm text-error">
       {{ error }}
     </p>
 
@@ -145,10 +131,7 @@ watch(
       Sem horários nesta data. Tente outro dia.
     </div>
 
-    <div
-      v-else
-      class="grid grid-cols-3 gap-2 sm:grid-cols-4"
-    >
+    <div v-else class="grid grid-cols-3 gap-2 sm:grid-cols-4">
       <UButton
         v-for="slot in availability.slots"
         :key="slot.startsAt"

@@ -58,13 +58,16 @@ async function getSession(email: string) {
   return session
 }
 
-function createStaffAppointment(cookie: string, body: {
-  serviceId: string
-  startsAt: string
-  clientName: string
-  clientPhone: string
-  notes?: string
-}) {
+function createStaffAppointment(
+  cookie: string,
+  body: {
+    serviceId: string
+    startsAt: string
+    clientName: string
+    clientPhone: string
+    notes?: string
+  }
+) {
   return $fetch<StaffAppointmentResponse>('/api/appointments', {
     method: 'POST',
     headers: authHeaders(cookie),
@@ -76,10 +79,10 @@ describe('API pública de agendamento', () => {
   it('lista o catálogo ativo do salão', async () => {
     const services = await $fetch<Service[]>('/api/public/services')
 
-    expect(services.map(service => service.name)).toEqual(
+    expect(services.map((service) => service.name)).toEqual(
       expect.arrayContaining(['Corte feminino', 'Escova'])
     )
-    expect(services.every(service => !('professionalId' in service))).toBe(true)
+    expect(services.every((service) => !('professionalId' in service))).toBe(true)
   })
 
   it('aplica a antecedência de 3 dias somente no fluxo da cliente', async () => {
@@ -96,7 +99,7 @@ describe('API pública de agendamento', () => {
 
     expect(available.slots.length).toBeGreaterThan(0)
     expect(boundary.slots.length).toBeGreaterThan(0)
-    expect(boundary.slots.some(slot => slot.label === '09:00')).toBe(true)
+    expect(boundary.slots.some((slot) => slot.label === '09:00')).toBe(true)
     expect(tooSoon.slots).toHaveLength(0)
   })
 
@@ -122,7 +125,7 @@ describe('API pública de agendamento', () => {
     const duplicated = await $fetch('/api/public/appointments', {
       method: 'POST',
       body
-    }).catch(error => error)
+    }).catch((error) => error)
 
     expect(errorStatus(duplicated)).toBe(409)
 
@@ -130,14 +133,16 @@ describe('API pública de agendamento', () => {
       query: { phone }
     })
 
-    expect(history.appointments).toEqual(expect.arrayContaining([
-      expect.objectContaining({ id: created.appointment.id, serviceName: 'Corte feminino' })
-    ]))
+    expect(history.appointments).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: created.appointment.id, serviceName: 'Corte feminino' })
+      ])
+    )
 
     const wrongPhone = await $fetch(`/api/public/appointments/${created.appointment.id}`, {
       method: 'PATCH',
       body: { action: 'cancel', phone: '11999990011' }
-    }).catch(error => error)
+    }).catch((error) => error)
 
     expect(errorStatus(wrongPhone)).toBe(403)
 
@@ -151,7 +156,7 @@ describe('API pública de agendamento', () => {
     const cancelAgain = await $fetch(`/api/public/appointments/${created.appointment.id}`, {
       method: 'PATCH',
       body: { action: 'cancel', phone }
-    }).catch(error => error)
+    }).catch((error) => error)
 
     expect(errorStatus(cancelAgain)).toBe(409)
 
@@ -162,7 +167,7 @@ describe('API pública de agendamento', () => {
       }
     })
 
-    expect(reopened.slots.some(slot => slot.startsAt === startsAt)).toBe(true)
+    expect(reopened.slots.some((slot) => slot.startsAt === startsAt)).toBe(true)
   })
 })
 
@@ -173,7 +178,7 @@ describe('API da agenda do staff', () => {
 
     const unauthenticated = await $fetch('/api/appointments', {
       query: { date }
-    }).catch(error => error)
+    }).catch((error) => error)
 
     expect(errorStatus(unauthenticated)).toBe(401)
 
@@ -181,7 +186,7 @@ describe('API da agenda do staff', () => {
       headers: authHeaders(owner.cookie),
       query: { active: 'true' }
     })
-    const corte = services.find(item => item.name === 'Corte feminino')!
+    const corte = services.find((item) => item.name === 'Corte feminino')!
 
     const appointment = await createStaffAppointment(owner.cookie, {
       serviceId: corte.id,
@@ -200,16 +205,18 @@ describe('API da agenda do staff', () => {
       query: { date }
     })
 
-    expect(agenda.appointments).toEqual(expect.arrayContaining([
-      expect.objectContaining({ id: appointment.appointment.id, serviceName: 'Corte feminino' })
-    ]))
+    expect(agenda.appointments).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: appointment.appointment.id, serviceName: 'Corte feminino' })
+      ])
+    )
 
     const duplicated = await createStaffAppointment(owner.cookie, {
       serviceId: corte.id,
       startsAt: instantAt(date, '10:00'),
       clientName: 'Outra Cliente',
       clientPhone: '11999990022'
-    }).catch(error => error)
+    }).catch((error) => error)
 
     expect(errorStatus(duplicated)).toBe(409)
 
@@ -239,7 +246,7 @@ describe('API da agenda do staff', () => {
       method: 'PATCH',
       headers: authHeaders(owner.cookie),
       body: { action: 'cancel' }
-    }).catch(error => error)
+    }).catch((error) => error)
 
     expect(errorStatus(cancelFinished)).toBe(409)
 
@@ -255,24 +262,24 @@ describe('API da agenda do staff', () => {
       query: { date }
     })
 
-    expect(agendaAfter.appointments).toEqual(expect.arrayContaining([
-      expect.objectContaining({ id: second.appointment.id })
-    ]))
+    expect(agendaAfter.appointments).toEqual(
+      expect.arrayContaining([expect.objectContaining({ id: second.appointment.id })])
+    )
   })
 })
 
 describe('validações da API', () => {
   it('valida os parâmetros da disponibilidade pública', async () => {
-    const missing = await $fetch('/api/public/availability').catch(error => error)
+    const missing = await $fetch('/api/public/availability').catch((error) => error)
     const missingService = await $fetch('/api/public/availability', {
       query: { date: todayIso() }
-    }).catch(error => error)
+    }).catch((error) => error)
     const invalidDate = await $fetch('/api/public/availability', {
       query: {
         serviceId: seed.services.corte,
         date: '2026-02-30'
       }
-    }).catch(error => error)
+    }).catch((error) => error)
 
     expect(errorStatus(missing)).toBe(400)
     expect(errorStatus(missingService)).toBe(400)
@@ -280,10 +287,10 @@ describe('validações da API', () => {
   })
 
   it('valida o WhatsApp do histórico público', async () => {
-    const missing = await $fetch('/api/public/appointments').catch(error => error)
+    const missing = await $fetch('/api/public/appointments').catch((error) => error)
     const invalid = await $fetch('/api/public/appointments', {
       query: { phone: '123' }
-    }).catch(error => error)
+    }).catch((error) => error)
 
     expect(errorStatus(missing)).toBe(400)
     expect(errorStatus(invalid)).toBe(400)
@@ -300,15 +307,15 @@ describe('validações da API', () => {
     const invalidBody = await $fetch('/api/public/appointments', {
       method: 'POST',
       body: {}
-    }).catch(error => error)
+    }).catch((error) => error)
     const invalidPhone = await $fetch('/api/public/appointments', {
       method: 'POST',
       body: { ...base, clientPhone: '123' }
-    }).catch(error => error)
+    }).catch((error) => error)
     const wrongService = await $fetch('/api/public/appointments', {
       method: 'POST',
       body: { ...base, serviceId: '00000000-0000-0000-0000-000000000000' }
-    }).catch(error => error)
+    }).catch((error) => error)
     const tooSoon = await $fetch('/api/public/appointments', {
       method: 'POST',
       body: {
@@ -316,7 +323,7 @@ describe('validações da API', () => {
         startsAt: instantAt(addDays(todayIso(), 1), '09:00'),
         clientPhone: '11999990031'
       }
-    }).catch(error => error)
+    }).catch((error) => error)
 
     expect(errorStatus(invalidBody)).toBe(400)
     expect(errorStatus(invalidPhone)).toBe(400)
@@ -361,7 +368,7 @@ describe('validações da API', () => {
     const conflict = await $fetch(`/api/public/appointments/${created.appointment.id}`, {
       method: 'PATCH',
       body: { action: 'reschedule', phone, startsAt: instantAt(date, '11:00') }
-    }).catch(error => error)
+    }).catch((error) => error)
 
     expect(errorStatus(conflict)).toBe(409)
   })
@@ -379,7 +386,7 @@ describe('validações da API', () => {
     const tooLate = await $fetch(`/api/public/appointments/${appointment.appointment.id}`, {
       method: 'PATCH',
       body: { action: 'cancel', phone }
-    }).catch(error => error)
+    }).catch((error) => error)
 
     expect(errorStatus(tooLate)).toBe(409)
   })
@@ -398,17 +405,17 @@ describe('validações da API', () => {
       method: 'POST',
       headers: authHeaders(owner.cookie),
       body: {}
-    }).catch(error => error)
+    }).catch((error) => error)
     const invalidPhone = await $fetch('/api/appointments', {
       method: 'POST',
       headers: authHeaders(owner.cookie),
       body: { ...base, clientPhone: '123' }
-    }).catch(error => error)
+    }).catch((error) => error)
     const wrongService = await $fetch('/api/appointments', {
       method: 'POST',
       headers: authHeaders(owner.cookie),
       body: { ...base, serviceId: '00000000-0000-0000-0000-000000000000' }
-    }).catch(error => error)
+    }).catch((error) => error)
 
     expect(errorStatus(invalidBody)).toBe(400)
     expect(errorStatus(invalidPhone)).toBe(400)
@@ -423,17 +430,17 @@ describe('validações da API', () => {
       method: 'PATCH',
       headers: authHeaders(owner.cookie),
       body: { action: 'status', status: 'invalid' }
-    }).catch(error => error)
+    }).catch((error) => error)
     const notFound = await $fetch('/api/appointments/00000000-0000-0000-0000-000000000000', {
       method: 'PATCH',
       headers: authHeaders(owner.cookie),
       body: { action: 'cancel' }
-    }).catch(error => error)
+    }).catch((error) => error)
     const sameStatus = await $fetch(`/api/appointments/${created.appointment.id}`, {
       method: 'PATCH',
       headers: authHeaders(owner.cookie),
       body: { action: 'status', status: 'scheduled' }
-    }).catch(error => error)
+    }).catch((error) => error)
 
     expect(errorStatus(invalidBodyPatch)).toBe(400)
     expect(errorStatus(notFound)).toBe(404)
@@ -446,7 +453,7 @@ describe('validações da API', () => {
     const invalidDate = await $fetch('/api/appointments', {
       headers: authHeaders(owner.cookie),
       query: { date: '2026-02-30' }
-    }).catch(error => error)
+    }).catch((error) => error)
 
     expect(errorStatus(invalidDate)).toBe(400)
   })
@@ -472,12 +479,12 @@ describe('gestão de serviços', () => {
       method: 'POST',
       headers: authHeaders(owner.cookie),
       body: base
-    }).catch(error => error)
+    }).catch((error) => error)
     const duplicateCase = await $fetch('/api/services', {
       method: 'POST',
       headers: authHeaders(owner.cookie),
       body: { ...base, name: 'serviço integração' }
-    }).catch(error => error)
+    }).catch((error) => error)
     const inactiveDuplicate = await $fetch<Service>('/api/services', {
       method: 'POST',
       headers: authHeaders(owner.cookie),
@@ -487,11 +494,11 @@ describe('gestão de serviços', () => {
       method: 'POST',
       headers: authHeaders(owner.cookie),
       body: { ...base, durationMin: 1 }
-    }).catch(error => error)
+    }).catch((error) => error)
     const unauthenticated = await $fetch('/api/services', {
       method: 'POST',
       body: base
-    }).catch(error => error)
+    }).catch((error) => error)
 
     expect(created.bufferMin).toBe(0)
     expect(errorStatus(duplicate)).toBe(409)
@@ -509,17 +516,17 @@ describe('gestão de serviços', () => {
       method: 'PATCH',
       headers: authHeaders(owner.cookie),
       body: { name: 'corte feminino' }
-    }).catch(error => error)
+    }).catch((error) => error)
     const reactivateDuplicate = await $fetch(`/api/services/${inactiveDuplicate.id}`, {
       method: 'PATCH',
       headers: authHeaders(owner.cookie),
       body: { active: true }
-    }).catch(error => error)
+    }).catch((error) => error)
     const notFound = await $fetch('/api/services/00000000-0000-0000-0000-000000000000', {
       method: 'PATCH',
       headers: authHeaders(owner.cookie),
       body: { active: false }
-    }).catch(error => error)
+    }).catch((error) => error)
     const list = await $fetch<Service[]>('/api/services', {
       headers: authHeaders(owner.cookie)
     })
@@ -533,7 +540,7 @@ describe('gestão de serviços', () => {
     expect(errorStatus(reactivateDuplicate)).toBe(409)
     expect(errorStatus(notFound)).toBe(404)
     expect(list.length).toBeGreaterThan(activeList.length)
-    expect(activeList.every(service => service.active)).toBe(true)
+    expect(activeList.every((service) => service.active)).toBe(true)
   })
 })
 
@@ -567,17 +574,17 @@ describe('bloqueios de horário', () => {
       query
     })
 
-    expect(before.slots.some(slot => slot.startsAt === startsAt)).toBe(true)
-    expect(after.slots.some(slot => slot.startsAt === startsAt)).toBe(false)
-    expect(after.slots.some(slot => slot.startsAt === instantAt(date, '11:00'))).toBe(true)
+    expect(before.slots.some((slot) => slot.startsAt === startsAt)).toBe(true)
+    expect(after.slots.some((slot) => slot.startsAt === startsAt)).toBe(false)
+    expect(after.slots.some((slot) => slot.startsAt === instantAt(date, '11:00'))).toBe(true)
 
     const list = await $fetch<TimeBlock[]>('/api/time-blocks', {
       headers: authHeaders(owner.cookie)
     })
 
-    expect(list).toEqual(expect.arrayContaining([
-      expect.objectContaining({ id: created.block.id, reason: 'Almoço' })
-    ]))
+    expect(list).toEqual(
+      expect.arrayContaining([expect.objectContaining({ id: created.block.id, reason: 'Almoço' })])
+    )
 
     const removed = await $fetch<{ id: string }>(`/api/time-blocks/${created.block.id}`, {
       method: 'DELETE',
@@ -589,7 +596,7 @@ describe('bloqueios de horário', () => {
     })
 
     expect(removed.id).toBe(created.block.id)
-    expect(reopened.slots.some(slot => slot.startsAt === startsAt)).toBe(true)
+    expect(reopened.slots.some((slot) => slot.startsAt === startsAt)).toBe(true)
   })
 
   it('aplica bloqueio semanal em todas as ocorrências e valida recorrência', async () => {
@@ -626,10 +633,16 @@ describe('bloqueios de horário', () => {
       query: { serviceId: seed.services.escova, date: previousWeek }
     })
 
-    expect(sameWeek.slots.some(slot => slot.startsAt === startsAt)).toBe(false)
-    expect(followingWeek.slots.some(slot => slot.startsAt === instantAt(nextWeek, '12:00'))).toBe(false)
-    expect(otherWeekday.slots.some(slot => slot.startsAt === instantAt(otherDay, '12:00'))).toBe(true)
-    expect(beforeStart.slots.some(slot => slot.startsAt === instantAt(previousWeek, '12:00'))).toBe(true)
+    expect(sameWeek.slots.some((slot) => slot.startsAt === startsAt)).toBe(false)
+    expect(followingWeek.slots.some((slot) => slot.startsAt === instantAt(nextWeek, '12:00'))).toBe(
+      false
+    )
+    expect(otherWeekday.slots.some((slot) => slot.startsAt === instantAt(otherDay, '12:00'))).toBe(
+      true
+    )
+    expect(
+      beforeStart.slots.some((slot) => slot.startsAt === instantAt(previousWeek, '12:00'))
+    ).toBe(true)
 
     const crossDay = await $fetch('/api/time-blocks', {
       method: 'POST',
@@ -639,7 +652,7 @@ describe('bloqueios de horário', () => {
         endsAt: instantAt(addDays(date, 1), '01:00'),
         recurrence: 'weekly'
       }
-    }).catch(error => error)
+    }).catch((error) => error)
     const invalidRecurrence = await $fetch('/api/time-blocks', {
       method: 'POST',
       headers: authHeaders(owner.cookie),
@@ -648,7 +661,7 @@ describe('bloqueios de horário', () => {
         endsAt: instantAt(addDays(date, 2), '13:00'),
         recurrence: 'daily'
       }
-    }).catch(error => error)
+    }).catch((error) => error)
     const inverted = await $fetch('/api/time-blocks', {
       method: 'POST',
       headers: authHeaders(owner.cookie),
@@ -656,7 +669,7 @@ describe('bloqueios de horário', () => {
         startsAt: instantAt(addDays(date, 3), '13:00'),
         endsAt: instantAt(addDays(date, 3), '12:00')
       }
-    }).catch(error => error)
+    }).catch((error) => error)
 
     expect(errorStatus(crossDay)).toBe(400)
     expect(errorStatus(invalidRecurrence)).toBe(400)
@@ -681,16 +694,18 @@ describe('bloqueios de horário', () => {
         endsAt: instantAt(date, '10:15'),
         reason: 'Compromisso'
       }
-    }).catch(error => error)
+    }).catch((error) => error)
 
     expect(errorStatus(conflict)).toBe(409)
 
-    const payload = (conflict as {
-      data?: {
-        conflicts?: Array<{ id: string, clientName: string }>
-        data?: { conflicts?: Array<{ id: string, clientName: string }> }
+    const payload = (
+      conflict as {
+        data?: {
+          conflicts?: Array<{ id: string; clientName: string }>
+          data?: { conflicts?: Array<{ id: string; clientName: string }> }
+        }
       }
-    }).data
+    ).data
     const conflicts = payload?.data?.conflicts ?? payload?.conflicts
 
     expect(conflicts).toEqual([
@@ -705,12 +720,14 @@ describe('bloqueios de horário', () => {
       query: { date }
     })
 
-    expect(beforeConfirmation.appointments).toEqual(expect.arrayContaining([
-      expect.objectContaining({
-        id: appointment.appointment.id,
-        status: 'scheduled'
-      })
-    ]))
+    expect(beforeConfirmation.appointments).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: appointment.appointment.id,
+          status: 'scheduled'
+        })
+      ])
+    )
 
     const confirmed = await $fetch<TimeBlockResponse>('/api/time-blocks', {
       method: 'POST',
@@ -729,26 +746,28 @@ describe('bloqueios de horário', () => {
     })
 
     expect(confirmed.conflicts).toHaveLength(1)
-    expect(afterConfirmation.appointments).toEqual(expect.arrayContaining([
-      expect.objectContaining({
-        id: appointment.appointment.id,
-        status: 'scheduled'
-      })
-    ]))
+    expect(afterConfirmation.appointments).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: appointment.appointment.id,
+          status: 'scheduled'
+        })
+      ])
+    )
   })
 
   it('exige autenticação e valida a remoção do bloqueio', async () => {
     const owner = await getSession(TEST_USERS.owner.email)
     const date = addDays(todayIso(), 50)
 
-    const unauthenticated = await $fetch('/api/time-blocks').catch(error => error)
+    const unauthenticated = await $fetch('/api/time-blocks').catch((error) => error)
     const unauthenticatedCreate = await $fetch('/api/time-blocks', {
       method: 'POST',
       body: {
         startsAt: instantAt(date, '15:00'),
         endsAt: instantAt(date, '16:00')
       }
-    }).catch(error => error)
+    }).catch((error) => error)
 
     expect(errorStatus(unauthenticated)).toBe(401)
     expect(errorStatus(unauthenticatedCreate)).toBe(401)
@@ -765,7 +784,7 @@ describe('bloqueios de horário', () => {
     const notFound = await $fetch('/api/time-blocks/00000000-0000-0000-0000-000000000000', {
       method: 'DELETE',
       headers: authHeaders(owner.cookie)
-    }).catch(error => error)
+    }).catch((error) => error)
 
     expect(errorStatus(notFound)).toBe(404)
 
@@ -783,7 +802,7 @@ describe('jornada de trabalho', () => {
     const owner = await getSession(TEST_USERS.owner.email)
     const route = '/api/working-hours'
 
-    const unauthenticated = await $fetch(route).catch(error => error)
+    const unauthenticated = await $fetch(route).catch((error) => error)
     const overlapping = await $fetch(route, {
       method: 'PUT',
       headers: authHeaders(owner.cookie),
@@ -793,12 +812,12 @@ describe('jornada de trabalho', () => {
           { weekday: 1, startMinute: 570, endMinute: 660 }
         ]
       }
-    }).catch(error => error)
+    }).catch((error) => error)
     const inverted = await $fetch(route, {
       method: 'PUT',
       headers: authHeaders(owner.cookie),
       body: { hours: [{ weekday: 1, startMinute: 600, endMinute: 540 }] }
-    }).catch(error => error)
+    }).catch((error) => error)
 
     expect(errorStatus(unauthenticated)).toBe(401)
     expect(errorStatus(overlapping)).toBe(400)
@@ -821,7 +840,7 @@ describe('jornada de trabalho', () => {
       method: 'PUT',
       headers: authHeaders(owner.cookie),
       body: {
-        hours: [0, 1, 2, 3, 4, 5, 6].map(weekday => ({
+        hours: [0, 1, 2, 3, 4, 5, 6].map((weekday) => ({
           weekday,
           startMinute: 540,
           endMinute: 1080

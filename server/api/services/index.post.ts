@@ -8,7 +8,11 @@ import { writeAuditLog } from '../../utils/audit-log'
 
 const bodySchema = z.object({
   name: z.string().trim().min(2, 'Informe o nome').max(120, 'Nome muito longo'),
-  durationMin: z.number().int().min(5, 'Duração mínima de 5 min').max(600, 'Duração máxima de 600 min'),
+  durationMin: z
+    .number()
+    .int()
+    .min(5, 'Duração mínima de 5 min')
+    .max(600, 'Duração máxima de 600 min'),
   bufferMin: z.number().int().min(0).max(240).default(0),
   priceCents: z.number().int().min(0, 'Preço inválido').max(10_000_000).default(0),
   active: z.boolean().default(true)
@@ -34,7 +38,10 @@ export default defineEventHandler(async (event) => {
       .limit(1)
 
     if (duplicate) {
-      throw createError({ statusCode: 409, message: 'Já existe um serviço ativo com este nome no salão' })
+      throw createError({
+        statusCode: 409,
+        message: 'Já existe um serviço ativo com este nome no salão'
+      })
     }
   }
 
@@ -51,7 +58,10 @@ export default defineEventHandler(async (event) => {
     .returning(serviceColumns)
     .catch((error: unknown) => {
       if (isUniqueViolation(error)) {
-        throw createError({ statusCode: 409, message: 'Já existe um serviço ativo com este nome no salão' })
+        throw createError({
+          statusCode: 409,
+          message: 'Já existe um serviço ativo com este nome no salão'
+        })
       }
       throw error
     })

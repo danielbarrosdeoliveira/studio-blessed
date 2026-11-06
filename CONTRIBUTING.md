@@ -63,16 +63,16 @@ Exemplos:
 Cada épico do [`docs/backlog.md`](../docs/backlog.md) vira **uma branch** (ou mais,
 se o épico for grande). Exemplos:
 
-| Épico | Branch sugerida |
-| --- | --- |
-| E1 — Fundação & Autenticação | `feat/e1-fundacao` |
-| E2 — Profissionais & Jornada | `feat/e2-profissionais-jornada` |
-| E3 — Serviços | `feat/e3-servicos` |
-| E5 — Bloqueios | `feat/e5-bloqueios` |
-| E6 — Motor de Disponibilidade | `feat/e6-disponibilidade` |
-| E7 — Agendamento Público | `feat/e7-agendamento-publico` |
+| Épico                         | Branch sugerida                 |
+| ----------------------------- | ------------------------------- |
+| E1 — Fundação & Autenticação  | `feat/e1-fundacao`              |
+| E2 — Profissionais & Jornada  | `feat/e2-profissionais-jornada` |
+| E3 — Serviços                 | `feat/e3-servicos`              |
+| E5 — Bloqueios                | `feat/e5-bloqueios`             |
+| E6 — Motor de Disponibilidade | `feat/e6-disponibilidade`       |
+| E7 — Agendamento Público      | `feat/e7-agendamento-publico`   |
 | E8 — Operação de Agendamentos | `feat/e8-operacao-agendamentos` |
-| E9 — Dashboard de Métricas | `feat/e9-metricas` |
+| E9 — Dashboard de Métricas    | `feat/e9-metricas`              |
 
 ## Definition of Done (DoD)
 

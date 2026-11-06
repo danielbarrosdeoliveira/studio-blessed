@@ -6,17 +6,17 @@
 
 ## Épicos
 
-| ID | Épico | Prioridade |
-| --- | --- | --- |
-| E1 | Fundação & Autenticação | P0 |
-| E2 | Jornada & Horário da Dona | P0 |
-| E3 | Serviços | P0 |
-| E4 | Integração Google Calendar | P2 (fase final do MVP) |
-| E5 | Bloqueios de Horário | P1 |
-| E6 | Motor de Disponibilidade | P0 |
-| E7 | Agendamento Público (Cliente) | P0 |
-| E8 | Operação de Agendamentos | P0 |
-| E9 | Dashboard de Métricas | P1 |
+| ID  | Épico                         | Prioridade             |
+| --- | ----------------------------- | ---------------------- |
+| E1  | Fundação & Autenticação       | P0                     |
+| E2  | Jornada & Horário da Dona     | P0                     |
+| E3  | Serviços                      | P0                     |
+| E4  | Integração Google Calendar    | P2 (fase final do MVP) |
+| E5  | Bloqueios de Horário          | P1                     |
+| E6  | Motor de Disponibilidade      | P0                     |
+| E7  | Agendamento Público (Cliente) | P0                     |
+| E8  | Operação de Agendamentos      | P0                     |
+| E9  | Dashboard de Métricas         | P1                     |
 
 ---
 
@@ -44,7 +44,7 @@
 
 - **CA1:** Dado uma sessão válida, quando acessa uma rota interna, então é permitido.
 - **CA2:** Dado uma requisição sem sessão, quando acessa uma rota interna, então
-  recebe `401`. *(Não há papéis: qualquer usuário autenticado é a dona do salão.)*
+  recebe `401`. _(Não há papéis: qualquer usuário autenticado é a dona do salão.)_
 
 ### US1.4 — Acesso da cliente sem login
 
@@ -250,7 +250,7 @@ do agendamento.
 - **CA1:** Dado o telefone informado, quando existem agendamentos, então listo os
   meus (salão todo).
 - **CA2:** Dado o telefone informado, quando não há agendamentos, então mostro
-  estado vazio. *(risco de privacidade aceito — ver discovery §6)*
+  estado vazio. _(risco de privacidade aceito — ver discovery §6)_
 
 ### US7.4 — Cancelar/remarcar pelo cliente
 

@@ -1,31 +1,33 @@
 <template>
-  <section class="py-20 md:py-28 bg-zinc-950">
-    <div class="max-w-[1400px] mx-auto px-8 lg:px-12">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+  <section class="bg-zinc-950 py-20 md:py-28">
+    <div class="mx-auto max-w-350 px-8 lg:px-12">
+      <div class="grid grid-cols-1 items-center gap-16 lg:grid-cols-2">
         <div class="space-y-8">
-          <span class="font-sans text-xs uppercase tracking-[0.2em] text-orange-500 font-semibold">05 / Diferenciais</span>
-          <h2 class="font-serif text-4xl md:text-5xl text-zinc-50 leading-tight">
+          <span class="font-sans text-xs font-semibold tracking-[0.2em] text-orange-500 uppercase"
+            >05 / Diferenciais</span
+          >
+          <h2 class="font-serif text-4xl/tight text-zinc-50 md:text-5xl">
             Por que escolher<br />o Studio Blessed?
           </h2>
-          <p class="font-sans text-zinc-400 text-base leading-relaxed max-w-md">
+          <p class="max-w-md font-sans text-base/relaxed text-zinc-400">
             Do olhar ao bem-estar, cada detalhe pensado para realçar sua beleza natural — com
             tecnologia, produtos de alta qualidade e um atendimento verdadeiramente personalizado.
           </p>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div
             v-for="item in diferenciais"
             :key="item.title"
-            class="rounded-2xl border border-zinc-800/80 bg-zinc-900/40 p-6 space-y-3 transition-colors duration-300 hover:border-orange-500/40"
+            class="space-y-3 rounded-2xl border border-zinc-800/80 bg-zinc-900/40 p-6 transition-colors duration-300 hover:border-orange-500/40"
           >
-            <div class="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center">
-              <LandingIcon :icon="item.icon" class="w-5 h-5 text-orange-500" />
+            <div class="flex size-10 items-center justify-center rounded-full bg-orange-500/10">
+              <LandingIcon :icon="item.icon" class="size-5 text-orange-500" />
             </div>
-            <h4 class="font-sans text-sm font-bold text-zinc-100 uppercase tracking-wider">
+            <h4 class="font-sans text-sm font-bold tracking-wider text-zinc-100 uppercase">
               {{ item.title }}
             </h4>
-            <p class="font-sans text-zinc-400 text-xs leading-relaxed">{{ item.description }}</p>
+            <p class="font-sans text-xs/relaxed text-zinc-400">{{ item.description }}</p>
           </div>
         </div>
       </div>
@@ -53,7 +55,8 @@ const diferenciais = [
   {
     icon: 'lucide:smile',
     title: 'Resultados Garantidos',
-    description: 'Atendimento feito pela própria dona do salão, com resultados que superam expectativas.'
+    description:
+      'Atendimento feito pela própria dona do salão, com resultados que superam expectativas.'
   }
 ]
 </script>

@@ -20,7 +20,9 @@ export function canSetAppointmentStatus(
     return false
   }
 
-  return appointment.status === 'scheduled'
-    || appointment.status === 'completed'
-    || appointment.status === 'no_show'
+  return (
+    appointment.status === 'scheduled' ||
+    appointment.status === 'completed' ||
+    appointment.status === 'no_show'
+  )
 }

@@ -22,13 +22,15 @@ describe('computeAvailability', () => {
     expect(slots[0]?.label).toBe('09:00')
     expect(slots.at(-1)?.label).toBe('17:15')
     expect(slots).toHaveLength(34)
-    expect(slots.every((slot, index) => {
-      if (index === 0) {
-        return true
-      }
+    expect(
+      slots.every((slot, index) => {
+        if (index === 0) {
+          return true
+        }
 
-      return Date.parse(slot.startsAt) - Date.parse(slots[index - 1]!.startsAt) === 15 * 60_000
-    })).toBe(true)
+        return Date.parse(slot.startsAt) - Date.parse(slots[index - 1]!.startsAt) === 15 * 60_000
+      })
+    ).toBe(true)
   })
 
   it('não oferece início quando o serviço não cabe antes do fim da jornada', () => {
@@ -48,7 +50,7 @@ describe('computeAvailability', () => {
       bufferMin: 10
     })
 
-    expect(slots.map(slot => slot.label)).toEqual(['09:00'])
+    expect(slots.map((slot) => slot.label)).toEqual(['09:00'])
   })
 
   it('respeita intervalos múltiplos de jornada (almoço)', () => {
@@ -60,9 +62,9 @@ describe('computeAvailability', () => {
       ]
     })
 
-    expect(slots.filter(slot => slot.label < '12:00').at(-1)?.label).toBe('11:15')
-    expect(slots.some(slot => slot.label >= '12:00' && slot.label < '13:00')).toBe(false)
-    expect(slots.find(slot => slot.label >= '13:00')?.label).toBe('13:00')
+    expect(slots.filter((slot) => slot.label < '12:00').at(-1)?.label).toBe('11:15')
+    expect(slots.some((slot) => slot.label >= '12:00' && slot.label < '13:00')).toBe(false)
+    expect(slots.find((slot) => slot.label >= '13:00')?.label).toBe('13:00')
   })
 
   it('alinha o primeiro início à grade de 15 minutos', () => {
@@ -112,7 +114,7 @@ describe('computeAvailability', () => {
       ]
     })
 
-    expect(slots.map(slot => slot.label)).toEqual(['09:00', '09:15'])
+    expect(slots.map((slot) => slot.label)).toEqual(['09:00', '09:15'])
   })
 
   it('devolve fim do serviço sem somar o buffer', () => {

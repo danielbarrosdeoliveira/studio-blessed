@@ -1,22 +1,22 @@
 <template>
-  <section id="location" class="py-20 md:py-28 bg-zinc-900/40">
-    <div class="max-w-[1400px] mx-auto px-8 lg:px-12">
-      <div class="text-center mb-16 space-y-2">
-        <span class="font-sans text-xs uppercase tracking-[0.2em] text-orange-500 font-semibold">Localização</span>
-        <h2 class="font-serif text-4xl md:text-5xl text-zinc-50 leading-tight">
-          Onde Estamos
-        </h2>
-        <p class="font-sans text-zinc-400 text-base max-w-xl mx-auto">
+  <section id="location" class="bg-zinc-900/40 py-20 md:py-28">
+    <div class="mx-auto max-w-350 px-8 lg:px-12">
+      <div class="mb-16 space-y-2 text-center">
+        <span class="font-sans text-xs font-semibold tracking-[0.2em] text-orange-500 uppercase"
+          >Localização</span
+        >
+        <h2 class="font-serif text-4xl/tight text-zinc-50 md:text-5xl">Onde Estamos</h2>
+        <p class="mx-auto max-w-xl font-sans text-base text-zinc-400">
           Estamos localizados no coração do Parque Viana, em Barueri.
         </p>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-        <div class="overflow-hidden rounded-2xl shadow-xl border border-zinc-800">
+      <div class="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
+        <div class="overflow-hidden rounded-2xl border border-zinc-800 shadow-xl">
           <iframe
             title="Mapa da localização do Studio Blessed"
             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3657.693785668594!2d-46.87051772467042!3d-23.543513578812046!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94cf010616dab381%3A0xce1051bab47c8e84!2sR.%20Imbauva%2C%2020%20-%204%20-%20Parque%20Viana%2C%20Barueri%20-%20SP%2C%2006449-310!5e0!3m2!1spt-BR!2sbr!4v1743297689841!5m2!1spt-BR!2sbr"
-            class="w-full h-full min-h-[400px]"
+            class="size-full min-h-100"
             style="border: 0"
             loading="lazy"
             referrerpolicy="no-referrer-when-downgrade"
@@ -25,14 +25,16 @@
 
         <div class="space-y-8">
           <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center shrink-0">
-              <LandingIcon icon="lucide:phone" class="w-5 h-5 text-orange-500" />
+            <div
+              class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-orange-500/10"
+            >
+              <LandingIcon icon="lucide:phone" class="size-5 text-orange-500" />
             </div>
             <div>
-              <p class="font-sans text-xs uppercase tracking-wider text-zinc-500">Telefone</p>
+              <p class="font-sans text-xs tracking-wider text-zinc-500 uppercase">Telefone</p>
               <a
                 href="tel:+5511988880015"
-                class="font-sans text-base text-zinc-200 hover:text-orange-500 transition-colors"
+                class="font-sans text-base text-zinc-200 transition-colors hover:text-orange-500"
               >
                 (11) 98888-0015
               </a>
@@ -40,14 +42,16 @@
           </div>
 
           <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center shrink-0">
-              <LandingIcon icon="lucide:mail" class="w-5 h-5 text-orange-500" />
+            <div
+              class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-orange-500/10"
+            >
+              <LandingIcon icon="lucide:mail" class="size-5 text-orange-500" />
             </div>
             <div>
-              <p class="font-sans text-xs uppercase tracking-wider text-zinc-500">E-mail</p>
+              <p class="font-sans text-xs tracking-wider text-zinc-500 uppercase">E-mail</p>
               <a
                 href="mailto:contato@blessedstudio.com.br"
-                class="font-sans text-base text-zinc-200 hover:text-orange-500 transition-colors"
+                class="font-sans text-base text-zinc-200 transition-colors hover:text-orange-500"
               >
                 contato@blessedstudio.com.br
               </a>
@@ -55,11 +59,13 @@
           </div>
 
           <div class="flex items-start gap-4">
-            <div class="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center shrink-0">
-              <LandingIcon icon="lucide:map-pin" class="w-5 h-5 text-orange-500" />
+            <div
+              class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-orange-500/10"
+            >
+              <LandingIcon icon="lucide:map-pin" class="size-5 text-orange-500" />
             </div>
             <div>
-              <p class="font-sans text-xs uppercase tracking-wider text-zinc-500">Endereço</p>
+              <p class="font-sans text-xs tracking-wider text-zinc-500 uppercase">Endereço</p>
               <p class="font-sans text-base text-zinc-200">
                 R. Imbauva, 20 - Pq. Viana, Sala 3<br />
                 Barueri-SP
@@ -72,17 +78,17 @@
               href="https://wa.me/5511988880015"
               target="_blank"
               rel="noopener noreferrer"
-              class="w-11 h-11 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-300 hover:bg-orange-500 hover:text-zinc-950 transition-all duration-300"
+              class="flex size-11 items-center justify-center rounded-full bg-zinc-800 text-zinc-300 transition-all duration-300 hover:bg-orange-500 hover:text-zinc-950"
             >
-              <LandingIcon icon="mdi:whatsapp" class="w-5 h-5" />
+              <LandingIcon icon="mdi:whatsapp" class="size-5" />
             </a>
             <a
               href="https://instagram.com/studio.bles"
               target="_blank"
               rel="noopener noreferrer"
-              class="w-11 h-11 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-300 hover:bg-orange-500 hover:text-zinc-950 transition-all duration-300"
+              class="flex size-11 items-center justify-center rounded-full bg-zinc-800 text-zinc-300 transition-all duration-300 hover:bg-orange-500 hover:text-zinc-950"
             >
-              <LandingIcon icon="lucide:instagram" class="w-5 h-5" />
+              <LandingIcon icon="lucide:instagram" class="size-5" />
             </a>
           </div>
         </div>

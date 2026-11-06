@@ -46,4 +46,3 @@
 - [ ] Tabela `audit_log` para ações críticas (agendamento, bloqueio, serviço, jornada)
 - [ ] Alerta de erros 5xx via coletor de logs da nuvem
 - [ ] Dashboard de métricas operacionais (E9 — Dashboard de Métricas)
-

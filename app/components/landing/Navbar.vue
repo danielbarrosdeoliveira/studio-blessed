@@ -1,19 +1,27 @@
 <template>
-  <nav class="fixed top-0 left-0 w-full z-50 bg-zinc-950/80 backdrop-blur-md border-b border-zinc-800/80 transition-all duration-300">
-    <div class="max-w-[1400px] mx-auto flex items-center justify-between px-8 lg:px-12 py-4">
-      <a href="#" class="block hover:opacity-80 transition-opacity duration-300">
-        <img src="/images/logo-studio-blessed-white.svg" alt="Studio Blessed" class="h-8 md:h-10 w-auto" />
+  <nav
+    class="fixed top-0 left-0 z-50 w-full border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur-md transition-all duration-300"
+  >
+    <div class="mx-auto flex max-w-350 items-center justify-between px-8 py-4 lg:px-12">
+      <a href="#" class="block transition-opacity duration-300 hover:opacity-80">
+        <img
+          src="/images/logo-studio-blessed-white.svg"
+          alt="Studio Blessed"
+          class="h-8 w-auto md:h-10"
+        />
       </a>
 
-      <div class="hidden lg:flex items-center gap-8">
-        <div class="flex items-center gap-6 font-sans text-xs uppercase font-medium tracking-[0.15em] text-zinc-400">
+      <div class="hidden items-center gap-8 lg:flex">
+        <div
+          class="flex items-center gap-6 font-sans text-xs font-medium tracking-[0.15em] text-zinc-400 uppercase"
+        >
           <a
             v-for="link in links"
             :key="link.href"
             :href="link.href"
             :class="[
-              'hover:text-orange-500 transition-all duration-300 whitespace-nowrap',
-              { 'text-orange-500': activeSection === link.href.slice(1) },
+              'whitespace-nowrap transition-all duration-300 hover:text-orange-500',
+              { 'text-orange-500': activeSection === link.href.slice(1) }
             ]"
           >
             {{ link.label }}
@@ -21,30 +29,32 @@
         </div>
         <NuxtLink
           to="/agendamento"
-          class="rounded-full bg-orange-500 text-zinc-950 text-xs uppercase tracking-wider px-6 py-3 font-semibold hover:bg-orange-400 transition-all duration-300 shadow-lg shadow-orange-500/20"
+          class="rounded-full bg-orange-500 px-6 py-3 text-xs font-semibold tracking-wider text-zinc-950 uppercase shadow-lg shadow-orange-500/20 transition-all duration-300 hover:bg-orange-400"
         >
           Agendar Agora
         </NuxtLink>
       </div>
 
       <button
-        class="lg:hidden p-2 text-zinc-400 hover:text-orange-500 transition-colors duration-300"
+        class="p-2 text-zinc-400 transition-colors duration-300 hover:text-orange-500 lg:hidden"
         aria-label="Abrir menu"
         @click="isOpen = !isOpen"
       >
-        <LandingIcon v-if="!isOpen" icon="lucide:menu" class="w-6 h-6" />
-        <LandingIcon v-else icon="lucide:x" class="w-6 h-6" />
+        <LandingIcon v-if="!isOpen" icon="lucide:menu" class="size-6" />
+        <LandingIcon v-else icon="lucide:x" class="size-6" />
       </button>
     </div>
 
-    <div v-if="isOpen" class="lg:hidden bg-zinc-950 border-t border-zinc-800 px-8 py-6 space-y-4">
+    <div v-if="isOpen" class="space-y-4 border-t border-zinc-800 bg-zinc-950 px-8 py-6 lg:hidden">
       <a
         v-for="link in links"
         :key="link.href"
         :href="link.href"
         :class="[
-          'block font-sans text-sm uppercase tracking-[0.15em] transition-all duration-300',
-          activeSection === link.href.slice(1) ? 'text-orange-500' : 'text-zinc-400 hover:text-orange-500',
+          'block font-sans text-sm tracking-[0.15em] uppercase transition-all duration-300',
+          activeSection === link.href.slice(1)
+            ? 'text-orange-500'
+            : 'text-zinc-400 hover:text-orange-500'
         ]"
         @click="isOpen = false"
       >
@@ -52,7 +62,7 @@
       </a>
       <NuxtLink
         to="/agendamento"
-        class="block text-center rounded-full bg-orange-500 text-zinc-950 text-xs uppercase tracking-wider px-6 py-3 font-semibold hover:bg-orange-400 transition-all duration-300"
+        class="block rounded-full bg-orange-500 px-6 py-3 text-center text-xs font-semibold tracking-wider text-zinc-950 uppercase transition-all duration-300 hover:bg-orange-400"
         @click="isOpen = false"
       >
         Agendar Agora

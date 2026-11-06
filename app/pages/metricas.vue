@@ -36,12 +36,12 @@ const formatCurrency = (cents: number) =>
 
     <template #body>
       <div class="flex flex-col gap-4 sm:gap-6">
-        <div v-if="pending" class="text-center py-20">
+        <div v-if="pending" class="py-20 text-center">
           <USpinner />
         </div>
 
         <template v-else-if="metrics">
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
             <UCard>
               <div class="flex flex-col gap-1">
                 <span class="text-xs font-semibold text-muted uppercase">Faturamento</span>
@@ -72,29 +72,33 @@ const formatCurrency = (cents: number) =>
           </div>
 
           <UCard v-if="metrics.serviceRanking?.length">
-            <h3 class="text-lg font-bold mb-4">Serviços mais realizados</h3>
-            <table class="w-full text-left border-collapse">
+            <h3 class="mb-4 text-lg font-bold">Serviços mais realizados</h3>
+            <table class="w-full border-collapse text-left">
               <thead>
                 <tr class="border-b border-default">
                   <th class="pb-3 text-sm font-semibold text-muted">Serviço</th>
-                  <th class="pb-3 text-sm font-semibold text-muted text-right">Qtde</th>
-                  <th class="pb-3 text-sm font-semibold text-muted text-right">Faturamento</th>
+                  <th class="pb-3 text-right text-sm font-semibold text-muted">Qtde</th>
+                  <th class="pb-3 text-right text-sm font-semibold text-muted">Faturamento</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="item in metrics.serviceRanking" :key="item.serviceName" class="border-b border-default/60">
+                <tr
+                  v-for="item in metrics.serviceRanking"
+                  :key="item.serviceName"
+                  class="border-b border-default/60"
+                >
                   <td class="py-3 text-sm text-default">{{ item.serviceName }}</td>
-                  <td class="py-3 text-sm font-medium text-right text-default">{{ item.total }}</td>
-                  <td class="py-3 text-sm font-medium text-right text-default">{{ formatCurrency(item.revenue || 0) }}</td>
+                  <td class="py-3 text-right text-sm font-medium text-default">{{ item.total }}</td>
+                  <td class="py-3 text-right text-sm font-medium text-default">
+                    {{ formatCurrency(item.revenue || 0) }}
+                  </td>
                 </tr>
               </tbody>
             </table>
           </UCard>
         </template>
 
-        <div v-else class="text-center py-20 text-muted">
-          Nenhum dado disponível.
-        </div>
+        <div v-else class="py-20 text-center text-muted">Nenhum dado disponível.</div>
       </div>
     </template>
   </UDashboardPanel>

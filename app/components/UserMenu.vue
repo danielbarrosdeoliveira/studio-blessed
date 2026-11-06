@@ -10,7 +10,25 @@ const colorMode = useColorMode()
 const appConfig = useAppConfig()
 const { user } = await useUserSession()
 
-const colors = ['red', 'orange', 'amber', 'yellow', 'lime', 'green', 'emerald', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose']
+const colors = [
+  'red',
+  'orange',
+  'amber',
+  'yellow',
+  'lime',
+  'green',
+  'emerald',
+  'teal',
+  'cyan',
+  'sky',
+  'blue',
+  'indigo',
+  'violet',
+  'purple',
+  'fuchsia',
+  'pink',
+  'rose'
+]
 const neutrals = ['slate', 'gray', 'zinc', 'neutral', 'stone', 'taupe', 'mauve', 'mist', 'olive']
 
 const displayName = computed(() => user.value?.name ?? 'Usuário')
@@ -30,87 +48,108 @@ async function signOut() {
   await navigateTo('/login')
 }
 
-const items = computed<DropdownMenuItem[][]>(() => ([[{
-  type: 'label',
-  label: displayName.value,
-  avatar: avatar.value
-}], [{
-  label: 'Configurações',
-  icon: 'i-ri-settings-line',
-  to: '/configuracoes'
-}], [{
-  label: 'Tema',
-  icon: 'i-ri-palette-line',
-  children: [{
-    label: 'Primary',
-    slot: 'chip',
-    chip: appConfig.ui.colors.primary,
-    content: {
-      align: 'center',
-      collisionPadding: 16
-    },
-    children: colors.map(color => ({
-      label: color,
-      chip: color,
-      slot: 'chip',
-      checked: appConfig.ui.colors.primary === color,
-      type: 'checkbox' as const,
-      onSelect: (e: Event) => {
-        e.preventDefault()
-        appConfig.ui.colors.primary = color
-      }
-    }))
-  }, {
-    label: 'Neutral',
-    slot: 'chip',
-    chip: appConfig.ui.colors.neutral === 'neutral' ? 'old-neutral' : appConfig.ui.colors.neutral,
-    content: {
-      align: 'end',
-      collisionPadding: 16
-    },
-    children: neutrals.map(color => ({
-      label: color,
-      chip: color === 'neutral' ? 'old-neutral' : color,
-      slot: 'chip',
-      type: 'checkbox' as const,
-      checked: appConfig.ui.colors.neutral === color,
-      onSelect: (e: Event) => {
-        e.preventDefault()
-        appConfig.ui.colors.neutral = color
-      }
-    }))
-  }]
-}, {
-  label: 'Aparência',
-  icon: 'i-ri-contrast-line',
-  children: [{
-    label: 'Claro',
-    icon: 'i-ri-sun-line',
-    type: 'checkbox' as const,
-    checked: colorMode.value === 'light',
-    onSelect(e: Event) {
-      e.preventDefault()
-      colorMode.preference = 'light'
+const items = computed<DropdownMenuItem[][]>(() => [
+  [
+    {
+      type: 'label',
+      label: displayName.value,
+      avatar: avatar.value
     }
-  }, {
-    label: 'Escuro',
-    icon: 'i-ri-moon-line',
-    type: 'checkbox' as const,
-    checked: colorMode.value === 'dark',
-    onUpdateChecked(checked: boolean) {
-      if (checked) {
-        colorMode.preference = 'dark'
-      }
-    },
-    onSelect(e: Event) {
-      e.preventDefault()
+  ],
+  [
+    {
+      label: 'Configurações',
+      icon: 'i-ri-settings-line',
+      to: '/configuracoes'
     }
-  }]
-}], [{
-  label: 'Sair',
-  icon: 'i-ri-logout-box-line',
-  onSelect: () => signOut()
-}]]))
+  ],
+  [
+    {
+      label: 'Tema',
+      icon: 'i-ri-palette-line',
+      children: [
+        {
+          label: 'Primary',
+          slot: 'chip',
+          chip: appConfig.ui.colors.primary,
+          content: {
+            align: 'center',
+            collisionPadding: 16
+          },
+          children: colors.map((color) => ({
+            label: color,
+            chip: color,
+            slot: 'chip',
+            checked: appConfig.ui.colors.primary === color,
+            type: 'checkbox' as const,
+            onSelect: (e: Event) => {
+              e.preventDefault()
+              appConfig.ui.colors.primary = color
+            }
+          }))
+        },
+        {
+          label: 'Neutral',
+          slot: 'chip',
+          chip:
+            appConfig.ui.colors.neutral === 'neutral' ? 'old-neutral' : appConfig.ui.colors.neutral,
+          content: {
+            align: 'end',
+            collisionPadding: 16
+          },
+          children: neutrals.map((color) => ({
+            label: color,
+            chip: color === 'neutral' ? 'old-neutral' : color,
+            slot: 'chip',
+            type: 'checkbox' as const,
+            checked: appConfig.ui.colors.neutral === color,
+            onSelect: (e: Event) => {
+              e.preventDefault()
+              appConfig.ui.colors.neutral = color
+            }
+          }))
+        }
+      ]
+    },
+    {
+      label: 'Aparência',
+      icon: 'i-ri-contrast-line',
+      children: [
+        {
+          label: 'Claro',
+          icon: 'i-ri-sun-line',
+          type: 'checkbox' as const,
+          checked: colorMode.value === 'light',
+          onSelect(e: Event) {
+            e.preventDefault()
+            colorMode.preference = 'light'
+          }
+        },
+        {
+          label: 'Escuro',
+          icon: 'i-ri-moon-line',
+          type: 'checkbox' as const,
+          checked: colorMode.value === 'dark',
+          onUpdateChecked(checked: boolean) {
+            if (checked) {
+              colorMode.preference = 'dark'
+            }
+          },
+          onSelect(e: Event) {
+            e.preventDefault()
+          }
+        }
+      ]
+    }
+  ],
+  [
+    {
+      label: 'Sair',
+      icon: 'i-ri-logout-box-line',
+      onSelect: () => signOut()
+    }
+  ]
+])
 </script>
 
 <template>
@@ -134,9 +173,9 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
     />
 
     <template #chip-leading="{ item }">
-      <div class="inline-flex items-center justify-center shrink-0 size-5">
+      <div class="inline-flex size-5 shrink-0 items-center justify-center">
         <span
-          class="rounded-full ring ring-bg bg-(--chip-light) dark:bg-(--chip-dark) size-2"
+          class="size-2 rounded-full bg-(--chip-light) ring ring-bg dark:bg-(--chip-dark)"
           :style="{
             '--chip-light': `var(--color-${(item as any).chip}-500)`,
             '--chip-dark': `var(--color-${(item as any).chip}-400)`

@@ -19,7 +19,7 @@ const bodySchema = z.discriminatedUnion('action', [
   z.object({
     action: z.literal('reschedule'),
     phone: z.string().min(1, 'Informe seu WhatsApp'),
-    startsAt: z.string().refine(value => !Number.isNaN(Date.parse(value)), 'Horário inválido')
+    startsAt: z.string().refine((value) => !Number.isNaN(Date.parse(value)), 'Horário inválido')
   })
 ])
 

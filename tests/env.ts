@@ -2,8 +2,8 @@
  * Configuração compartilhada entre scripts, Vitest e Playwright.
  * O banco de teste é separado do banco de desenvolvimento.
  */
-export const TEST_DATABASE_URL = process.env.TEST_DATABASE_URL
-  ?? 'postgres://studio:studio@localhost:5432/studio_blessed_test'
+export const TEST_DATABASE_URL =
+  process.env.TEST_DATABASE_URL ?? 'postgres://studio:studio@localhost:5432/studio_blessed_test'
 
 export const TEST_AUTH_SECRET = 'studio-blessed-test-secret-nao-use-em-producao'
 

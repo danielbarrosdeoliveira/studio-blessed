@@ -28,14 +28,14 @@
 
 O sistema **não possui múltiplas agendas**. Apenas **uma agenda única** para o salão, pertencente à dona.
 
-| Item | Detalhe |
-| --- | --- |
-| **Fonte da verdade** | PostgreSQL (agenda interna) — única para todo o salão |
-| **WorkingHours** | `weekday`, `startMinute`, `endMinute` (sem `professionalId`) |
-| **TimeBlock** | `startsAt`, `endsAt`, `reason`, `recurrence` (`weekly` \| null) |
-| **Disponibilidade** | `WorkingHours` − `TimeBlocks` − serviços agendados. |
-| **Antecedência** | Cliente: **3 dias** mínimos, por **data local** (no 3º dia, o primeiro horário já vale). Dona: pode agendar hoje/amanhã e encaixes. |
-| **Bloqueios** | A dona cria bloqueios pontuais ou semanais. Pode sobrepor agendamento `scheduled` somente com **confirmação explícita**; o agendamento não é cancelado. |
+| Item                 | Detalhe                                                                                                                                                 |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Fonte da verdade** | PostgreSQL (agenda interna) — única para todo o salão                                                                                                   |
+| **WorkingHours**     | `weekday`, `startMinute`, `endMinute` (sem `professionalId`)                                                                                            |
+| **TimeBlock**        | `startsAt`, `endsAt`, `reason`, `recurrence` (`weekly` \| null)                                                                                         |
+| **Disponibilidade**  | `WorkingHours` − `TimeBlocks` − serviços agendados.                                                                                                     |
+| **Antecedência**     | Cliente: **3 dias** mínimos, por **data local** (no 3º dia, o primeiro horário já vale). Dona: pode agendar hoje/amanhã e encaixes.                     |
+| **Bloqueios**        | A dona cria bloqueios pontuais ou semanais. Pode sobrepor agendamento `scheduled` somente com **confirmação explícita**; o agendamento não é cancelado. |
 
 ### Mapeamento do agendamento
 

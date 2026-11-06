@@ -22,10 +22,12 @@ export function sameServiceName(name: string) {
 
 /** Violação de índice único do PostgreSQL. */
 export function isUniqueViolation(error: unknown) {
-  return typeof error === 'object'
-    && error !== null
-    && 'code' in error
-    && (error as { code?: string }).code === '23505'
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    (error as { code?: string }).code === '23505'
+  )
 }
 
 /**

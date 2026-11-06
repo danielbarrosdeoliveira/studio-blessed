@@ -86,20 +86,20 @@ Ele exibe: load average, memória RAM, disco, status dos containers Docker, uso 
 
 ### Limites do OCI Always Free (referência)
 
-| Recurso | Limite Always Free | Recomendação para o MVP |
-|---------|-------------------|-------------------------|
-| Compute ARM | Até 4 instâncias, 24 GB RAM, 4 OCPUs no total | 1 VM `VM.Standard.A1.Flex` (1 OCPU, 6 GB RAM) cabe sobrando |
-| Block Storage | Até 200 GB total | PostgreSQL + logs cabe facilmente |
-| Egress de dados | Até 10 TB/mês | Suficiente para centenas/milhares de usuários |
+| Recurso         | Limite Always Free                            | Recomendação para o MVP                                     |
+| --------------- | --------------------------------------------- | ----------------------------------------------------------- |
+| Compute ARM     | Até 4 instâncias, 24 GB RAM, 4 OCPUs no total | 1 VM `VM.Standard.A1.Flex` (1 OCPU, 6 GB RAM) cabe sobrando |
+| Block Storage   | Até 200 GB total                              | PostgreSQL + logs cabe facilmente                           |
+| Egress de dados | Até 10 TB/mês                                 | Suficiente para centenas/milhares de usuários               |
 
 ### Quando avaliar upgrade ou otimização
 
-| Métrica | Limiar de atenção | Ação |
-|---------|------------------|------|
-| CPU da VM | > 80% por mais de 5 min | Avaliar mais OCPUs ou otimizar queries |
-| Memória da VM | > 80% por mais de 5 min | Avaliar mais RAM ou reduzir consumo do Node/Postgres |
-| Disco | > 80% usado | Limpar logs antigos ou aumentar block storage |
-| Erros 5xx da app | > 10 erros / 5 min | Investigar logs com `level=error` |
+| Métrica          | Limiar de atenção       | Ação                                                 |
+| ---------------- | ----------------------- | ---------------------------------------------------- |
+| CPU da VM        | > 80% por mais de 5 min | Avaliar mais OCPUs ou otimizar queries               |
+| Memória da VM    | > 80% por mais de 5 min | Avaliar mais RAM ou reduzir consumo do Node/Postgres |
+| Disco            | > 80% usado             | Limpar logs antigos ou aumentar block storage        |
+| Erros 5xx da app | > 10 erros / 5 min      | Investigar logs com `level=error`                    |
 
 ---
 
@@ -107,13 +107,13 @@ Ele exibe: load average, memória RAM, disco, status dos containers Docker, uso 
 
 A partir dos logs JSON, é possível derivar sem nenhuma biblioteca extra:
 
-| Métrica | Como extrair |
-|---------|--------------|
-| Requisições por endpoint | `path` + `method` |
-| Erros 5xx por endpoint | `level=error` + `path` |
-| Tempo médio de resposta | `durationMs` por `path` |
-| Agendamentos criados | `POST /api/appointments` com `statusCode=201` |
-| Agendamentos cancelados | `PATCH /api/appointments/[id]` com `status= cancelled` |
+| Métrica                  | Como extrair                                           |
+| ------------------------ | ------------------------------------------------------ |
+| Requisições por endpoint | `path` + `method`                                      |
+| Erros 5xx por endpoint   | `level=error` + `path`                                 |
+| Tempo médio de resposta  | `durationMs` por `path`                                |
+| Agendamentos criados     | `POST /api/appointments` com `statusCode=201`          |
+| Agendamentos cancelados  | `PATCH /api/appointments/[id]` com `status= cancelled` |
 
 Recomendação: configurar um alerta simples quando `level=error` exceder um limiar (ex.: > 10 erros/5 min).
 
@@ -123,15 +123,15 @@ Recomendação: configurar um alerta simples quando `level=error` exceder um lim
 
 Para ações que alteram dados (agendamento, bloqueio, serviço, jornada), registrar no log da requisição o `userId` (já feito pelo middleware) e, opcionalmente, gravar em uma tabela `audit_log`:
 
-| Coluna | Tipo |
-|--------|------|
-| id | uuid |
-| userId | uuid (FK user) |
-| action | text (ex.: `appointment.create`) |
-| entity | text (ex.: `appointment`) |
-| entityId | uuid |
-| metadata | jsonb |
-| createdAt | timestamptz |
+| Coluna    | Tipo                             |
+| --------- | -------------------------------- |
+| id        | uuid                             |
+| userId    | uuid (FK user)                   |
+| action    | text (ex.: `appointment.create`) |
+| entity    | text (ex.: `appointment`)        |
+| entityId  | uuid                             |
+| metadata  | jsonb                            |
+| createdAt | timestamptz                      |
 
 Isso permite responder: "quem cancelou o agendamento X e quando?".
 
@@ -166,4 +166,3 @@ curl http://IP_PUBLICO:3000/api/health
 # Ver métricas no OCI
 # Console OCI > Compute > Instâncias > [sua instância] > Métricas
 ```
-

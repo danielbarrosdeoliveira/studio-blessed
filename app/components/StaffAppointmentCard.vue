@@ -19,17 +19,24 @@ const cancelError = ref('')
 const statusMeta = computed(() => appointmentStatusMeta[props.appointment.status])
 const isScheduled = computed(() => props.appointment.status === 'scheduled')
 const canCancel = computed(() => isScheduled.value)
-const canMarkStatus = computed(() => (
-  isScheduled.value
-  || props.appointment.status === 'completed'
-  || props.appointment.status === 'no_show'
-))
+const canMarkStatus = computed(
+  () =>
+    isScheduled.value ||
+    props.appointment.status === 'completed' ||
+    props.appointment.status === 'no_show'
+)
 
-const timeRange = computed(() => (
-  `${formatInstantTime(props.appointment.startsAt)} – ${formatInstantTime(props.appointment.endsAt)}`
-))
+const timeRange = computed(
+  () =>
+    `${formatInstantTime(props.appointment.startsAt)} – ${formatInstantTime(props.appointment.endsAt)}`
+)
 
 const whatsappUrl = computed(() => `https://wa.me/55${props.appointment.clientPhone}`)
+
+function openCancel() {
+  cancelError.value = ''
+  cancelOpen.value = true
+}
 
 async function setStatus(status: 'completed' | 'no_show') {
   working.value = true
@@ -93,16 +100,10 @@ async function cancel() {
           <span class="font-mono text-sm font-semibold text-highlighted">
             {{ timeRange }}
           </span>
-          <UBadge
-            :color="statusMeta.color"
-            variant="subtle"
-          >
+          <UBadge :color="statusMeta.color" variant="subtle">
             {{ statusMeta.label }}
           </UBadge>
-          <UBadge
-            color="neutral"
-            variant="outline"
-          >
+          <UBadge color="neutral" variant="outline">
             {{ appointment.origin === 'staff' ? 'Staff' : 'Cliente' }}
           </UBadge>
         </div>
@@ -123,10 +124,7 @@ async function cancel() {
             rel="noopener"
             class="inline-flex items-center gap-1 text-primary hover:underline"
           >
-            <UIcon
-              name="i-ri-whatsapp-line"
-              class="size-4"
-            />
+            <UIcon name="i-ri-whatsapp-line" class="size-4" />
             {{ formatPhone(appointment.clientPhone) }}
           </a>
         </div>
@@ -139,10 +137,7 @@ async function cancel() {
         </p>
       </div>
 
-      <div
-        v-if="canMarkStatus || canCancel"
-        class="flex shrink-0 flex-wrap gap-2 lg:justify-end"
-      >
+      <div v-if="canMarkStatus || canCancel" class="flex shrink-0 flex-wrap gap-2 lg:justify-end">
         <template v-if="isScheduled">
           <UButton
             label="Concluir"
@@ -195,41 +190,26 @@ async function cancel() {
           color="error"
           variant="outline"
           :disabled="working"
-          @click="cancelError = ''; cancelOpen = true"
+          @click="openCancel"
         />
       </div>
     </div>
 
-    <UModal
-      v-model:open="cancelOpen"
-      title="Cancelar agendamento"
-    >
+    <UModal v-model:open="cancelOpen" title="Cancelar agendamento">
       <template #body>
         <div class="space-y-3">
           <p class="text-sm text-muted">
-            Cancelar <strong class="text-highlighted">{{ appointment.serviceName }}</strong>
-            de {{ appointment.clientName }}?
+            Cancelar <strong class="text-highlighted">{{ appointment.serviceName }}</strong> de
+            {{ appointment.clientName }}?
           </p>
-          <p class="text-sm text-muted">
-            {{ timeRange }}. O horário volta a ficar disponível.
-          </p>
-          <UAlert
-            v-if="cancelError"
-            color="error"
-            variant="subtle"
-            :description="cancelError"
-          />
+          <p class="text-sm text-muted">{{ timeRange }}. O horário volta a ficar disponível.</p>
+          <UAlert v-if="cancelError" color="error" variant="subtle" :description="cancelError" />
         </div>
       </template>
 
       <template #footer>
         <div class="flex w-full justify-end gap-2">
-          <UButton
-            label="Voltar"
-            color="neutral"
-            variant="ghost"
-            @click="cancelOpen = false"
-          />
+          <UButton label="Voltar" color="neutral" variant="ghost" @click="cancelOpen = false" />
           <UButton
             label="Confirmar cancelamento"
             color="error"

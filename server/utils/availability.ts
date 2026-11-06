@@ -55,10 +55,7 @@ export async function getAvailabilityForDay(params: AvailabilityParams): Promise
       bufferMin: service.bufferMin
     })
     .from(service)
-    .where(and(
-      eq(service.id, params.serviceId),
-      eq(service.active, true)
-    ))
+    .where(and(eq(service.id, params.serviceId), eq(service.active, true)))
     .limit(1)
 
   if (!found) {
@@ -85,11 +82,13 @@ export async function getAvailabilityForDay(params: AvailabilityParams): Promise
       })
       .from(appointment)
       .innerJoin(service, eq(appointment.serviceId, service.id))
-      .where(and(
-        inArray(appointment.status, ['scheduled', 'completed']),
-        lt(appointment.startsAt, bounds.end),
-        gt(appointment.endsAt, new Date(bounds.start.getTime() - MAX_BUFFER_MIN * 60_000))
-      )),
+      .where(
+        and(
+          inArray(appointment.status, ['scheduled', 'completed']),
+          lt(appointment.startsAt, bounds.end),
+          gt(appointment.endsAt, new Date(bounds.start.getTime() - MAX_BUFFER_MIN * 60_000))
+        )
+      ),
 
     db
       .select({
@@ -98,13 +97,12 @@ export async function getAvailabilityForDay(params: AvailabilityParams): Promise
         recurrence: timeBlock.recurrence
       })
       .from(timeBlock)
-      .where(or(
-        and(
-          lt(timeBlock.startsAt, bounds.end),
-          gt(timeBlock.endsAt, bounds.start)
-        ),
-        eq(timeBlock.recurrence, 'weekly')
-      ))
+      .where(
+        or(
+          and(lt(timeBlock.startsAt, bounds.end), gt(timeBlock.endsAt, bounds.start)),
+          eq(timeBlock.recurrence, 'weekly')
+        )
+      )
   ])
 
   const busyIntervals: MinuteInterval[] = []
@@ -153,8 +151,8 @@ export async function getAvailabilityForDay(params: AvailabilityParams): Promise
   }
 
   const workingIntervals: MinuteInterval[] = hours
-    .map(interval => ({ start: interval.start, end: interval.end }))
-    .filter(interval => interval.end > interval.start)
+    .map((interval) => ({ start: interval.start, end: interval.end }))
+    .filter((interval) => interval.end > interval.start)
 
   const now = params.now ?? new Date()
 
@@ -163,9 +161,10 @@ export async function getAvailabilityForDay(params: AvailabilityParams): Promise
    * 3º dia — assim o primeiro slot do dia limite já fica disponível.
    * Para a dona, vale o instante atual (encaixes e hoje/amanhã).
    */
-  const earliestStart = params.origin === 'client'
-    ? dayBounds(addDaysToIsoDate(localDateOf(now), CLIENT_LEAD_DAYS)).start
-    : now
+  const earliestStart =
+    params.origin === 'client'
+      ? dayBounds(addDaysToIsoDate(localDateOf(now), CLIENT_LEAD_DAYS)).start
+      : now
 
   const slots = computeAvailability({
     workingIntervals,
@@ -173,7 +172,7 @@ export async function getAvailabilityForDay(params: AvailabilityParams): Promise
     durationMin: found.durationMin,
     bufferMin: found.bufferMin,
     earliestStart,
-    toInstant: minute => new Date(bounds.start.getTime() + minute * 60_000)
+    toInstant: (minute) => new Date(bounds.start.getTime() + minute * 60_000)
   })
 
   return {
@@ -195,9 +194,9 @@ export async function isSlotAvailable(params: {
   now?: Date
 }): Promise<boolean> {
   if (
-    Number.isNaN(params.startsAt.getTime())
-    || params.startsAt.getSeconds() !== 0
-    || params.startsAt.getMilliseconds() !== 0
+    Number.isNaN(params.startsAt.getTime()) ||
+    params.startsAt.getSeconds() !== 0 ||
+    params.startsAt.getMilliseconds() !== 0
   ) {
     return false
   }
@@ -211,5 +210,5 @@ export async function isSlotAvailable(params: {
 
   const target = params.startsAt.getTime()
 
-  return availability.slots.some(slot => Date.parse(slot.startsAt) === target)
+  return availability.slots.some((slot) => Date.parse(slot.startsAt) === target)
 }

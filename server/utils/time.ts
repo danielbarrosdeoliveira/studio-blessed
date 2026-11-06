@@ -45,10 +45,7 @@ export function dayBounds(date: string): DayBounds {
       new CalendarDateTime(parsed.year, parsed.month, parsed.day, 0, 0),
       TIME_ZONE
     ).toDate(),
-    end: toZoned(
-      new CalendarDateTime(next.year, next.month, next.day, 0, 0),
-      TIME_ZONE
-    ).toDate()
+    end: toZoned(new CalendarDateTime(next.year, next.month, next.day, 0, 0), TIME_ZONE).toDate()
   }
 }
 
@@ -81,11 +78,7 @@ export function localPartsOf(instant: Date) {
  * Converte um intervalo absoluto em minutos desde a meia-noite local,
  * recortando o que estiver fora do dia consultado.
  */
-export function toMinuteInterval(
-  start: Date,
-  end: Date,
-  bounds: DayBounds
-): MinuteInterval | null {
+export function toMinuteInterval(start: Date, end: Date, bounds: DayBounds): MinuteInterval | null {
   const clippedStart = Math.max(start.getTime(), bounds.start.getTime())
   const clippedEnd = Math.min(end.getTime(), bounds.end.getTime())
 

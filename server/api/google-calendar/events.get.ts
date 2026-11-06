@@ -9,8 +9,8 @@ interface GoogleCalendarEvent {
   id?: string
   summary?: string
   status?: string
-  start?: { dateTime?: string, date?: string }
-  end?: { dateTime?: string, date?: string }
+  start?: { dateTime?: string; date?: string }
+  end?: { dateTime?: string; date?: string }
 }
 
 export default defineEventHandler(async (event) => {
@@ -29,8 +29,10 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const timeMin = getQuery(event).timeMin as string ?? new Date().toISOString()
-  const timeMax = getQuery(event).timeMax as string ?? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+  const timeMin = (getQuery(event).timeMin as string) ?? new Date().toISOString()
+  const timeMax =
+    (getQuery(event).timeMax as string) ??
+    new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
 
   const url = new URL(`${GOOGLE_CALENDAR_API}/calendars/primary/events`)
   url.searchParams.set('timeMin', timeMin)
@@ -56,9 +58,9 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const data = await res.json() as { items?: GoogleCalendarEvent[] }
+  const data = (await res.json()) as { items?: GoogleCalendarEvent[] }
 
-  const busy = (data.items ?? []).map(item => ({
+  const busy = (data.items ?? []).map((item) => ({
     id: item.id,
     summary: item.summary,
     startsAt: item.start?.dateTime ?? item.start?.date,

@@ -35,11 +35,7 @@ export async function getAppointmentById(id: string): Promise<AppointmentDetails
 
 /** Reaproveita a cliente pelo telefone; cria se ainda não existir. */
 export async function findOrCreateClient(name: string, phone: string) {
-  const [existing] = await db
-    .select()
-    .from(client)
-    .where(eq(client.phone, phone))
-    .limit(1)
+  const [existing] = await db.select().from(client).where(eq(client.phone, phone)).limit(1)
 
   if (existing) {
     return existing
@@ -55,11 +51,7 @@ export async function findOrCreateClient(name: string, phone: string) {
     return created
   }
 
-  const [raced] = await db
-    .select()
-    .from(client)
-    .where(eq(client.phone, phone))
-    .limit(1)
+  const [raced] = await db.select().from(client).where(eq(client.phone, phone)).limit(1)
 
   if (!raced) {
     throw createError({ statusCode: 500, message: 'Não foi possível registrar a cliente' })

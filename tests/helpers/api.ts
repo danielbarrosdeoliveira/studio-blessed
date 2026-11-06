@@ -18,7 +18,7 @@ export async function signIn(email: string): Promise<SignedInUser> {
     throw new Error(`Login falhou para ${email}: ${response.status}`)
   }
 
-  const data = await response.json() as { user: { id: string } }
+  const data = (await response.json()) as { user: { id: string } }
   const cookies = response.headers.getSetCookie()
 
   if (!cookies.length) {
@@ -26,7 +26,7 @@ export async function signIn(email: string): Promise<SignedInUser> {
   }
 
   return {
-    cookie: cookies.map(value => value.split(';')[0]).join('; '),
+    cookie: cookies.map((value) => value.split(';')[0]).join('; '),
     userId: data.user.id
   }
 }

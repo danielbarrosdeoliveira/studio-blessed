@@ -10,44 +10,46 @@ function isMinutePrecision(value: Date) {
   return value.getSeconds() === 0 && value.getMilliseconds() === 0
 }
 
-const bodySchema = z.object({
-  startsAt: z.string().refine(value => !Number.isNaN(Date.parse(value)), 'Início inválido'),
-  endsAt: z.string().refine(value => !Number.isNaN(Date.parse(value)), 'Fim inválido'),
-  reason: z.string().trim().max(200, 'Motivo muito longo').optional(),
-  recurrence: z.literal('weekly').nullable().optional(),
-  confirmConflict: z.boolean().default(false)
-}).superRefine((value, ctx) => {
-  const startsAt = new Date(value.startsAt)
-  const endsAt = new Date(value.endsAt)
+const bodySchema = z
+  .object({
+    startsAt: z.string().refine((value) => !Number.isNaN(Date.parse(value)), 'Início inválido'),
+    endsAt: z.string().refine((value) => !Number.isNaN(Date.parse(value)), 'Fim inválido'),
+    reason: z.string().trim().max(200, 'Motivo muito longo').optional(),
+    recurrence: z.literal('weekly').nullable().optional(),
+    confirmConflict: z.boolean().default(false)
+  })
+  .superRefine((value, ctx) => {
+    const startsAt = new Date(value.startsAt)
+    const endsAt = new Date(value.endsAt)
 
-  if (Number.isNaN(startsAt.getTime()) || Number.isNaN(endsAt.getTime())) {
-    return
-  }
+    if (Number.isNaN(startsAt.getTime()) || Number.isNaN(endsAt.getTime())) {
+      return
+    }
 
-  if (!isMinutePrecision(startsAt) || !isMinutePrecision(endsAt)) {
-    ctx.addIssue({
-      code: 'custom',
-      message: 'Use horários com precisão de minutos',
-      path: ['startsAt']
-    })
-  }
+    if (!isMinutePrecision(startsAt) || !isMinutePrecision(endsAt)) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Use horários com precisão de minutos',
+        path: ['startsAt']
+      })
+    }
 
-  if (endsAt <= startsAt) {
-    ctx.addIssue({
-      code: 'custom',
-      message: 'O fim deve ser depois do início',
-      path: ['endsAt']
-    })
-  }
+    if (endsAt <= startsAt) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'O fim deve ser depois do início',
+        path: ['endsAt']
+      })
+    }
 
-  if (value.recurrence === 'weekly' && localDateOf(startsAt) !== localDateOf(endsAt)) {
-    ctx.addIssue({
-      code: 'custom',
-      message: 'O bloqueio semanal deve começar e terminar no mesmo dia',
-      path: ['endsAt']
-    })
-  }
-})
+    if (value.recurrence === 'weekly' && localDateOf(startsAt) !== localDateOf(endsAt)) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'O bloqueio semanal deve começar e terminar no mesmo dia',
+        path: ['endsAt']
+      })
+    }
+  })
 
 /** Cria um bloqueio pontual ou semanal para a dona do salão. */
 export default defineEventHandler(async (event) => {
@@ -67,10 +69,7 @@ export default defineEventHandler(async (event) => {
   const endsAt = new Date(parsed.data.endsAt)
   const recurrence = parsed.data.recurrence ?? null
 
-  const conditions = [
-    eq(appointment.status, 'scheduled'),
-    gt(appointment.endsAt, startsAt)
-  ]
+  const conditions = [eq(appointment.status, 'scheduled'), gt(appointment.endsAt, startsAt)]
 
   if (recurrence !== 'weekly') {
     conditions.push(lt(appointment.startsAt, endsAt))
@@ -90,15 +89,13 @@ export default defineEventHandler(async (event) => {
     .where(and(...conditions))
     .orderBy(asc(appointment.startsAt))
 
-  const conflicts = findBlockConflicts(
-    { startsAt, endsAt, recurrence },
-    appointments
-  )
+  const conflicts = findBlockConflicts({ startsAt, endsAt, recurrence }, appointments)
 
   if (conflicts.length && !parsed.data.confirmConflict) {
     throw createError({
       statusCode: 409,
-      message: 'Existe agendamento neste período. Confirme para salvar o bloqueio sem cancelar o agendamento.',
+      message:
+        'Existe agendamento neste período. Confirme para salvar o bloqueio sem cancelar o agendamento.',
       data: { conflicts }
     })
   }

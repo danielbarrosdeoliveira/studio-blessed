@@ -7,7 +7,8 @@ const CANCELLATION_WINDOW_MS = CANCELLATION_HOURS * 60 * 60 * 1000
 export const cancellationPolicy = {
   hours: CANCELLATION_HOURS,
   feePercentage: CANCELLATION_FEE_PERCENTAGE,
-  message: 'Cancelamento ou remarcação até 24h antes do horário. Após esse prazo, aplica-se a política de taxa de 50%.'
+  message:
+    'Cancelamento ou remarcação até 24h antes do horário. Após esse prazo, aplica-se a política de taxa de 50%.'
 }
 
 /** Só é possível alterar agendamentos futuros com pelo menos 24h de antecedência. */

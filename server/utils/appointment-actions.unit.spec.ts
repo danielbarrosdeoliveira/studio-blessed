@@ -1,12 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import {
-  canCancelAppointment,
-  canSetAppointmentStatus
-} from './appointment-actions'
+import { canCancelAppointment, canSetAppointmentStatus } from './appointment-actions'
 
-function appointment(
-  status: 'scheduled' | 'completed' | 'cancelled' | 'no_show'
-) {
+function appointment(status: 'scheduled' | 'completed' | 'cancelled' | 'no_show') {
   return { status } as Parameters<typeof canCancelAppointment>[0]
 }
 

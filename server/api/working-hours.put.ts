@@ -10,42 +10,44 @@ const hourSchema = z.object({
   endMinute: z.number().int().min(1).max(1440)
 })
 
-const bodySchema = z.object({
-  hours: z.array(hourSchema).max(70)
-}).superRefine((value, ctx) => {
-  const byWeekday = new Map<number, typeof value.hours>()
+const bodySchema = z
+  .object({
+    hours: z.array(hourSchema).max(70)
+  })
+  .superRefine((value, ctx) => {
+    const byWeekday = new Map<number, typeof value.hours>()
 
-  for (const hour of value.hours) {
-    const hours = byWeekday.get(hour.weekday) ?? []
-    hours.push(hour)
-    byWeekday.set(hour.weekday, hours)
-  }
+    for (const hour of value.hours) {
+      const hours = byWeekday.get(hour.weekday) ?? []
+      hours.push(hour)
+      byWeekday.set(hour.weekday, hours)
+    }
 
-  for (const [weekday, hours] of byWeekday) {
-    const sorted = [...hours].sort((a, b) => a.startMinute - b.startMinute)
+    for (const [weekday, hours] of byWeekday) {
+      const sorted = [...hours].sort((a, b) => a.startMinute - b.startMinute)
 
-    for (let index = 0; index < sorted.length; index++) {
-      const current = sorted[index]!
-      const previous = sorted[index - 1]
+      for (let index = 0; index < sorted.length; index++) {
+        const current = sorted[index]!
+        const previous = sorted[index - 1]
 
-      if (current.endMinute <= current.startMinute) {
-        ctx.addIssue({
-          code: 'custom',
-          message: `Intervalo inválido no dia ${weekday}: o fim deve ser depois do início`,
-          path: ['hours']
-        })
-      }
+        if (current.endMinute <= current.startMinute) {
+          ctx.addIssue({
+            code: 'custom',
+            message: `Intervalo inválido no dia ${weekday}: o fim deve ser depois do início`,
+            path: ['hours']
+          })
+        }
 
-      if (previous && current.startMinute < previous.endMinute) {
-        ctx.addIssue({
-          code: 'custom',
-          message: `Intervalos sobrepostos no dia ${weekday}`,
-          path: ['hours']
-        })
+        if (previous && current.startMinute < previous.endMinute) {
+          ctx.addIssue({
+            code: 'custom',
+            message: `Intervalos sobrepostos no dia ${weekday}`,
+            path: ['hours']
+          })
+        }
       }
     }
-  }
-})
+  })
 
 export default defineEventHandler(async (event) => {
   await requireUser(event)
@@ -65,7 +67,7 @@ export default defineEventHandler(async (event) => {
 
     if (parsed.data.hours.length) {
       await tx.insert(workingHours).values(
-        parsed.data.hours.map(hour => ({
+        parsed.data.hours.map((hour) => ({
           weekday: hour.weekday,
           startMinute: hour.startMinute,
           endMinute: hour.endMinute

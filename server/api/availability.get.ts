@@ -5,7 +5,8 @@ import { isValidDate } from '../utils/time'
 
 const querySchema = z.object({
   serviceId: z.string().min(1, 'Serviço não informado'),
-  date: z.string()
+  date: z
+    .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Data inválida')
     .refine(isValidDate, 'Data inválida')
 })

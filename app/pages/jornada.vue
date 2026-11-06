@@ -1,10 +1,5 @@
 <script setup lang="ts">
-import type {
-  TimeBlock,
-  TimeBlockConflict,
-  TimeBlockResponse,
-  WorkingHour
-} from '~/types/domain'
+import type { TimeBlock, TimeBlockConflict, TimeBlockResponse, WorkingHour } from '~/types/domain'
 import { CalendarDate } from '@internationalized/date'
 import {
   formatInstantLong,
@@ -24,10 +19,11 @@ useHead({
 const toast = useToast()
 const today = todayInTimeZone()
 
-const { data: workingHours, error: workingHoursError, refresh } = await useFetch<WorkingHour[]>(
-  '/api/working-hours',
-  { default: () => [] }
-)
+const {
+  data: workingHours,
+  error: workingHoursError,
+  refresh
+} = await useFetch<WorkingHour[]>('/api/working-hours', { default: () => [] })
 
 const {
   data: blocks,
@@ -71,26 +67,30 @@ function toMinute(time: string) {
 
 const days = ref<Day[]>([])
 
-watch(workingHours, (rows) => {
-  days.value = weekdays.map((_, weekday) => {
-    const dayRows = (rows ?? [])
-      .filter(row => row.weekday === weekday)
-      .sort((a, b) => a.startMinute - b.startMinute)
+watch(
+  workingHours,
+  (rows) => {
+    days.value = weekdays.map((_, weekday) => {
+      const dayRows = (rows ?? [])
+        .filter((row) => row.weekday === weekday)
+        .sort((a, b) => a.startMinute - b.startMinute)
 
-    return {
-      weekday,
-      enabled: dayRows.length > 0,
-      intervals: dayRows.length
-        ? dayRows.map(row => ({ start: toTime(row.startMinute), end: toTime(row.endMinute) }))
-        : [{ start: '09:00', end: '18:00' }]
-    }
-  })
-}, { immediate: true })
+      return {
+        weekday,
+        enabled: dayRows.length > 0,
+        intervals: dayRows.length
+          ? dayRows.map((row) => ({ start: toTime(row.startMinute), end: toTime(row.endMinute) }))
+          : [{ start: '09:00', end: '18:00' }]
+      }
+    })
+  },
+  { immediate: true }
+)
 
 const saving = ref(false)
 
 async function save() {
-  const hours: { weekday: number, startMinute: number, endMinute: number }[] = []
+  const hours: { weekday: number; startMinute: number; endMinute: number }[] = []
 
   for (const day of days.value) {
     if (!day.enabled) {
@@ -98,7 +98,7 @@ async function save() {
     }
 
     const intervals = day.intervals
-      .map(interval => ({
+      .map((interval) => ({
         startMinute: toMinute(interval.start),
         endMinute: toMinute(interval.end)
       }))
@@ -196,9 +196,9 @@ const blockCalendarDate = computed<CalendarDate | undefined>({
   }
 })
 
-const blockList = computed(() => [...(blocks.value ?? [])].sort(
-  (a, b) => Date.parse(a.startsAt) - Date.parse(b.startsAt)
-))
+const blockList = computed(() =>
+  [...(blocks.value ?? [])].sort((a, b) => Date.parse(a.startsAt) - Date.parse(b.startsAt))
+)
 
 function formatBlockRange(block: TimeBlock) {
   const date = isoDateOfInstant(block.startsAt)
@@ -280,12 +280,14 @@ async function saveBlock(confirmConflict = false) {
       })
     }
   } catch (error) {
-    const payload = (error as {
-      data?: {
-        conflicts?: TimeBlockConflict[]
-        data?: { conflicts?: TimeBlockConflict[] }
+    const payload = (
+      error as {
+        data?: {
+          conflicts?: TimeBlockConflict[]
+          data?: { conflicts?: TimeBlockConflict[] }
+        }
       }
-    })?.data
+    )?.data
     const conflicts = payload?.data?.conflicts ?? payload?.conflicts
 
     if (conflicts?.length) {
@@ -333,18 +335,13 @@ async function removeBlock(block: TimeBlock) {
         </template>
 
         <template #right>
-          <UButton
-            label="Salvar jornada"
-            icon="i-ri-check-line"
-            :loading="saving"
-            @click="save"
-          />
+          <UButton label="Salvar jornada" icon="i-ri-check-line" :loading="saving" @click="save" />
         </template>
       </UDashboardNavbar>
     </template>
 
     <template #body>
-      <div class="w-full max-w-2xl mx-auto space-y-4">
+      <div class="mx-auto w-full max-w-2xl space-y-4">
         <UAlert
           v-if="workingHoursError"
           color="error"
@@ -356,20 +353,13 @@ async function removeBlock(block: TimeBlock) {
         <UCard>
           <div class="flex items-start justify-between gap-4">
             <div>
-              <h2 class="font-medium text-highlighted">
-                Bloqueios
-              </h2>
+              <h2 class="font-medium text-highlighted">Bloqueios</h2>
               <p class="text-sm text-muted">
                 Folgas, almoços e compromissos fora do horário de atendimento.
               </p>
             </div>
 
-            <UButton
-              label="Novo bloqueio"
-              icon="i-ri-add-line"
-              size="sm"
-              @click="openBlock"
-            />
+            <UButton label="Novo bloqueio" icon="i-ri-add-line" size="sm" @click="openBlock" />
           </div>
 
           <UAlert
@@ -381,17 +371,11 @@ async function removeBlock(block: TimeBlock) {
             class="mt-4"
           />
 
-          <p
-            v-else-if="!blockList.length"
-            class="mt-4 text-sm text-muted"
-          >
+          <p v-else-if="!blockList.length" class="mt-4 text-sm text-muted">
             Nenhum bloqueio cadastrado.
           </p>
 
-          <ul
-            v-else
-            class="mt-4 divide-y divide-default"
-          >
+          <ul v-else class="mt-4 divide-y divide-default">
             <li
               v-for="block in blockList"
               :key="block.id"
@@ -427,10 +411,7 @@ async function removeBlock(block: TimeBlock) {
           </ul>
         </UCard>
 
-        <UCard
-          v-for="day in days"
-          :key="day.weekday"
-        >
+        <UCard v-for="day in days" :key="day.weekday">
           <div class="flex items-center justify-between gap-4">
             <div class="flex items-center gap-3">
               <USwitch v-model="day.enabled" />
@@ -450,28 +431,15 @@ async function removeBlock(block: TimeBlock) {
             />
           </div>
 
-          <div
-            v-if="day.enabled"
-            class="mt-4 space-y-2"
-          >
+          <div v-if="day.enabled" class="mt-4 space-y-2">
             <div
               v-for="(interval, index) in day.intervals"
               :key="index"
               class="flex flex-wrap items-center gap-2"
             >
-              <UInput
-                v-model="interval.start"
-                type="time"
-                step="900"
-                class="w-32"
-              />
+              <UInput v-model="interval.start" type="time" step="900" class="w-32" />
               <span class="text-sm text-muted">até</span>
-              <UInput
-                v-model="interval.end"
-                type="time"
-                step="900"
-                class="w-32"
-              />
+              <UInput v-model="interval.end" type="time" step="900" class="w-32" />
               <UButton
                 v-if="day.intervals.length > 1"
                 icon="i-ri-delete-bin-line"
@@ -484,17 +452,12 @@ async function removeBlock(block: TimeBlock) {
             </div>
           </div>
 
-          <p
-            v-else
-            class="text-sm text-muted mt-2"
-          >
-            Sem atendimento neste dia.
-          </p>
+          <p v-else class="mt-2 text-sm text-muted">Sem atendimento neste dia.</p>
         </UCard>
 
         <p class="text-xs text-muted">
-          Os intervalos definem quando o salão atende. Para pausas pontuais
-          ou recorrentes (almoço, folga), use os bloqueios acima.
+          Os intervalos definem quando o salão atende. Para pausas pontuais ou recorrentes (almoço,
+          folga), use os bloqueios acima.
         </p>
       </div>
     </template>
@@ -507,47 +470,26 @@ async function removeBlock(block: TimeBlock) {
     :ui="{ body: 'max-h-[75vh] overflow-y-auto' }"
   >
     <template #body>
-      <form
-        class="space-y-4"
-        @submit.prevent="saveBlock(false)"
-      >
+      <form class="space-y-4" @submit.prevent="saveBlock(false)">
         <UFormField
           label="Data do bloqueio"
-          :help="blockForm.weekly
-            ? 'O bloqueio se repete toda semana a partir desta data.'
-            : 'Data única do bloqueio.'"
+          :help="
+            blockForm.weekly
+              ? 'O bloqueio se repete toda semana a partir desta data.'
+              : 'Data única do bloqueio.'
+          "
           required
         >
-          <UCalendar
-            v-model="blockCalendarDate"
-            :min-value="todayCalendarDate"
-            class="w-full"
-          />
+          <UCalendar v-model="blockCalendarDate" :min-value="todayCalendarDate" class="w-full" />
         </UFormField>
 
         <div class="grid gap-4 sm:grid-cols-2">
-          <UFormField
-            label="Início"
-            required
-          >
-            <UInput
-              v-model="blockForm.start"
-              type="time"
-              step="900"
-              class="w-full"
-            />
+          <UFormField label="Início" required>
+            <UInput v-model="blockForm.start" type="time" step="900" class="w-full" />
           </UFormField>
 
-          <UFormField
-            label="Fim"
-            required
-          >
-            <UInput
-              v-model="blockForm.end"
-              type="time"
-              step="900"
-              class="w-full"
-            />
+          <UFormField label="Fim" required>
+            <UInput v-model="blockForm.end" type="time" step="900" class="w-full" />
           </UFormField>
         </div>
 
@@ -560,39 +502,19 @@ async function removeBlock(block: TimeBlock) {
           />
         </UFormField>
 
-        <USwitch
-          v-model="blockForm.weekly"
-          label="Repetir toda semana"
-        />
+        <USwitch v-model="blockForm.weekly" label="Repetir toda semana" />
 
-        <UAlert
-          v-if="blockError"
-          color="error"
-          variant="subtle"
-          :description="blockError"
-        />
+        <UAlert v-if="blockError" color="error" variant="subtle" :description="blockError" />
 
         <div class="flex justify-end gap-2">
-          <UButton
-            label="Cancelar"
-            color="neutral"
-            variant="ghost"
-            @click="closeBlock"
-          />
-          <UButton
-            type="submit"
-            label="Salvar bloqueio"
-            :loading="savingBlock"
-          />
+          <UButton label="Cancelar" color="neutral" variant="ghost" @click="closeBlock" />
+          <UButton type="submit" label="Salvar bloqueio" :loading="savingBlock" />
         </div>
       </form>
     </template>
   </UModal>
 
-  <UModal
-    v-model:open="conflictOpen"
-    title="Conflito com agendamento"
-  >
+  <UModal v-model:open="conflictOpen" title="Conflito com agendamento">
     <template #body>
       <div class="space-y-4">
         <UAlert
@@ -619,12 +541,7 @@ async function removeBlock(block: TimeBlock) {
         </ul>
 
         <div class="flex justify-end gap-2">
-          <UButton
-            label="Cancelar"
-            color="neutral"
-            variant="ghost"
-            @click="conflictOpen = false"
-          />
+          <UButton label="Cancelar" color="neutral" variant="ghost" @click="conflictOpen = false" />
           <UButton
             label="Salvar mesmo assim"
             color="warning"

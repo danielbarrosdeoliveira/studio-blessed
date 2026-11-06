@@ -4,9 +4,7 @@ import { authClient } from '~/lib/auth-client'
 const PUBLIC_PATHS = ['/', '/login', '/agendamento', '/meus-agendamentos']
 
 function isPublic(path: string) {
-  return PUBLIC_PATHS.some(publicPath =>
-    path === publicPath || path.startsWith(`${publicPath}/`)
-  )
+  return PUBLIC_PATHS.some((publicPath) => path === publicPath || path.startsWith(`${publicPath}/`))
 }
 
 export default defineNuxtRouteMiddleware(async (to) => {

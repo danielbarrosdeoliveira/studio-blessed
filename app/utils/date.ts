@@ -29,7 +29,9 @@ export function instantOfLocalDateTime(date: string, time: string): string {
   return toZoned(
     new CalendarDateTime(parsed.year, parsed.month, parsed.day, hour, minute),
     APP_TIME_ZONE
-  ).toDate().toISOString()
+  )
+    .toDate()
+    .toISOString()
 }
 
 /** Ex.: `sábado`. */
@@ -48,12 +50,14 @@ export function formatIsoDateLong(date: string): string {
   const [year, month, day] = date.split('-').map(Number)
   const parsed = new Date(Date.UTC(year!, month! - 1, day!, 12))
 
-  return capitalize(new Intl.DateTimeFormat('pt-BR', {
-    timeZone: 'UTC',
-    weekday: 'long',
-    day: '2-digit',
-    month: 'long'
-  }).format(parsed))
+  return capitalize(
+    new Intl.DateTimeFormat('pt-BR', {
+      timeZone: 'UTC',
+      weekday: 'long',
+      day: '2-digit',
+      month: 'long'
+    }).format(parsed)
+  )
 }
 
 /** Data local (`YYYY-MM-DD`) de um instante ISO. */
@@ -77,14 +81,16 @@ export function formatInstantTime(iso: string): string {
 
 /** Ex.: `Sábado, 31 de outubro às 09:00`. */
 export function formatInstantLong(iso: string): string {
-  return capitalize(new Intl.DateTimeFormat('pt-BR', {
-    timeZone: APP_TIME_ZONE,
-    weekday: 'long',
-    day: '2-digit',
-    month: 'long',
-    hour: '2-digit',
-    minute: '2-digit'
-  }).format(new Date(iso)))
+  return capitalize(
+    new Intl.DateTimeFormat('pt-BR', {
+      timeZone: APP_TIME_ZONE,
+      weekday: 'long',
+      day: '2-digit',
+      month: 'long',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(new Date(iso))
+  )
 }
 
 function capitalize(value: string): string {

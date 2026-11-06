@@ -13,10 +13,10 @@ Plataforma web responsiva (single-tenant) para gestão de agendamentos do salão
 
 ## Arquitetura
 
-| Ambiente | Hospedagem | Banco | Deploy |
-|----------|-----------|-------|--------|
-| **Desenvolvimento** | Local | PostgreSQL via Docker Compose | `pnpm dev` |
-| **Produção** | [Vercel](https://vercel.com) | [Neon](https://neon.tech) (PostgreSQL serverless) | Git push → Vercel |
+| Ambiente            | Hospedagem                   | Banco                                             | Deploy            |
+| ------------------- | ---------------------------- | ------------------------------------------------- | ----------------- |
+| **Desenvolvimento** | Local                        | PostgreSQL via Docker Compose                     | `pnpm dev`        |
+| **Produção**        | [Vercel](https://vercel.com) | [Neon](https://neon.tech) (PostgreSQL serverless) | Git push → Vercel |
 
 O Docker é mantido **apenas para desenvolvimento local** (subir o PostgreSQL de testes). Em produção, a aplicação roda na Vercel e o banco no Neon.
 
@@ -86,22 +86,22 @@ pnpm db:migrate
 
 ## Scripts
 
-| Script | Descrição |
-|--------|-----------|
-| `pnpm dev` | Servidor de desenvolvimento |
-| `pnpm build` | Build de produção |
-| `pnpm preview` | Preview do build |
-| `pnpm lint` | ESLint |
-| `pnpm typecheck` | Checagem de tipos |
-| `pnpm test` | Testes unitários + integração |
-| `pnpm test:e2e` | Testes E2E com Playwright |
-| `pnpm test:coverage` | Cobertura completa (unit + integração + E2E) |
-| `pnpm test:db:setup` | Recria o banco de teste e o seed |
-| `pnpm db:up` | Sobe o PostgreSQL local (Docker Compose) |
-| `pnpm db:down` | Derruba o PostgreSQL local |
-| `pnpm db:generate` | Geração de migration a partir do schema Drizzle |
-| `pnpm db:migrate` | Aplica migrations |
-| `pnpm db:studio` | Abre o Drizzle Studio |
+| Script               | Descrição                                       |
+| -------------------- | ----------------------------------------------- |
+| `pnpm dev`           | Servidor de desenvolvimento                     |
+| `pnpm build`         | Build de produção                               |
+| `pnpm preview`       | Preview do build                                |
+| `pnpm lint`          | ESLint                                          |
+| `pnpm typecheck`     | Checagem de tipos                               |
+| `pnpm test`          | Testes unitários + integração                   |
+| `pnpm test:e2e`      | Testes E2E com Playwright                       |
+| `pnpm test:coverage` | Cobertura completa (unit + integração + E2E)    |
+| `pnpm test:db:setup` | Recria o banco de teste e o seed                |
+| `pnpm db:up`         | Sobe o PostgreSQL local (Docker Compose)        |
+| `pnpm db:down`       | Derruba o PostgreSQL local                      |
+| `pnpm db:generate`   | Geração de migration a partir do schema Drizzle |
+| `pnpm db:migrate`    | Aplica migrations                               |
+| `pnpm db:studio`     | Abre o Drizzle Studio                           |
 
 ## Driver do Drizzle ORM (híbrido)
 
@@ -131,7 +131,7 @@ pnpm test:coverage     # cobertura completa com os thresholds do MVP
 ```
 
 O E2E roda contra o **build de produção** (`.output/server`), não contra
-`nuxt dev`: o otimizador de dependências do Vite dispara *full reloads* no meio
+`nuxt dev`: o otimizador de dependências do Vite dispara _full reloads_ no meio
 do teste e deixa a suíte instável.
 
 Metas: **75%** para unitário e integração, **50%** para os fluxos E2E. Veja

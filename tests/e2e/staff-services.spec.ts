@@ -37,7 +37,9 @@ test('dona cadastra, edita e desativa um serviço', async ({ page }) => {
 
   // Desativa o serviço.
   await row.getByRole('button', { name: 'Desativar' }).click()
-  await expect(page.getByRole('row').filter({ hasText: 'Hydrating E2E' }).first().getByText('Inativo')).toBeVisible()
+  await expect(
+    page.getByRole('row').filter({ hasText: 'Hydrating E2E' }).first().getByText('Inativo')
+  ).toBeVisible()
 })
 
 test('o nome do serviço é único entre os serviços ativos', async ({ page }) => {

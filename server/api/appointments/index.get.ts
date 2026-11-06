@@ -8,7 +8,8 @@ import { requireUser } from '../../utils/auth-guard'
 import { TIME_ZONE, dayBounds, isValidDate } from '../../utils/time'
 
 const querySchema = z.object({
-  date: z.string()
+  date: z
+    .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Data inválida')
     .refine(isValidDate, 'Data inválida')
 })
@@ -29,10 +30,7 @@ export default defineEventHandler(async (event) => {
 
   const bounds = dayBounds(parsed.data.date)
 
-  const conditions = [
-    gte(appointment.startsAt, bounds.start),
-    lt(appointment.startsAt, bounds.end)
-  ]
+  const conditions = [gte(appointment.startsAt, bounds.start), lt(appointment.startsAt, bounds.end)]
 
   const rows = await db
     .select(appointmentColumns)
@@ -47,6 +45,6 @@ export default defineEventHandler(async (event) => {
   return {
     date: parsed.data.date,
     timezone: TIME_ZONE,
-    appointments: rows.map(row => serializeStaffAppointment(row))
+    appointments: rows.map((row) => serializeStaffAppointment(row))
   }
 })

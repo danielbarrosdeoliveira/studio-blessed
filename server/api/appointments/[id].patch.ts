@@ -2,10 +2,7 @@ import { eq } from 'drizzle-orm'
 import * as z from 'zod'
 import { db } from '../../database'
 import { appointment } from '../../database/schema'
-import {
-  canCancelAppointment,
-  canSetAppointmentStatus
-} from '../../utils/appointment-actions'
+import { canCancelAppointment, canSetAppointmentStatus } from '../../utils/appointment-actions'
 import { serializeStaffAppointment } from '../../utils/appointment-serialization'
 import { getAppointmentById } from '../../utils/appointments'
 import { requireUser } from '../../utils/auth-guard'

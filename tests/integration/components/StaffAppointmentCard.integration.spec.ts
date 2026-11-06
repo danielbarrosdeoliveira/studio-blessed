@@ -28,7 +28,7 @@ const appointment: StaffAppointment = {
 }
 
 function buttonByText(wrapper: Awaited<ReturnType<typeof mountSuspended>>, text: string) {
-  return wrapper.findAll('button').find(button => button.text() === text)
+  return wrapper.findAll('button').find((button) => button.text() === text)
 }
 
 function mountCard(overrides: Partial<StaffAppointment> = {}) {
@@ -40,8 +40,9 @@ function mountCard(overrides: Partial<StaffAppointment> = {}) {
 }
 
 function documentButtonByText(text: string) {
-  return Array.from(document.querySelectorAll('button'))
-    .find(button => button.textContent?.trim() === text)
+  return Array.from(document.querySelectorAll('button')).find(
+    (button) => button.textContent?.trim() === text
+  )
 }
 
 beforeEach(() => {
@@ -79,9 +80,11 @@ describe('StaffAppointmentCard', () => {
       method: 'PATCH',
       body: { action: 'status', status: 'completed' }
     })
-    expect(toastAdd).toHaveBeenCalledWith(expect.objectContaining({
-      title: 'Atendimento concluído'
-    }))
+    expect(toastAdd).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'Atendimento concluído'
+      })
+    )
     expect(wrapper.emitted('changed')).toHaveLength(1)
   })
 
@@ -94,10 +97,12 @@ describe('StaffAppointmentCard', () => {
     await buttonByText(wrapper, 'Concluir')!.trigger('click')
     await flushPromises()
 
-    expect(toastAdd).toHaveBeenCalledWith(expect.objectContaining({
-      title: 'Não foi possível atualizar o status',
-      description: 'Agendamento já finalizado'
-    }))
+    expect(toastAdd).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'Não foi possível atualizar o status',
+        description: 'Agendamento já finalizado'
+      })
+    )
     expect(wrapper.emitted('changed')).toBeUndefined()
   })
 
@@ -115,9 +120,11 @@ describe('StaffAppointmentCard', () => {
       method: 'PATCH',
       body: { action: 'cancel' }
     })
-    expect(toastAdd).toHaveBeenCalledWith(expect.objectContaining({
-      title: 'Agendamento cancelado'
-    }))
+    expect(toastAdd).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'Agendamento cancelado'
+      })
+    )
     expect(wrapper.emitted('changed')).toHaveLength(1)
     wrapper.unmount()
   })

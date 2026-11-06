@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {
-  appointmentOverlapsBlock,
-  findBlockConflicts,
-  serializeTimeBlock
-} from './time-blocks'
+import { appointmentOverlapsBlock, findBlockConflicts, serializeTimeBlock } from './time-blocks'
 
 function local(date: string, time: string) {
   return new Date(`${date}T${time}:00-03:00`)
@@ -17,20 +13,35 @@ describe('bloqueios de horário', () => {
       recurrence: null
     }
 
-    expect(appointmentOverlapsBlock({
-      startsAt: local('2026-10-26', '13:30'),
-      endsAt: local('2026-10-26', '14:30')
-    }, block)).toBe(true)
+    expect(
+      appointmentOverlapsBlock(
+        {
+          startsAt: local('2026-10-26', '13:30'),
+          endsAt: local('2026-10-26', '14:30')
+        },
+        block
+      )
+    ).toBe(true)
 
-    expect(appointmentOverlapsBlock({
-      startsAt: local('2026-10-26', '12:30'),
-      endsAt: local('2026-10-26', '13:10')
-    }, block)).toBe(true)
+    expect(
+      appointmentOverlapsBlock(
+        {
+          startsAt: local('2026-10-26', '12:30'),
+          endsAt: local('2026-10-26', '13:10')
+        },
+        block
+      )
+    ).toBe(true)
 
-    expect(appointmentOverlapsBlock({
-      startsAt: local('2026-10-26', '14:00'),
-      endsAt: local('2026-10-26', '14:30')
-    }, block)).toBe(false)
+    expect(
+      appointmentOverlapsBlock(
+        {
+          startsAt: local('2026-10-26', '14:00'),
+          endsAt: local('2026-10-26', '14:30')
+        },
+        block
+      )
+    ).toBe(false)
   })
 
   it('aplica bloqueio semanal somente na weekday e a partir da data inicial', () => {
@@ -40,25 +51,45 @@ describe('bloqueios de horário', () => {
       recurrence: 'weekly'
     }
 
-    expect(appointmentOverlapsBlock({
-      startsAt: local('2026-11-02', '13:30'),
-      endsAt: local('2026-11-02', '14:30')
-    }, block)).toBe(true)
+    expect(
+      appointmentOverlapsBlock(
+        {
+          startsAt: local('2026-11-02', '13:30'),
+          endsAt: local('2026-11-02', '14:30')
+        },
+        block
+      )
+    ).toBe(true)
 
-    expect(appointmentOverlapsBlock({
-      startsAt: local('2026-11-02', '14:00'),
-      endsAt: local('2026-11-02', '14:30')
-    }, block)).toBe(false)
+    expect(
+      appointmentOverlapsBlock(
+        {
+          startsAt: local('2026-11-02', '14:00'),
+          endsAt: local('2026-11-02', '14:30')
+        },
+        block
+      )
+    ).toBe(false)
 
-    expect(appointmentOverlapsBlock({
-      startsAt: local('2026-11-03', '13:30'),
-      endsAt: local('2026-11-03', '14:30')
-    }, block)).toBe(false)
+    expect(
+      appointmentOverlapsBlock(
+        {
+          startsAt: local('2026-11-03', '13:30'),
+          endsAt: local('2026-11-03', '14:30')
+        },
+        block
+      )
+    ).toBe(false)
 
-    expect(appointmentOverlapsBlock({
-      startsAt: local('2026-10-19', '13:30'),
-      endsAt: local('2026-10-19', '14:30')
-    }, block)).toBe(false)
+    expect(
+      appointmentOverlapsBlock(
+        {
+          startsAt: local('2026-10-19', '13:30'),
+          endsAt: local('2026-10-19', '14:30')
+        },
+        block
+      )
+    ).toBe(false)
   })
 
   it('serializa bloqueios e conflitos para a API', () => {

@@ -1,11 +1,6 @@
 import { resolve } from 'node:path'
 import { defineConfig, devices } from '@playwright/test'
-import {
-  E2E_BASE_URL,
-  E2E_PORT,
-  TEST_AUTH_SECRET,
-  TEST_DATABASE_URL
-} from './tests/env'
+import { E2E_BASE_URL, E2E_PORT, TEST_AUTH_SECRET, TEST_DATABASE_URL } from './tests/env'
 
 const coverageEnabled = process.env.E2E_COVERAGE === 'true'
 

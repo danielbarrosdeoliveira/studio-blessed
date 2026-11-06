@@ -60,12 +60,10 @@ try {
 
 const { db } = await import('../server/database')
 const { auth } = await import('../server/lib/auth')
-const {
-  service: serviceTable,
-  workingHours: workingHoursTable
-} = await import('../server/database/schema')
+const { service: serviceTable, workingHours: workingHoursTable } =
+  await import('../server/database/schema')
 
-async function createUser(input: { email: string, name: string }) {
+async function createUser(input: { email: string; name: string }) {
   const result = await auth.api.signUpEmail({
     body: {
       email: input.email,
@@ -104,16 +102,16 @@ try {
 
   const weekdays = [0, 1, 2, 3, 4, 5, 6]
 
-  await db
-    .insert(workingHoursTable)
-    .values(weekdays.map(weekday => ({
+  await db.insert(workingHoursTable).values(
+    weekdays.map((weekday) => ({
       weekday,
       startMinute: 9 * 60,
       endMinute: 18 * 60
-    })))
+    }))
+  )
 
   const serviceId = (name: string) => {
-    const found = services.find(row => row.name === name)
+    const found = services.find((row) => row.name === name)
 
     if (!found) {
       throw new Error(`Serviço de teste não encontrado: ${name}`)
@@ -123,13 +121,20 @@ try {
   }
 
   await mkdir('.data', { recursive: true })
-  await writeFile('.data/test-seed.json', JSON.stringify({
-    users: { owner },
-    services: {
-      corte: serviceId('Corte feminino'),
-      escova: serviceId('Escova')
-    }
-  }, null, 2))
+  await writeFile(
+    '.data/test-seed.json',
+    JSON.stringify(
+      {
+        users: { owner },
+        services: {
+          corte: serviceId('Corte feminino'),
+          escova: serviceId('Escova')
+        }
+      },
+      null,
+      2
+    )
+  )
 
   console.log(`Banco de teste pronto: ${databaseName}`)
   console.log(`Usuário (dona): ${TEST_USERS.owner.email}`)
