@@ -3,7 +3,7 @@ import type {
   PublicAppointment,
   PublicAppointmentResponse,
   PublicCancellationPolicy,
-  PublicServiceGroup
+  Service
 } from '~/types/domain'
 import { addDaysToIsoDate, formatInstantLong, todayInTimeZone } from '~/utils/date'
 import { getApiErrorMessage } from '~/utils/error'
@@ -18,34 +18,27 @@ useHead({
 })
 
 interface ServiceSelection {
-  group: PublicServiceGroup
-  professional: PublicServiceGroup['professionals'][number]
+  service: Service
 }
 
 const route = useRoute()
 
-const { data: groups, status } = await useFetch<PublicServiceGroup[]>('/api/public/services', {
+const { data: services, status } = await useFetch<Service[]>('/api/public/services', {
   default: () => []
 })
 
-function findSelection(serviceId: string, professionalId: string): ServiceSelection | null {
-  for (const group of groups.value) {
-    const professional = group.professionals.find(item => (
-      item.id === professionalId && item.serviceId === serviceId
-    ))
-
-    if (professional) {
-      return { group, professional }
-    }
+function findSelection(serviceId: string): ServiceSelection | null {
+  const service = services.value?.find(item => item.id === serviceId)
+  if (!service) {
+    return null
   }
 
-  return null
+  return { service }
 }
 
 const initialServiceId = typeof route.query.serviceId === 'string' ? route.query.serviceId : ''
-const initialProfessionalId = typeof route.query.professionalId === 'string' ? route.query.professionalId : ''
-const initialSelection = findSelection(initialServiceId, initialProfessionalId)
-const hadInitialQuery = !!initialServiceId || !!initialProfessionalId
+const initialSelection = findSelection(initialServiceId)
+const hadInitialQuery = !!initialServiceId
 
 const selectedService = ref<ServiceSelection | null>(initialSelection)
 const step = ref(initialSelection ? 1 : 0)
@@ -87,14 +80,8 @@ function formatPrice(cents: number) {
   return brl.format(cents / 100)
 }
 
-function selectService(group: PublicServiceGroup) {
-  const professional = group.professionals[0]
-
-  if (!professional) {
-    return
-  }
-
-  selectedService.value = { group, professional }
+function selectService(service: Service) {
+  selectedService.value = { service }
   selectedSlot.value = null
   formError.value = ''
   pickerKey.value += 1
@@ -120,8 +107,7 @@ async function submit() {
     const response = await $fetch<PublicAppointmentResponse>('/api/public/appointments', {
       method: 'POST',
       body: {
-        professionalId: selectedService.value.professional.id,
-        serviceId: selectedService.value.professional.serviceId,
+        serviceId: selectedService.value.service.id,
         startsAt: selectedSlot.value,
         clientName: form.name.trim(),
         clientPhone: form.phone
@@ -192,7 +178,7 @@ function bookAnother() {
             Escolha o serviço
           </h2>
           <p class="text-sm text-muted">
-            Cada serviço tem uma profissional responsável.
+            Cada serviço pertence à dona do salão.
           </p>
         </div>
       </template>
@@ -219,28 +205,28 @@ function bookAnother() {
       </div>
 
       <div
-        v-else-if="groups.length"
+        v-else-if="services.length"
         class="grid gap-4 sm:grid-cols-2"
       >
         <UCard
-          v-for="group in groups"
-          :key="group.name"
+          v-for="service in services"
+          :key="service.id"
           data-testid="service-option"
-          :class="selectedService?.group.name === group.name ? 'ring-2 ring-primary' : ''"
+          :class="selectedService?.service.id === service.id ? 'ring-2 ring-primary' : ''"
         >
           <div class="flex items-start justify-between gap-3">
             <div class="min-w-0">
               <h3 class="font-semibold text-highlighted">
-                {{ group.name }}
+                {{ service.name }}
               </h3>
               <p class="mt-1 text-sm text-muted">
                 Profissional responsável
               </p>
               <p class="text-sm text-highlighted">
-                {{ group.professionals[0]?.name }}
+                {{ service.professionalName }}
               </p>
               <p class="text-sm text-muted">
-                {{ group.professionals[0]?.durationMin }} min
+                {{ service.durationMin }} min
               </p>
             </div>
 
@@ -248,17 +234,17 @@ function bookAnother() {
               color="primary"
               variant="subtle"
             >
-              {{ formatPrice(group.minPriceCents) }}
+              {{ formatPrice(service.priceCents) }}
             </UBadge>
           </div>
 
           <UButton
             class="mt-4"
-            :label="selectedService?.group.name === group.name ? 'Selecionado' : 'Selecionar'"
-            :color="selectedService?.group.name === group.name ? 'primary' : 'neutral'"
-            :variant="selectedService?.group.name === group.name ? 'solid' : 'outline'"
+            :label="selectedService?.service.id === service.id ? 'Selecionado' : 'Selecionar'"
+            :color="selectedService?.service.id === service.id ? 'primary' : 'neutral'"
+            :variant="selectedService?.service.id === service.id ? 'solid' : 'outline'"
             block
-            @click="selectService(group)"
+            @click="selectService(service)"
           />
         </UCard>
       </div>
@@ -282,7 +268,7 @@ function bookAnother() {
       </div>
     </UCard>
 
-    <template v-else-if="step === 1 && selectedService">
+    <template v-else-if="step === 1 && selectedService && selectedSlot">
       <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
         <UCard>
           <template #header>
@@ -292,11 +278,11 @@ function bookAnother() {
                   Escolha a data e o horário
                 </h2>
                 <p class="text-sm text-muted">
-                  {{ selectedService.group.name }} · {{ selectedService.professional.durationMin }} min
+                  {{ selectedService.service.name }} · {{ selectedService.service.durationMin }} min
                 </p>
               </div>
               <span class="whitespace-nowrap font-medium text-highlighted">
-                {{ formatPrice(selectedService.professional.priceCents) }}
+                {{ formatPrice(selectedService.service.priceCents) }}
               </span>
             </div>
           </template>
@@ -312,8 +298,8 @@ function bookAnother() {
           <AvailabilityPicker
             :key="pickerKey"
             v-model="selectedSlot"
-            :professional-id="selectedService.professional.id"
-            :service-id="selectedService.professional.serviceId"
+            :professional-id="selectedService.service.id"
+            :service-id="selectedService.service.id"
             :min-date="minDate"
           />
 
@@ -342,59 +328,53 @@ function bookAnother() {
           </template>
 
           <dl class="space-y-3 text-sm">
-            <div class="flex justify-between gap-4">
-              <dt class="text-neutral-500 dark:text-neutral-400">
-                Serviço
-              </dt>
-              <dd class="text-right font-medium text-neutral-100">
-                {{ selectedService.group.name }}
-              </dd>
-            </div>
-            <div class="flex justify-between gap-4">
-              <dt class="text-neutral-500 dark:text-neutral-400">
-                Profissional
-              </dt>
-              <dd class="text-right font-medium text-neutral-100">
-                {{ selectedService.professional.name }}
-              </dd>
-            </div>
-            <div class="flex justify-between gap-4">
-              <dt class="text-neutral-500 dark:text-neutral-400">
-                Duração
-              </dt>
-              <dd class="text-right font-medium text-neutral-100">
-                {{ selectedService.professional.durationMin }} min
-              </dd>
-            </div>
-            <div class="flex justify-between gap-4">
-              <dt class="text-neutral-500 dark:text-neutral-400">
-                Preço
-              </dt>
-              <dd class="text-right font-medium text-neutral-100">
-                {{ formatPrice(selectedService.professional.priceCents) }}
-              </dd>
-            </div>
-            <div
-              v-if="selectedSlot"
-              class="flex justify-between gap-4"
-            >
-              <dt class="text-neutral-500 dark:text-neutral-400">
-                Horário
-              </dt>
-              <dd class="text-right font-medium text-neutral-100">
-                {{ formatInstantLong(selectedSlot) }}
-              </dd>
-            </div>
+            <dt class="text-neutral-500 dark:text-neutral-400">
+              Serviço
+            </dt>
+            <dd class="text-right font-medium text-neutral-100">
+              {{ selectedService.service.name }}
+            </dd>
+            <dt class="text-neutral-500 dark:text-neutral-400">
+              Profissional
+            </dt>
+            <dd class="text-right font-medium text-neutral-100">
+              {{ selectedService.service.professionalName }}
+            </dd>
+            <dt class="text-neutral-500 dark:text-neutral-400">
+              Duração
+            </dt>
+            <dd class="text-right font-medium text-neutral-100">
+              {{ selectedService.service.durationMin }} min
+            </dd>
+            <dt class="text-neutral-500 dark:text-neutral-400">
+              Preço
+            </dt>
+            <dd class="text-right font-medium text-neutral-100">
+              {{ formatPrice(selectedService.service.priceCents) }}
+            </dd>
+            <dt v-if="selectedSlot" class="text-neutral-500 dark:text-neutral-400">
+              Horário
+            </dt>
+            <dd v-if="selectedSlot" class="text-right font-medium text-neutral-100">
+              {{ formatInstantLong(selectedSlot) }}
+            </dd>
           </dl>
 
-          <UButton
-            class="mt-4"
-            label="Trocar serviço"
-            color="neutral"
-            variant="outline"
-            block
-            @click="changeService"
-          />
+          <div class="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-between">
+            <UButton
+              label="Voltar"
+              icon="i-ri-arrow-left-line"
+              color="neutral"
+              variant="ghost"
+              @click="step = 0"
+            />
+            <UButton
+              label="Continuar"
+              trailing-icon="i-ri-arrow-right-line"
+              :disabled="!selectedSlot"
+              @click="step = 2"
+            />
+          </div>
         </UCard>
       </div>
     </template>
@@ -454,6 +434,14 @@ function bookAnother() {
               </p>
             </UFormField>
 
+            <p class="mt-3 text-xs text-muted">
+              Ao informar seu nome e WhatsApp, você concorda com o armazenamento
+              desses dados para identificação de agendamentos, conforme nossa
+              política de privacidade. Dados são armazenados na agenda interna do
+              salão e podem ser acessados a qualquer momento para consulta ou
+              correção.
+            </p>
+
             <UAlert
               v-if="formError"
               color="error"
@@ -492,46 +480,36 @@ function bookAnother() {
           </template>
 
           <dl class="space-y-3 text-sm">
-            <div class="flex justify-between gap-4">
-              <dt class="text-muted">
-                Serviço
-              </dt>
-              <dd class="text-right font-medium text-highlighted">
-                {{ selectedService.group.name }}
-              </dd>
-            </div>
-            <div class="flex justify-between gap-4">
-              <dt class="text-muted">
-                Profissional
-              </dt>
-              <dd class="text-right font-medium text-highlighted">
-                {{ selectedService.professional.name }}
-              </dd>
-            </div>
-            <div class="flex justify-between gap-4">
-              <dt class="text-muted">
-                Duração
-              </dt>
-              <dd class="text-right font-medium text-highlighted">
-                {{ selectedService.professional.durationMin }} min
-              </dd>
-            </div>
-            <div class="flex justify-between gap-4">
-              <dt class="text-muted">
-                Preço
-              </dt>
-              <dd class="text-right font-medium text-highlighted">
-                {{ formatPrice(selectedService.professional.priceCents) }}
-              </dd>
-            </div>
-            <div class="flex justify-between gap-4">
-              <dt class="text-muted">
-                Horário
-              </dt>
-              <dd class="text-right font-medium text-highlighted">
-                {{ formatInstantLong(selectedSlot) }}
-              </dd>
-            </div>
+            <dt class="text-muted">
+              Serviço
+            </dt>
+            <dd class="text-right font-medium text-highlighted">
+              {{ selectedService.service.name }}
+            </dd>
+            <dt class="text-muted">
+              Profissional
+            </dt>
+            <dd class="text-right font-medium text-highlighted">
+              {{ selectedService.service.professionalName }}
+            </dd>
+            <dt class="text-neutral-500 dark:text-neutral-400">
+              Duração
+            </dt>
+            <dd class="text-right font-medium text-neutral-100">
+              {{ selectedService.service.durationMin }} min
+            </dd>
+            <dt class="text-neutral-500 dark:text-neutral-400">
+              Preço
+            </dt>
+            <dd class="text-right font-medium text-neutral-100">
+              {{ formatPrice(selectedService.service.priceCents) }}
+            </dd>
+            <dt class="text-neutral-500 dark:text-neutral-400">
+              Horário
+            </dt>
+            <dd class="text-right font-medium text-neutral-100">
+              {{ formatInstantLong(selectedSlot) }}
+            </dd>
           </dl>
         </UCard>
       </div>
@@ -557,38 +535,30 @@ function bookAnother() {
       </div>
 
       <dl class="mt-6 space-y-3 text-sm">
-        <div class="flex justify-between gap-4">
-          <dt class="text-neutral-500 dark:text-neutral-400">
-            Serviço
-          </dt>
-          <dd class="text-right font-medium text-neutral-100">
-            {{ created.serviceName }}
-          </dd>
-        </div>
-        <div class="flex justify-between gap-4">
-          <dt class="text-neutral-500 dark:text-neutral-400">
-            Profissional
-          </dt>
-          <dd class="text-right font-medium text-neutral-100">
-            {{ created.professionalName }}
-          </dd>
-        </div>
-        <div class="flex justify-between gap-4">
-          <dt class="text-neutral-500 dark:text-neutral-400">
-            Data e horário
-          </dt>
-          <dd class="text-right font-medium text-neutral-100">
-            {{ formatInstantLong(created.startsAt) }}
-          </dd>
-        </div>
-        <div class="flex justify-between gap-4">
-          <dt class="text-neutral-500 dark:text-neutral-400">
-            Nome
-          </dt>
-          <dd class="text-right font-medium text-neutral-100">
-            {{ created.clientName }}
-          </dd>
-        </div>
+        <dt class="text-neutral-500 dark:text-neutral-400">
+          Serviço
+        </dt>
+        <dd class="text-right font-medium text-neutral-100">
+          {{ created.serviceName }}
+        </dd>
+        <dt class="text-neutral-500 dark:text-neutral-400">
+          Profissional
+        </dt>
+        <dd class="text-right font-medium text-neutral-100">
+          {{ created.professionalName }}
+        </dd>
+        <dt class="text-neutral-500 dark:text-neutral-400">
+          Data e horário
+        </dt>
+        <dd class="text-right font-medium text-neutral-100">
+          {{ formatInstantLong(created.startsAt) }}
+        </dd>
+        <dt class="text-neutral-500 dark:text-neutral-400">
+          Nome
+        </dt>
+        <dd class="text-right font-medium text-neutral-100">
+          {{ created.clientName }}
+        </dd>
       </dl>
 
       <UAlert
