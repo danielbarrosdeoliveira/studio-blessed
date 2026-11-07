@@ -23,7 +23,7 @@
           class="mx-auto aspect-4/5 w-full max-w-sm overflow-hidden rounded-2xl border-2 border-zinc-800 ring-2 ring-orange-500/20 lg:mx-0"
         >
           <img
-            src="/images/ceo-caroline-silva.jpg"
+            src="/images/a-dona.jpg"
             alt="Caroline Silva, dona do Studio Blessed"
             class="size-full object-cover"
             loading="lazy"
