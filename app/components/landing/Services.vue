@@ -76,16 +76,6 @@ const servicos = [
     name: 'Limpeza de Pele',
     icon: 'lucide:sparkle',
     desc: 'Limpeza profunda que revitaliza e renova sua pele.'
-  },
-  {
-    name: 'Brow Lamination',
-    icon: 'lucide:wand',
-    desc: 'Modelagem e fixação dos fios para sobrancelhas alinhadas.'
-  },
-  {
-    name: 'Alongamento de Unhas',
-    icon: 'lucide:flower-2',
-    desc: 'Unhas alongadas com acabamento impecável e durabilidade.'
   }
 ]
 </script>

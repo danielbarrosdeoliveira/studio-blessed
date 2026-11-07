@@ -111,8 +111,6 @@ const servicos = [
   'Sobrancelha',
   'Hidra Gloss Lips',
   'Epilação',
-  'Limpeza de Pele',
-  'Brow Lamination',
-  'Alongamento de Unhas'
+  'Limpeza de Pele'
 ]
 </script>
