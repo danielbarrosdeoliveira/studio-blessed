@@ -33,6 +33,7 @@ export interface AppointmentDetails {
   clientName: string
   clientPhone: string
   notes: string | null
+  googleEventId: string | null
 }
 
 /** Objeto público: sem o telefone da cliente; datas em ISO e `canChange` calculado. */

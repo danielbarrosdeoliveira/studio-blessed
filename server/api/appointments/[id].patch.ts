@@ -7,6 +7,7 @@ import { serializeStaffAppointment } from '../../utils/appointment-serialization
 import { getAppointmentById } from '../../utils/appointments'
 import { requireUser } from '../../utils/auth-guard'
 import { writeAuditLog } from '../../utils/audit-log'
+import { deleteGoogleCalendarEvent } from '../../utils/google-calendar'
 
 const bodySchema = z.discriminatedUnion('action', [
   z.object({
@@ -56,6 +57,12 @@ export default defineEventHandler(async (event) => {
       .set({ status: 'cancelled', updatedAt: new Date() })
       .where(eq(appointment.id, id))
 
+    // Delete from Google Calendar if exists
+    if (existing.googleEventId) {
+      await deleteGoogleCalendarEvent(existing.googleEventId)
+      await db.update(appointment).set({ googleEventId: null }).where(eq(appointment.id, id))
+    }
+
     await writeAuditLog({
       action: 'appointment.cancel',
       entity: 'appointment',
@@ -82,6 +89,15 @@ export default defineEventHandler(async (event) => {
       .update(appointment)
       .set({ status: parsed.data.status, updatedAt: new Date() })
       .where(eq(appointment.id, id))
+
+    // Sync with Google Calendar: delete event for completed/no_show/cancelled
+    if (
+      existing.googleEventId &&
+      ['completed', 'no_show', 'cancelled'].includes(parsed.data.status)
+    ) {
+      await deleteGoogleCalendarEvent(existing.googleEventId)
+      await db.update(appointment).set({ googleEventId: null }).where(eq(appointment.id, id))
+    }
 
     await writeAuditLog({
       action: `appointment.${parsed.data.status}`,

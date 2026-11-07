@@ -10,6 +10,10 @@ import {
 import { getAppointmentById } from '../../../utils/appointments'
 import { isSlotAvailable } from '../../../utils/availability'
 import { normalizePhone } from '../../../utils/phone'
+import {
+  deleteGoogleCalendarEvent,
+  updateGoogleCalendarEvent
+} from '../../../utils/google-calendar'
 
 const bodySchema = z.discriminatedUnion('action', [
   z.object({
@@ -69,6 +73,12 @@ export default defineEventHandler(async (event) => {
       .update(appointment)
       .set({ status: 'cancelled', updatedAt: new Date() })
       .where(eq(appointment.id, id))
+
+    // Delete from Google Calendar if exists
+    if (current.googleEventId) {
+      await deleteGoogleCalendarEvent(current.googleEventId)
+      await db.update(appointment).set({ googleEventId: null }).where(eq(appointment.id, id))
+    }
   } else {
     const startsAt = new Date(parsed.data.startsAt)
 
@@ -93,6 +103,14 @@ export default defineEventHandler(async (event) => {
         updatedAt: new Date()
       })
       .where(eq(appointment.id, id))
+
+    // Update Google Calendar event if exists
+    if (current.googleEventId) {
+      await updateGoogleCalendarEvent(current.googleEventId, {
+        startsAt: startsAt.toISOString(),
+        endsAt: new Date(startsAt.getTime() + current.durationMin * 60_000).toISOString()
+      })
+    }
   }
 
   const updated = await getAppointmentById(id)

@@ -6,6 +6,7 @@ import { cancellationPolicy, serializeAppointment } from '../../../utils/appoint
 import { findOrCreateClient, getAppointmentById } from '../../../utils/appointments'
 import { isSlotAvailable } from '../../../utils/availability'
 import { normalizePhone } from '../../../utils/phone'
+import { createGoogleCalendarEvent } from '../../../utils/google-calendar'
 
 const bodySchema = z.object({
   serviceId: z.string().min(1, 'Serviço não informado'),
@@ -81,6 +82,22 @@ export default defineEventHandler(async (event) => {
 
   if (!row) {
     throw createError({ statusCode: 500, message: 'Não foi possível carregar o agendamento' })
+  }
+
+  // Sync with Google Calendar if connected
+  const googleResult = await createGoogleCalendarEvent({
+    summary: `${row.serviceName} — ${row.clientName}`,
+    startsAt: row.startsAt.toISOString(),
+    endsAt: row.endsAt.toISOString(),
+    appointmentId: row.id
+  })
+
+  if (googleResult.ok) {
+    await db
+      .update(appointment)
+      .set({ googleEventId: googleResult.googleEventId })
+      .where(eq(appointment.id, row.id))
+    row.googleEventId = googleResult.googleEventId
   }
 
   return {
