@@ -43,6 +43,13 @@
       "when": 1793981454934,
       "tag": "0005_burly_boomer",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794027182497,
+      "tag": "0006_curious_satana",
+      "breakpoints": true
     }
   ]
 }

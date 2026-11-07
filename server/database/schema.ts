@@ -175,12 +175,14 @@ export const appointment = pgTable(
     status: appointmentStatus('status').notNull().default('scheduled'),
     origin: appointmentOrigin('origin').notNull().default('client'),
     notes: text('notes'),
+    googleEventId: text('google_event_id'),
     createdAt: createdAt(),
     updatedAt: updatedAt()
   },
   (t) => [
     index('appointment_client_idx').on(t.clientId),
-    index('appointment_service_starts_idx').on(t.serviceId, t.startsAt)
+    index('appointment_service_starts_idx').on(t.serviceId, t.startsAt),
+    index('appointment_google_event_id_idx').on(t.googleEventId)
   ]
 )
 
