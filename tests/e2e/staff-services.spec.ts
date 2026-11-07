@@ -1,9 +1,9 @@
 import { expect, test } from '@playwright/test'
-import { expectToast, login, OWNER_EMAIL, waitForHydration } from './helpers'
+import { expectToast, login, waitForHydration } from './helpers'
 
 test('dona cadastra, edita e desativa um serviço', async ({ page }) => {
-  await login(page, OWNER_EMAIL)
-  await page.goto('/servicos')
+  await login(page)
+  await page.goto('/painel/servicos')
   await waitForHydration(page)
 
   await expect(page.getByRole('heading', { name: 'Serviços' })).toBeVisible()
@@ -43,8 +43,8 @@ test('dona cadastra, edita e desativa um serviço', async ({ page }) => {
 })
 
 test('o nome do serviço é único entre os serviços ativos', async ({ page }) => {
-  await login(page, OWNER_EMAIL)
-  await page.goto('/servicos')
+  await login(page)
+  await page.goto('/painel/servicos')
   await waitForHydration(page)
 
   await page.getByRole('button', { name: 'Novo serviço' }).click()

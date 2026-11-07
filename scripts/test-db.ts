@@ -3,16 +3,13 @@ import { mkdir, writeFile } from 'node:fs/promises'
 import { drizzle } from 'drizzle-orm/postgres-js'
 import { migrate } from 'drizzle-orm/postgres-js/migrator'
 import postgres from 'postgres'
-import { createHash } from 'node:crypto'
 import {
   INTEGRATION_BASE_URL,
   TEST_AUTH_SECRET,
   TEST_DATABASE_URL,
-  TEST_PASSWORD,
   TEST_USERS
 } from '../tests/env'
 
-// Habilita email/password no better-auth para testes
 process.env.NODE_ENV = 'test'
 process.env.DATABASE_URL = TEST_DATABASE_URL
 process.env.BETTER_AUTH_SECRET = TEST_AUTH_SECRET
@@ -62,50 +59,67 @@ try {
 }
 
 const { db } = await import('../server/database')
-const { service: serviceTable, workingHours: workingHoursTable, user: userTable, account: accountTable } =
+const { service: serviceTable, workingHours: workingHoursTable, user: userTable, account: accountTable, session: sessionTable } =
   await import('../server/database/schema')
 
-/** Gera hash compatível com better-auth para testes */
-function hashPassword(password: string): string {
-  // better-auth usa bcrypt. Para testes usamos hash simples determinístico.
-  // NOTA: O better-auth valida a senha comparando hashes bcrypt.
-  // Para que o login funcione nos testes, precisamos usar o mesmo método.
-  return createHash('sha256').update(password + TEST_AUTH_SECRET).digest('hex')
-}
-
-async function createTestUser() {
+/** Cria usuário de teste com conta Google e sessão válida */
+async function createTestUserWithSession() {
   const userId = crypto.randomUUID()
   const now = new Date()
 
-  // Inserir usuário diretamente
+  // Inserir usuário
   await db.insert(userTable).values({
     id: userId,
     name: TEST_USERS.owner.name,
     email: TEST_USERS.owner.email,
     emailVerified: true,
-    image: null,
+    image: 'https://lh3.googleusercontent.com/test-avatar',
     createdAt: now,
     updatedAt: now
   })
 
-  // Inserir conta com senha hash (para email/password - usado nos testes)
-  const passwordHash = hashPassword(TEST_PASSWORD)
-
+  // Inserir conta Google (providerId: 'google')
+  const accountId = crypto.randomUUID()
   await db.insert(accountTable).values({
-    id: crypto.randomUUID(),
-    accountId: userId,
-    providerId: 'credential',
+    id: accountId,
+    accountId: 'google-oauth2-test-user-id',
+    providerId: 'google',
     userId: userId,
-    password: passwordHash,
+    accessToken: 'test-access-token',
+    refreshToken: 'test-refresh-token',
+    idToken: 'test-id-token',
+    accessTokenExpiresAt: new Date(now.getTime() + 3600000), // 1 hora
+    refreshTokenExpiresAt: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000), // 30 dias
+    scope: 'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile',
     createdAt: now,
     updatedAt: now
   })
 
-  return { id: userId, email: TEST_USERS.owner.email, name: TEST_USERS.owner.name }
+  // Criar sessão válida
+  const sessionToken = `test-session-${crypto.randomUUID()}`
+  const expiresAt = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000) // 7 dias
+
+  await db.insert(sessionTable).values({
+    id: crypto.randomUUID(),
+    token: sessionToken,
+    expiresAt,
+    createdAt: now,
+    updatedAt: now,
+    ipAddress: '127.0.0.1',
+    userAgent: 'Playwright Test Agent',
+    userId
+  })
+
+  return { 
+    id: userId, 
+    email: TEST_USERS.owner.email, 
+    name: TEST_USERS.owner.name,
+    sessionToken
+  }
 }
 
 try {
-  const owner = await createTestUser()
+  const owner = await createTestUserWithSession()
 
   const services = await db
     .insert(serviceTable)
@@ -163,8 +177,8 @@ try {
 
   console.log(`Banco de teste pronto: ${databaseName}`)
   console.log(`Usuário (dona): ${TEST_USERS.owner.email}`)
+  console.log(`Session token: ${owner.sessionToken}`)
 } finally {
-  // Fecha o pool do driver `node-postgres` (em produção o driver é o Neon HTTP).
   const client = (db as unknown as { $client?: { end: () => Promise<void> } }).$client
   await client?.end()
 }
