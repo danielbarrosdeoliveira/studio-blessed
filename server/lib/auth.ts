@@ -12,6 +12,12 @@ export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET,
   baseURL: process.env.BETTER_AUTH_URL,
 
+  // Trusted origins for CORS and OAuth redirects (fixes INVALID_ORIGIN in production)
+  trustedOrigins: [
+    'https://studioblessed.com.br',
+    'https://www.studioblessed.com.br'
+  ],
+
   // Disable email/password - only Google OAuth allowed
   emailAndPassword: {
     enabled: false
