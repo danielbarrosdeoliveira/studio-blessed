@@ -43,12 +43,18 @@
 <script setup lang="ts">
 const categorias = ['Todos', 'Cílios', 'Sobrancelha', 'Unhas', 'Peelings']
 const imagens = [
-  { id: 1, url: '/images/gallery-1.jpg', alt: 'Cliente com cílios' },
-  { id: 2, url: '/images/gallery-2.jpg', alt: 'Sobrancelha feita' },
-  { id: 3, url: '/images/gallery-3.jpg', alt: 'Unhas alongadas' },
-  { id: 4, url: '/images/gallery-4.jpg', alt: 'Peeling de pele' },
-  { id: 5, url: '/images/gallery-5.jpg', alt: 'Maquiagem' },
-  { id: 6, url: '/images/gallery-6.jpg', alt: 'Tratamento capilar' }
+  { id: 1, url: '/images/trabalhos/extensao-cilios-1.jpeg', alt: 'Cílios' },
+  { id: 2, url: '/images/trabalhos/extensao-cilios-2.jpeg', alt: 'Cílios' },
+  { id: 3, url: '/images/trabalhos/extensao-cilios-3.jpeg', alt: 'Cílios' },
+  { id: 4, url: '/images/trabalhos/extensao-cilios-4.jpeg', alt: 'Cílios' },
+  { id: 5, url: '/images/trabalhos/sobrancelha.jpeg', alt: 'Sobrancelha' },
+  { id: 6, url: '/images/trabalhos/sobrancelha-cilios.jpeg', alt: 'Sobrancelha' },
+  { id: 7, url: '/images/trabalhos/brown-lamination.jpeg', alt: 'Sobrancelha' },
+  { id: 8, url: '/images/trabalhos/hydra-gloss.jpeg', alt: 'Peelings' },
+  { id: 9, url: '/images/trabalhos/extensao-cilios-5.jpeg', alt: 'Cílios' },
+  { id: 10, url: '/images/trabalhos/extensao-cilios-6.jpeg', alt: 'Cílios' },
+  { id: 11, url: '/images/trabalhos/extensao-cilios-7.jpeg', alt: 'Cílios' },
+  { id: 12, url: '/images/trabalhos/depilacao-corporal.webp', alt: 'Outros' }
 ]
 
 const selectedCategory = ref('Todos')
@@ -56,6 +62,6 @@ const filteredImagens = computed(() => {
   if (selectedCategory.value === 'Todos') {
     return imagens
   }
-  return imagens.filter((img) => categorias.includes(img.alt))
+  return imagens.filter((img) => img.alt === selectedCategory.value)
 })
 </script>
