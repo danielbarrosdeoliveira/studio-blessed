@@ -87,8 +87,8 @@ export default defineEventHandler(async (event) => {
   // Sync with Google Calendar if connected
   const googleResult = await createGoogleCalendarEvent({
     summary: `${row.serviceName} — ${row.clientName}`,
-    startsAt: row.startsAt,
-    endsAt: row.endsAt,
+    startsAt: row.startsAt.toISOString(),
+    endsAt: row.endsAt.toISOString(),
     appointmentId: row.id
   })
 

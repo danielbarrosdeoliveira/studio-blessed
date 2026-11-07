@@ -18,7 +18,8 @@ export const appointmentColumns = {
   clientName: client.name,
   clientPhone: client.phone,
   clientId: appointment.clientId,
-  notes: appointment.notes
+  notes: appointment.notes,
+  googleEventId: appointment.googleEventId
 }
 
 export async function getAppointmentById(id: string): Promise<AppointmentDetails | null> {

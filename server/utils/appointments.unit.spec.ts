@@ -24,7 +24,8 @@ const details: AppointmentDetails = {
   priceCents: 13000,
   clientName: 'Cliente Teste',
   clientPhone: '11999990000',
-  notes: 'Primeira visita'
+  notes: 'Primeira visita',
+  googleEventId: null
 }
 
 describe('canChangeAppointment', () => {
