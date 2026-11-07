@@ -15,7 +15,7 @@ const router = useRouter()
 
 const today = todayInTimeZone()
 
-/** A data da agenda pode vir da URL (`/painel?date=2026-11-26`) para ser compartilhável. */
+/** A data da agenda pode vir da URL (`/staff/painel?date=2026-11-26`) para ser compartilhável. */
 function dateFromQuery(value: unknown): string {
   if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
     return today
