@@ -13,8 +13,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
     return
   }
 
-  // Proteger tudo que estiver em /staff/*
-  if (to.path.startsWith('/staff')) {
+  // Proteger tudo que estiver em /painel/*
+  if (to.path.startsWith('/painel')) {
     const { data: session } = await authClient.useSession(useFetch)
 
     if (!session.value) {
