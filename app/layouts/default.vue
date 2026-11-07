@@ -11,14 +11,14 @@ const links = computed<NavigationMenuItem[][]>(() => {
   return [
     [
       { label: 'Início', icon: 'i-ri-home-line', to: '/', onSelect: close },
-      { label: 'Agenda', icon: 'i-ri-calendar-line', to: '/painel', onSelect: close },
-      { label: 'Serviços', icon: 'i-ri-scissors-line', to: '/servicos', onSelect: close },
-      { label: 'Jornada', icon: 'i-ri-time-line', to: '/jornada', onSelect: close },
-      { label: 'Métricas', icon: 'i-ri-bar-chart-line', to: '/metricas', onSelect: close },
+      { label: 'Agenda', icon: 'i-ri-calendar-line', to: '/staff/painel', onSelect: close },
+      { label: 'Serviços', icon: 'i-ri-scissors-line', to: '/staff/servicos', onSelect: close },
+      { label: 'Jornada', icon: 'i-ri-time-line', to: '/staff/jornada', onSelect: close },
+      { label: 'Métricas', icon: 'i-ri-bar-chart-line', to: '/staff/metricas', onSelect: close },
       {
         label: 'Configurações',
         icon: 'i-ri-settings-3-line',
-        to: '/configuracoes',
+        to: '/staff/configuracoes',
         onSelect: close
       }
     ]
