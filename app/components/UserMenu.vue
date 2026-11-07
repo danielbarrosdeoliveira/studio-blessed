@@ -60,7 +60,7 @@ const items = computed<DropdownMenuItem[][]>(() => [
     {
       label: 'Configurações',
       icon: 'i-ri-settings-line',
-      to: '/staff/configuracoes'
+      to: '/painel/configuracoes'
     }
   ],
   [
