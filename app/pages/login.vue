@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { authClient, signInGoogle } from '~/lib/auth-client'
+import { signInGoogle } from '~/lib/auth-client'
 
 definePageMeta({
   layout: false
@@ -9,15 +9,8 @@ useHead({
   title: 'Entrar · Studio Blessed'
 })
 
-const route = useRoute()
-
 const loading = ref(false)
 const errorMessage = ref('')
-
-const redirectTo = computed(() => {
-  const value = route.query.redirect
-  return typeof value === 'string' && value.startsWith('/') ? value : '/'
-})
 
 async function onGoogleSignIn() {
   loading.value = true
