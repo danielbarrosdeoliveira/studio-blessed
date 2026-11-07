@@ -30,7 +30,7 @@ useHead({
               <dt class="text-muted">Jornada e bloqueios</dt>
               <dd>
                 <UButton
-                  to="/staff/jornada"
+                  to="/painel/jornada"
                   label="Gerenciar"
                   size="xs"
                   color="neutral"
@@ -42,7 +42,7 @@ useHead({
               <dt class="text-muted">Serviços</dt>
               <dd>
                 <UButton
-                  to="/staff/servicos"
+                  to="/painel/servicos"
                   label="Gerenciar"
                   size="xs"
                   color="neutral"

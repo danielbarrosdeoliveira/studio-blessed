@@ -162,7 +162,7 @@ export async function getAvailabilityForDay(params: AvailabilityParams): Promise
 
   // 3. Google Calendar events (THE single source of truth for external conflicts)
   // These events come from all configured calendars (primary, Pessoal, Família, etc.)
-  for (const { calendarId, events } of googleCalendarEvents) {
+  for (const { events } of googleCalendarEvents) {
     for (const event of events) {
       // Skip cancelled events and transparent (free) events
       if (event.status === 'cancelled' || event.transparency === 'transparent') {

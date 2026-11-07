@@ -19,7 +19,7 @@ const toast = useToast()
 async function onSubmit(event: FormSubmitEvent<Schema>) {
   toast.add({
     title: 'Success',
-    description: `New customer ${event.data.name} added`,
+    description: `Novo Cliente ${event.data.name} cadastrado com sucesso!`,
     color: 'success'
   })
   open.value = false
@@ -27,8 +27,8 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 </script>
 
 <template>
-  <UModal v-model:open="open" title="New customer" description="Add a new customer to the database">
-    <UButton label="New customer" icon="i-ri-add-line" />
+  <UModal v-model:open="open" title="Novo Cliente" description="Add a New Client to the database">
+    <UButton label="Novo Cliente" icon="i-ri-add-line" />
 
     <template #body>
       <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
