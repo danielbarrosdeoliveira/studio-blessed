@@ -13,6 +13,7 @@ import {
   localPartsOf,
   toMinuteInterval
 } from './time'
+import { getEventsFromCalendars, getGoogleCalendarConfig, type GoogleCalendarEvent } from './google-calendar'
 
 /** Maior buffer aceito no cadastro de serviço (`server/api/services/index.post.ts`). */
 const MAX_BUFFER_MIN = 240
@@ -46,7 +47,11 @@ export interface DayAvailability {
 
 /**
  * Disponibilidade do serviço da dona do salão:
- * jornada − agendamentos ativos (com buffer) − bloqueios.
+ * jornada − agendamentos ativos (com buffer) − bloqueios − eventos do Google Calendar.
+ *
+ * O Google Calendar é a **única fonte da verdade** para horários ocupados.
+ * Buscamos eventos em TODOS os calendários configurados (primary, Pessoal, Família, Studio Blessed, etc.)
+ * Se houver evento em QUALQUER um deles, o horário fica indisponível.
  */
 export async function getAvailabilityForDay(params: AvailabilityParams): Promise<DayAvailability> {
   const [found] = await db
@@ -64,7 +69,8 @@ export async function getAvailabilityForDay(params: AvailabilityParams): Promise
 
   const bounds = dayBounds(params.date)
 
-  const [hours, appointments, blocks] = await Promise.all([
+  // Fetch local data and Google Calendar events in parallel
+  const [hours, appointments, blocks, googleCalendarEvents] = await Promise.all([
     db
       .select({
         start: workingHours.startMinute,
@@ -102,13 +108,16 @@ export async function getAvailabilityForDay(params: AvailabilityParams): Promise
           and(lt(timeBlock.startsAt, bounds.end), gt(timeBlock.endsAt, bounds.start)),
           eq(timeBlock.recurrence, 'weekly')
         )
-      )
+      ),
+
+    // Fetch events from Google Calendar (single source of truth)
+    fetchGoogleCalendarEvents(params.date, bounds)
   ])
 
   const busyIntervals: MinuteInterval[] = []
 
+  // 1. Local appointments (with their buffers)
   for (const item of appointments) {
-    // O buffer do agendamento existente também fica ocupado.
     const interval = toMinuteInterval(
       item.startsAt,
       new Date(item.endsAt.getTime() + item.bufferMin * 60_000),
@@ -120,6 +129,7 @@ export async function getAvailabilityForDay(params: AvailabilityParams): Promise
     }
   }
 
+  // 2. Local time blocks
   for (const block of blocks) {
     if (block.recurrence === 'weekly') {
       if (params.date < localDateOf(block.startsAt)) {
@@ -144,6 +154,37 @@ export async function getAvailabilityForDay(params: AvailabilityParams): Promise
     } else {
       const interval = toMinuteInterval(block.startsAt, block.endsAt, bounds)
 
+      if (interval) {
+        busyIntervals.push(interval)
+      }
+    }
+  }
+
+  // 3. Google Calendar events (THE single source of truth for external conflicts)
+  // These events come from all configured calendars (primary, Pessoal, Família, etc.)
+  for (const { calendarId, events } of googleCalendarEvents) {
+    for (const event of events) {
+      // Skip cancelled events and transparent (free) events
+      if (event.status === 'cancelled' || event.transparency === 'transparent') {
+        continue
+      }
+
+      const startStr = event.start?.dateTime ?? event.start?.date
+      const endStr = event.end?.dateTime ?? event.end?.date
+
+      if (!startStr || !endStr) {
+        continue
+      }
+
+      const eventStart = new Date(startStr)
+      const eventEnd = new Date(endStr)
+
+      // Check if event overlaps with the day bounds
+      if (eventEnd <= bounds.start || eventStart >= bounds.end) {
+        continue
+      }
+
+      const interval = toMinuteInterval(eventStart, eventEnd, bounds)
       if (interval) {
         busyIntervals.push(interval)
       }
@@ -181,6 +222,36 @@ export async function getAvailabilityForDay(params: AvailabilityParams): Promise
     origin: params.origin,
     slots
   }
+}
+
+/**
+ * Fetches Google Calendar events for all configured calendars for a given day.
+ * Returns events from all calendars that the studio owner has access to.
+ */
+async function fetchGoogleCalendarEvents(
+  date: string,
+  bounds: { start: Date; end: Date; weekday: number }
+): Promise<Array<{ calendarId: string; events: GoogleCalendarEvent[] }>> {
+  const config = getGoogleCalendarConfig()
+  const calendarIds = config.availabilityCalendarIds
+
+  if (calendarIds.length === 0) {
+    return []
+  }
+
+  // Format timeMin/timeMax for Google Calendar API (RFC3339)
+  const timeMin = bounds.start.toISOString()
+  const timeMax = bounds.end.toISOString()
+
+  const result = await getEventsFromCalendars(calendarIds, timeMin, timeMax)
+
+  if (!result.ok) {
+    // Log error but don't fail - fall back to local data only
+    console.error('[Availability] Failed to fetch Google Calendar events:', result.message)
+    return []
+  }
+
+  return result.calendars
 }
 
 /**

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { authClient } from '~/lib/auth-client'
+import { authClient, signInGoogle } from '~/lib/auth-client'
 
 definePageMeta({
   layout: false
@@ -11,8 +11,6 @@ useHead({
 
 const route = useRoute()
 
-const email = ref('')
-const password = ref('')
 const loading = ref(false)
 const errorMessage = ref('')
 
@@ -21,23 +19,10 @@ const redirectTo = computed(() => {
   return typeof value === 'string' && value.startsWith('/') ? value : '/'
 })
 
-async function onSubmit() {
+async function onGoogleSignIn() {
   loading.value = true
   errorMessage.value = ''
-
-  const { error } = await authClient.signIn.email({
-    email: email.value,
-    password: password.value
-  })
-
-  loading.value = false
-
-  if (error) {
-    errorMessage.value = error.message || 'Não foi possível entrar. Verifique suas credenciais.'
-    return
-  }
-
-  await navigateTo(redirectTo.value)
+  await signInGoogle()
 }
 </script>
 
@@ -53,48 +38,25 @@ async function onSubmit() {
       </div>
 
       <UCard>
-        <form class="space-y-4" @submit.prevent="onSubmit">
-          <UFormField label="E-mail" name="email">
-            <UInput
-              v-model="email"
-              type="email"
-              placeholder="voce@studioblessed.local"
-              icon="i-ri-mail-line"
-              autocomplete="email"
-              required
-              class="w-full"
-            />
-          </UFormField>
+        <UButton
+          type="button"
+          variant="solid"
+          color="neutral"
+          block
+          :loading="loading"
+          icon="i-simple-icons-google"
+          label="Continuar com Google"
+          @click="onGoogleSignIn"
+        />
 
-          <UFormField label="Senha" name="password">
-            <UInput
-              v-model="password"
-              type="password"
-              placeholder="••••••••"
-              icon="i-ri-lock-line"
-              autocomplete="current-password"
-              required
-              class="w-full"
-            />
-          </UFormField>
-
-          <UAlert
-            v-if="errorMessage"
-            color="error"
-            variant="subtle"
-            icon="i-ri-error-warning-line"
-            :title="errorMessage"
-          />
-
-          <UButton
-            type="button"
-            label="Entrar"
-            icon="i-ri-login-box-line"
-            block
-            :loading="loading"
-            @click="onSubmit"
-          />
-        </form>
+        <UAlert
+          v-if="errorMessage"
+          color="error"
+          variant="subtle"
+          icon="i-ri-error-warning-line"
+          :title="errorMessage"
+          class="mt-4"
+        />
       </UCard>
 
       <p class="mt-6 text-center text-xs text-muted">Acesso restrito à equipe do Studio Blessed.</p>

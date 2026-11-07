@@ -39,3 +39,4 @@ playwright-report
 .opencode/skill/*
 !.opencode/skill/studio-blessed-testing/
 !.opencode/skill/studio-blessed-testing/**
+.neon
