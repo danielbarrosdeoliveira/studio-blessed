@@ -3,6 +3,7 @@ import { mkdir, writeFile } from 'node:fs/promises'
 import { drizzle } from 'drizzle-orm/postgres-js'
 import { migrate } from 'drizzle-orm/postgres-js/migrator'
 import postgres from 'postgres'
+import { createHash } from 'node:crypto'
 import {
   INTEGRATION_BASE_URL,
   TEST_AUTH_SECRET,
@@ -11,6 +12,8 @@ import {
   TEST_USERS
 } from '../tests/env'
 
+// Habilita email/password no better-auth para testes
+process.env.NODE_ENV = 'test'
 process.env.DATABASE_URL = TEST_DATABASE_URL
 process.env.BETTER_AUTH_SECRET = TEST_AUTH_SECRET
 process.env.BETTER_AUTH_URL = INTEGRATION_BASE_URL
@@ -59,28 +62,50 @@ try {
 }
 
 const { db } = await import('../server/database')
-const { auth } = await import('../server/lib/auth')
-const { service: serviceTable, workingHours: workingHoursTable } =
+const { service: serviceTable, workingHours: workingHoursTable, user: userTable, account: accountTable } =
   await import('../server/database/schema')
 
-async function createUser(input: { email: string; name: string }) {
-  const result = await auth.api.signUpEmail({
-    body: {
-      email: input.email,
-      name: input.name,
-      password: TEST_PASSWORD
-    }
+/** Gera hash compatível com better-auth para testes */
+function hashPassword(password: string): string {
+  // better-auth usa bcrypt. Para testes usamos hash simples determinístico.
+  // NOTA: O better-auth valida a senha comparando hashes bcrypt.
+  // Para que o login funcione nos testes, precisamos usar o mesmo método.
+  return createHash('sha256').update(password + TEST_AUTH_SECRET).digest('hex')
+}
+
+async function createTestUser() {
+  const userId = crypto.randomUUID()
+  const now = new Date()
+
+  // Inserir usuário diretamente
+  await db.insert(userTable).values({
+    id: userId,
+    name: TEST_USERS.owner.name,
+    email: TEST_USERS.owner.email,
+    emailVerified: true,
+    image: null,
+    createdAt: now,
+    updatedAt: now
   })
 
-  if (!result.user) {
-    throw new Error(`Não foi possível criar o usuário de teste ${input.email}`)
-  }
+  // Inserir conta com senha hash (para email/password - usado nos testes)
+  const passwordHash = hashPassword(TEST_PASSWORD)
 
-  return { id: result.user.id, email: input.email, name: input.name }
+  await db.insert(accountTable).values({
+    id: crypto.randomUUID(),
+    accountId: userId,
+    providerId: 'credential',
+    userId: userId,
+    password: passwordHash,
+    createdAt: now,
+    updatedAt: now
+  })
+
+  return { id: userId, email: TEST_USERS.owner.email, name: TEST_USERS.owner.name }
 }
 
 try {
-  const owner = await createUser(TEST_USERS.owner)
+  const owner = await createTestUser()
 
   const services = await db
     .insert(serviceTable)

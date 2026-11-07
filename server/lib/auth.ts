@@ -3,6 +3,8 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { db } from '../database'
 import * as schema from '../database/schema'
 
+const isTest = process.env.NODE_ENV === 'test' || process.env.VITEST === 'true'
+
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: 'pg',
@@ -18,9 +20,9 @@ export const auth = betterAuth({
     'https://www.studioblessed.com.br'
   ],
 
-  // Disable email/password - only Google OAuth allowed
+  // Email/password: disabled in production, enabled for tests
   emailAndPassword: {
-    enabled: false
+    enabled: isTest
   },
 
   socialProviders: {
