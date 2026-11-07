@@ -1,10 +1,10 @@
 import { expect, test } from '@playwright/test'
-import { addDays, login, OWNER_EMAIL, todayIso, waitForHydration } from './helpers'
+import { addDays, login, todayIso, waitForHydration } from './helpers'
 
 test('dona cria, lista e remove um bloqueio semanal', async ({ page }) => {
   const date = addDays(todayIso(), 20)
 
-  await login(page, OWNER_EMAIL)
+  await login(page)
 
   const startsAt = new Date(`${date}T12:00:00-03:00`).toISOString()
   const endsAt = new Date(`${date}T13:00:00-03:00`).toISOString()
@@ -20,7 +20,7 @@ test('dona cria, lista e remove um bloqueio semanal', async ({ page }) => {
 
   expect(created.ok()).toBe(true)
 
-  await page.goto('/jornada')
+  await page.goto('/painel/jornada')
   await waitForHydration(page)
 
   await expect(page.getByRole('heading', { name: 'Jornada' })).toBeVisible()
@@ -34,8 +34,8 @@ test('dona cria, lista e remove um bloqueio semanal', async ({ page }) => {
 })
 
 test('a jornada exibe os dias de atendimento da dona', async ({ page }) => {
-  await login(page, OWNER_EMAIL)
-  await page.goto('/jornada')
+  await login(page)
+  await page.goto('/painel/jornada')
   await waitForHydration(page)
 
   await expect(page.getByRole('heading', { name: 'Jornada' })).toBeVisible()

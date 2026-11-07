@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 import { login, OWNER_EMAIL, waitForHydration } from './helpers'
 
 test.describe('Autenticação Admin e Proteção de Rotas', () => {
-  test.describe('Proteção de rotas /painel/*', () => {
+  test.describe('Proteção de rotas /painel/* (sem login)', () => {
     test('acesso direto a /painel sem login redireciona para /login', async ({ page }) => {
       await page.goto('/painel')
       await waitForHydration(page)
@@ -60,29 +60,26 @@ test.describe('Autenticação Admin e Proteção de Rotas', () => {
     })
   })
 
-  test.describe('Fluxo de Autenticação Admin', () => {
-    test('login com credenciais válidas redireciona para /painel/metricas', async ({ page }) => {
-      await login(page, OWNER_EMAIL)
+  test.describe('Fluxo de Autenticação Admin (com login)', () => {
+    test.beforeEach(async ({ page }) => {
+      await login(page)
+    })
 
-      // Deve redirecionar para /painel/metricas (configurado no callbackURL)
-      await expect(page).toHaveURL(/\/painel\/metricas/)
+    test('login redireciona para /painel/metricas', async ({ page }) => {
+      // login() já navega para /painel e valida
+      await expect(page).toHaveURL(/\/painel/)
+      // Navegar para métricas (home pós-login)
+      await page.goto('/painel/metricas')
+      await waitForHydration(page)
       await expect(page.getByRole('heading', { name: 'Métricas' })).toBeVisible()
     })
 
     test('após login, navegação para /painel funciona', async ({ page }) => {
-      await login(page, OWNER_EMAIL)
-      await page.goto('/painel')
-      await waitForHydration(page)
-
       await expect(page).toHaveURL(/\/painel/)
       await expect(page.getByRole('heading', { name: 'Agenda' })).toBeVisible()
     })
 
     test('sidebar navega corretamente entre páginas protegidas', async ({ page }) => {
-      await login(page, OWNER_EMAIL)
-      await page.goto('/painel')
-      await waitForHydration(page)
-
       // Navegar para Jornada
       await page.getByRole('link', { name: 'Jornada' }).first().click()
       await expect(page).toHaveURL(/\/painel\/jornada/)
@@ -115,10 +112,6 @@ test.describe('Autenticação Admin e Proteção de Rotas', () => {
     })
 
     test('logout funciona e redireciona para /login', async ({ page }) => {
-      await login(page, OWNER_EMAIL)
-      await page.goto('/painel')
-      await waitForHydration(page)
-
       // Clicar no menu do usuário e sair
       await page.getByRole('button', { name: /Usuário|Dona|Owner/i }).first().click()
       await page.getByRole('menuitem', { name: 'Sair' }).click()
@@ -129,7 +122,6 @@ test.describe('Autenticação Admin e Proteção de Rotas', () => {
     })
 
     test('sessão persiste após recarregar página', async ({ page }) => {
-      await login(page, OWNER_EMAIL)
       await page.goto('/painel/metricas')
       await waitForHydration(page)
       await expect(page.getByRole('heading', { name: 'Métricas' })).toBeVisible()
@@ -144,7 +136,7 @@ test.describe('Autenticação Admin e Proteção de Rotas', () => {
     })
   })
 
-  test.describe('Rotas Públicas permanecem acessíveis', () => {
+  test.describe('Rotas Públicas permanecem acessíveis (sem login)', () => {
     test('/ (landing) acessível sem login', async ({ page }) => {
       await page.goto('/')
       await waitForHydration(page)
@@ -188,8 +180,8 @@ test.describe('Autenticação Admin e Proteção de Rotas', () => {
       await expect(page).toHaveURL(/\/login/)
       await expect(page).toHaveURL(/redirect=%2Fpainel%2Fjornada/)
 
-      // Fazer login
-      await login(page, OWNER_EMAIL)
+      // Fazer login (define cookie de sessão)
+      await login(page)
 
       // Deve redirecionar para a página original
       await expect(page).toHaveURL(/\/painel\/jornada/)
@@ -203,7 +195,7 @@ test.describe('Autenticação Admin e Proteção de Rotas', () => {
       await expect(page).toHaveURL(/\/login/)
       await expect(page).toHaveURL(/redirect=%2Fpainel%2Fconfiguracoes/)
 
-      await login(page, OWNER_EMAIL)
+      await login(page)
 
       await expect(page).toHaveURL(/\/painel\/configuracoes/)
       await expect(page.getByRole('heading', { name: 'Configurações' })).toBeVisible()

@@ -6,7 +6,7 @@ const clientName = 'Cliente Staff E2E'
 test('dona cria, conclui e corrige um agendamento', async ({ page }) => {
   const tomorrow = addDays(todayIso(), 1)
 
-  await login(page, OWNER_EMAIL)
+  await login(page)
   await page.goto(`/painel?date=${tomorrow}`)
   await waitForHydration(page)
   await expect(page.getByRole('heading', { name: 'Agenda' })).toBeVisible()
@@ -42,7 +42,7 @@ test('dona cria, conclui e corrige um agendamento', async ({ page }) => {
 })
 
 test('a agenda não tem filtro de profissional', async ({ page }) => {
-  await login(page, OWNER_EMAIL)
+  await login(page)
   await page.goto('/painel')
   await waitForHydration(page)
 
@@ -52,14 +52,15 @@ test('a agenda não tem filtro de profissional', async ({ page }) => {
 })
 
 test('a navegação lateral leva às páginas da dona', async ({ page }) => {
-  await login(page, OWNER_EMAIL)
+  await login(page)
   await page.goto('/painel')
   await waitForHydration(page)
 
   await page.getByRole('link', { name: 'Jornada' }).first().click()
-  await expect(page).toHaveURL(/\/jornada/)
+  await expect(page).toHaveURL(/\/painel\/jornada/)
   await expect(page.getByRole('heading', { name: 'Jornada' })).toBeVisible()
 
   await page.getByRole('link', { name: 'Serviços' }).first().click()
-  await expect(page).toHaveURL(/\/servicos/)
+  await expect(page).toHaveURL(/\/painel\/servicos/)
+  await expect(page.getByRole('heading', { name: 'Serviços' })).toBeVisible()
 })
