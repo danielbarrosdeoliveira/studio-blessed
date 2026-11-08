@@ -215,8 +215,7 @@ async function save() {
 
         <p class="text-xs text-muted">
           Os intervalos definem quando o salão atende. Qualquer evento ou bloqueio na agenda do
-          Google Calendar automaticamente invalida aquele slot na listagem de horários
-          disponíveis.
+          Google Calendar automaticamente invalida aquele slot na listagem de horários disponíveis.
         </p>
       </div>
     </template>
