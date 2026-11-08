@@ -1,16 +1,14 @@
-import { and, asc, eq, gt, inArray, lt, or } from 'drizzle-orm'
+import { and, asc, eq, gt, inArray, lt } from 'drizzle-orm'
 import { db } from '../database'
-import { appointment, service, timeBlock, workingHours } from '../database/schema'
+import { appointment, service, workingHours } from '../database/schema'
 import { computeAvailability } from './availability-engine'
 import type { AvailabilitySlot } from './availability-engine'
 import type { MinuteInterval } from './time'
 import {
-  MINUTES_PER_DAY,
   TIME_ZONE,
   addDaysToIsoDate,
   dayBounds,
   localDateOf,
-  localPartsOf,
   toMinuteInterval
 } from './time'
 import {
@@ -74,7 +72,7 @@ export async function getAvailabilityForDay(params: AvailabilityParams): Promise
   const bounds = dayBounds(params.date)
 
   // Fetch local data and Google Calendar events in parallel
-  const [hours, appointments, blocks, googleCalendarEvents] = await Promise.all([
+  const [hours, appointments, googleCalendarEvents] = await Promise.all([
     db
       .select({
         start: workingHours.startMinute,
@@ -100,20 +98,6 @@ export async function getAvailabilityForDay(params: AvailabilityParams): Promise
         )
       ),
 
-    db
-      .select({
-        startsAt: timeBlock.startsAt,
-        endsAt: timeBlock.endsAt,
-        recurrence: timeBlock.recurrence
-      })
-      .from(timeBlock)
-      .where(
-        or(
-          and(lt(timeBlock.startsAt, bounds.end), gt(timeBlock.endsAt, bounds.start)),
-          eq(timeBlock.recurrence, 'weekly')
-        )
-      ),
-
     // Fetch events from Google Calendar (single source of truth)
     fetchGoogleCalendarEvents(params.date, bounds)
   ])
@@ -133,38 +117,7 @@ export async function getAvailabilityForDay(params: AvailabilityParams): Promise
     }
   }
 
-  // 2. Local time blocks
-  for (const block of blocks) {
-    if (block.recurrence === 'weekly') {
-      if (params.date < localDateOf(block.startsAt)) {
-        continue
-      }
-
-      const start = localPartsOf(block.startsAt)
-
-      if (start.weekday !== bounds.weekday) {
-        continue
-      }
-
-      const startMinute = start.hour * 60 + start.minute
-      const sameDay = localDateOf(block.endsAt) === localDateOf(block.startsAt)
-      const endMinute = sameDay
-        ? localPartsOf(block.endsAt).hour * 60 + localPartsOf(block.endsAt).minute
-        : MINUTES_PER_DAY
-
-      if (endMinute > startMinute) {
-        busyIntervals.push({ start: startMinute, end: endMinute })
-      }
-    } else {
-      const interval = toMinuteInterval(block.startsAt, block.endsAt, bounds)
-
-      if (interval) {
-        busyIntervals.push(interval)
-      }
-    }
-  }
-
-  // 3. Google Calendar events (THE single source of truth for external conflicts)
+  // 2. Google Calendar events (THE single source of truth for external conflicts)
   // These events come from all configured calendars (primary, Pessoal, Família, etc.)
   for (const { events } of googleCalendarEvents) {
     for (const event of events) {

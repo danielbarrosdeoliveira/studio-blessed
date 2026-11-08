@@ -30,12 +30,10 @@ O sistema **não possui múltiplas agendas**. Apenas **uma agenda única** para 
 
 | Item                 | Detalhe                                                                                                                                                 |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Fonte da verdade** | PostgreSQL (agenda interna) — única para todo o salão                                                                                                   |
+| **Fonte da verdade** | Google Calendar — evento em qualquer calendário configurado invalida o slot                                                                             |
 | **WorkingHours**     | `weekday`, `startMinute`, `endMinute` (sem `professionalId`)                                                                                            |
-| **TimeBlock**        | `startsAt`, `endsAt`, `reason`, `recurrence` (`weekly` \| null)                                                                                         |
-| **Disponibilidade**  | `WorkingHours` − `TimeBlocks` − serviços agendados.                                                                                                     |
+| **Disponibilidade**  | `WorkingHours` − agendamentos − eventos do Google Calendar                                                                                              |
 | **Antecedência**     | Cliente: **3 dias** mínimos, por **data local** (no 3º dia, o primeiro horário já vale). Dona: pode agendar hoje/amanhã e encaixes.                     |
-| **Bloqueios**        | A dona cria bloqueios pontuais ou semanais. Pode sobrepor agendamento `scheduled` somente com **confirmação explícita**; o agendamento não é cancelado. |
 
 ### Mapeamento do agendamento
 
@@ -45,10 +43,9 @@ O sistema **não possui múltiplas agendas**. Apenas **uma agenda única** para 
 
 ## 4. Motor de Disponibilidade
 
-- **Entrada:** `WorkingHours` da dona − `TimeBlocks` − serviço (`durationMin` + `bufferMin`).
+- **Entrada:** `WorkingHours` da dona − agendamentos com buffer − eventos do Google Calendar (`GOOGLE_CALENDAR_AVAILABILITY_IDS`)
 - **Saída:** lista de horários de início a cada **15 minutos** dentro da jornada.
 - **Antecedência:** cliente exige **3 dias** por data local; a dona pode hoje/amanhã e encaixes.
-- **Bloqueios:** pontuais ou semanais. Se um bloqueio sobrepõe agendamento `scheduled`, a API responde `409` com os conflitos e só grava após `confirmConflict: true`; o agendamento permanece `scheduled`.
 - **Concorrência:** sem lock. A disponibilidade é **revalidada imediatamente antes de gravar**; se o slot ocupou, o cliente escolhe outro horário.
   - ⚠️ Risco residual aceito: em salão pequeno com baixo volume, double-booking é improvável.
 - **Performance:** agrupar chamadas e cachear `WorkingHours`/serviços.
@@ -58,7 +55,6 @@ O sistema **não possui múltiplas agendas**. Apenas **uma agenda única** para 
 - **Client:** `name`, `phone` (único — cliente única por telefone no salão).
 - **Service:** `name`, `durationMin`, `bufferMin`, `priceCents`, `active`. O `name` é único entre os serviços ativos (sem diferenciar maiúsculas/espaços). Todos os serviços pertencem à dona.
 - **WorkingHours:** `weekday`, `startMinute`, `endMinute` (múltiplos intervalos por dia — cobre almoço).
-- **TimeBlock:** `startsAt`, `endsAt`, `reason`, `recurrence` (`weekly` | null).
 - **Appointment:** `clientId`, `serviceId`, `startsAt`, `endsAt`, `status` (`scheduled`|`completed`|`cancelled`|`no_show`), `origin` (`client`|`staff`).
 
 **Nota:** **Não existe entidade `Professional`**. Todas as operações são da dona única.

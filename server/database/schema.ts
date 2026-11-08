@@ -145,20 +145,6 @@ export const workingHours = pgTable(
   (t) => [index('working_hours_weekday_idx').on(t.weekday)]
 )
 
-/** Bloqueio pontual ou recorrente (ex.: `weekly`) da dona do salão. */
-export const timeBlock = pgTable(
-  'time_block',
-  {
-    id: id(),
-    startsAt: timestamp('starts_at', { withTimezone: true }).notNull(),
-    endsAt: timestamp('ends_at', { withTimezone: true }).notNull(),
-    reason: text('reason'),
-    recurrence: text('recurrence'),
-    createdAt: createdAt()
-  },
-  (t) => [index('time_block_starts_at_idx').on(t.startsAt)]
-)
-
 /** Agendamento público (cliente) ou de staff. */
 export const appointment = pgTable(
   'appointment',
@@ -219,6 +205,5 @@ export type User = typeof user.$inferSelect
 export type Client = typeof client.$inferSelect
 export type Service = typeof service.$inferSelect
 export type WorkingHours = typeof workingHours.$inferSelect
-export type TimeBlock = typeof timeBlock.$inferSelect
 export type Appointment = typeof appointment.$inferSelect
 export type AuditLog = typeof auditLog.$inferSelect

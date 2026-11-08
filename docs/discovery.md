@@ -29,7 +29,7 @@ financeiro de repasse nem comissão, pois há apenas uma usuária.
 
 O modelo é **single-owner**: não existem papéis, `role` ou hierarquia de acesso.
 
-- **Dona do salão:** qualquer usuário autenticado tem acesso total. Cadastra serviços, horários e bloqueios. Cria agendamentos para hoje/amanhã/encaixes. Vê todas as métricas e corrige status.
+- **Dona do salão:** qualquer usuário autenticado tem acesso total. Cadastra serviços, horários e jornada. Cria agendamentos para hoje/amanhã/encaixes. Vê todas as métricas e corrige status.
 - **Cliente (público):** **sem login**. Identificada por **nome + WhatsApp**. Consulta histórico apenas informando o telefone (risco aceito).
 - **Profissional:** **não existe** como entidade ou papel. Todas as funcionalidades antes atribuídas a profissionais agora pertencem à dona.
 
@@ -39,7 +39,6 @@ O modelo é **single-owner**: não existem papéis, `role` ou hierarquia de aces
 - **Service:** `name`, `durationMin`, `bufferMin`, `priceCents`, `active`. O nome é **único entre os serviços ativos** (sem diferenciar maiúsculas/faixas); o catálogo lista cada serviço uma vez. Serviços inativos preservam o histórico. Combos são serviços próprios com nome e duração maior.
 - **WorkingHour:** `weekday`, `startMinute`, `endMinute`, `createdAt`. Pertence à dona.
 - **Appointment:** `client`, `service`, `startsAt`, `endsAt`, `status` (`scheduled` | `completed` | `cancelled` | `no_show`), `origin` (`client` | `staff`). **Sem `professionalId`** — a relação é implícita pela dona única do salão.
-- **TimeBlock:** `startsAt`, `endsAt`, `reason`, `recurrence` (`weekly`). Bloqueios da dona.
 
 ## 5. Fluxo de agendamento (cliente)
 
@@ -59,9 +58,9 @@ A rota antiga `/agendar` redireciona para `/agendamento`, preservando os parâme
 > O Google Calendar entra na **fase final do MVP**. A abstração de provider já
 > existe no código, mas sem chamadas reais ao Google nesta fase.
 
-- **Fonte da verdade:** Agenda interna no Postgres (fase 1).
-- **Disponibilidade =** `WorkingHours` − `TimeBlocks` − eventos busy.
-- **Escrita:** ao confirmar, cria registro no PostgreSQL.
+- **Fonte da verdade:** Google Calendar — eventos em qualquer calendário configurado (`GOOGLE_CALENDAR_AVAILABILITY_IDS`) invalide o slot
+- **Disponibilidade =** `WorkingHours` − agendamentos − eventos do Google Calendar
+- **Escrita:** ao confirmar, cria registro no PostgreSQL (agendamento).
 - **Rules de antecedência:**
   - **Cliente:** antecedência mínima de **3 dias** para qualquer serviço,
     contada por **data local** — no 3º dia, o primeiro horário (09:00) já está
@@ -71,11 +70,6 @@ A rota antiga `/agendar` redireciona para `/agendamento`, preservando os parâme
 ### Granularidade dos horários
 
 - Inícios de horário a cada **15 minutos** dentro da jornada.
-
-### Bloqueios
-
-- A dona **pode** criar bloqueios pontuais ou semanais.
-- Suportam **recorrência** (ex.: semanal), além de bloqueios pontuais.
 
 ### Concorrência
 
@@ -121,7 +115,6 @@ Multi-tenant; pagamento online/gateway; engine fiscal; notificações automátic
 - "Sem notificações" × "enviar mensagem de confirmação" → **sem envio no MVP** (só tela de sucesso); automação futura via WAHA + N8N.
 - PWA (ambos os docs) → **web responsivo, sem PWA**.
 - "Comissão/repasse" × métrica "faturamento" → faturamento = **movimento** (soma dos preços de serviços concluídos), sem quebra por agenda (não há profissionais).
-- **Bloqueio sobre agendamento existente** → exige **confirmação explícita**; o bloqueio é salvo e o agendamento permanece `scheduled`.
 - **Agregação de serviços por nome** → regra definida: o nome é **único entre os serviços ativos** (sem diferenciar maiúsculas/espaços) e cada serviço pertence à dona. Não há o mesmo serviço em agendas diferentes (não há profissionais).
 
 ---

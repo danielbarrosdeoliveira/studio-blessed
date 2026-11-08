@@ -12,7 +12,6 @@
 | E2  | Jornada & Horário da Dona     | P0                     |
 | E3  | Serviços                      | P0                     |
 | E4  | Integração Google Calendar    | P2 (fase final do MVP) |
-| E5  | Bloqueios de Horário          | P1                     |
 | E6  | Motor de Disponibilidade      | P0                     |
 | E7  | Agendamento Público (Cliente) | P0                     |
 | E8  | Operação de Agendamentos      | P0                     |
@@ -69,16 +68,6 @@
 - **CA2:** Dado um dia sem `WorkingHours`, quando consultado, então não há disponibilidade.
 - **CA3:** Dado alteração de jornada, quando salva, então os próximos cálculos de
   disponibilidade refletem a mudança.
-
-### US2.2 — Configurar blocos
-
-**Como** dona do salão, **quero** bloquear períodos do dia,
-**para** deixá-los indisponíveis.
-
-- **CA1:** Dado um bloco `13:00–14:00`, quando calculo disponibilidade, então
-  não há slots nesse intervalo.
-- **CA2:** Dado um bloqueio semanal, quando o dia da semana coincide, então o
-  intervalo é bloqueado em todas as ocorrências.
 
 ---
 
@@ -146,37 +135,6 @@
 - **CA1:** Dado cancelamento, quando a dona usa Google, então o evento é removido.
 - **CA2:** Dado reagendamento, quando a dona usa Google, então o evento é movido
   para o novo horário.
-
----
-
-## E5 — Bloqueios de Horário (P1)
-
-**Objetivo:** registrar folgas, almoços e compromissos da dona.
-
-### US5.1 — Criar bloqueio
-
-**Como** dona do salão, **quero** bloquear um período,
-**para** deixá-lo indisponível.
-
-- **CA1:** Dado um bloqueio `13:00–14:00`, quando calculo disponibilidade, então
-  não há slots nesse intervalo.
-
-### US5.2 — Bloqueio recorrente
-
-**Como** dona do salão, **quero** bloqueios recorrentes (ex.: semanal),
-**para** não recriar o almoço todos os dias.
-
-- **CA1:** Dado um bloqueio semanal, quando o dia da semana coincide, então o
-  intervalo é bloqueado em todas as ocorrências.
-
-### US5.3 — Bloqueio sobre agendamento
-
-**Como** dona do salão, **quero** ser avisada ao tentar bloquear sobre um
-agendamento existente, **para** não perder o compromisso.
-
-- **CA1:** Dado conflito com agendamento `scheduled`, quando tento salvar o bloqueio,
-  então a API responde `409` com a lista de conflitos e a UI pede confirmação explícita.
-- **CA2:** Dado que confirmo, quando salvo, então o bloqueio é criado e o agendamento permanece `scheduled`; nenhum agendamento é cancelado.
 
 ---
 

@@ -27,7 +27,7 @@ useHead({
               <dd class="font-medium text-highlighted">Dona única</dd>
             </div>
             <div class="flex items-center justify-between gap-4">
-              <dt class="text-muted">Jornada e bloqueios</dt>
+              <dt class="text-muted">Jornada e disponibilidade</dt>
               <dd>
                 <UButton
                   to="/painel/jornada"

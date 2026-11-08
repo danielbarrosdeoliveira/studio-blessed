@@ -67,7 +67,6 @@ se o épico for grande). Exemplos:
 | E1 — Fundação & Autenticação  | `feat/e1-fundacao`              |
 | E2 — Profissionais & Jornada  | `feat/e2-profissionais-jornada` |
 | E3 — Serviços                 | `feat/e3-servicos`              |
-| E5 — Bloqueios                | `feat/e5-bloqueios`             |
 | E6 — Motor de Disponibilidade | `feat/e6-disponibilidade`       |
 | E7 — Agendamento Público      | `feat/e7-agendamento-publico`   |
 | E8 — Operação de Agendamentos | `feat/e8-operacao-agendamentos` |
