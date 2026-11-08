@@ -15,10 +15,7 @@ export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL,
 
   // Trusted origins for CORS and OAuth redirects (fixes INVALID_ORIGIN in production)
-  trustedOrigins: [
-    'https://studioblessed.com.br',
-    'https://www.studioblessed.com.br'
-  ],
+  trustedOrigins: ['https://studioblessed.com.br', 'https://www.studioblessed.com.br'],
 
   // Email/password: disabled in production, enabled for tests
   emailAndPassword: {
@@ -44,13 +41,13 @@ export const auth = betterAuth({
 
   // Sessão do usuário no app (cookie) - 7 dias, renova a cada uso
   session: {
-    expiresIn: 60 * 60 * 24 * 7,      // 7 dias (em segundos)
-    updateAge: 60 * 60 * 24,          // Renova se último update > 1 dia
+    expiresIn: 60 * 60 * 24 * 7, // 7 dias (em segundos)
+    updateAge: 60 * 60 * 24, // Renova se último update > 1 dia
     cookieCache: {
       enabled: true,
-      maxAge: 60 * 5                  // Cache do cookie por 5 min (performance)
+      maxAge: 60 * 5 // Cache do cookie por 5 min (performance)
     }
-  },
+  }
 
   // Better Auth automatically syncs user profile (name, image) from Google
   // when user signs in with the 'userinfo.profile' and 'userinfo.email' scopes.

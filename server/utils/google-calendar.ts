@@ -25,11 +25,9 @@ export interface GoogleCalendarError {
   message: string
 }
 
-export type CalendarListResult = 
-  | { ok: true; calendars: CalendarListEntry[] }
-  | GoogleCalendarError
+export type CalendarListResult = { ok: true; calendars: CalendarListEntry[] } | GoogleCalendarError
 
-export type EventsFromCalendarsResult = 
+export type EventsFromCalendarsResult =
   | { ok: true; calendars: Array<{ calendarId: string; events: GoogleCalendarEvent[] }> }
   | GoogleCalendarError
 
@@ -59,14 +57,16 @@ export interface GoogleCalendarConfig {
 export function getGoogleCalendarConfig(): GoogleCalendarConfig {
   // Parse comma-separated calendar IDs from env, or use defaults
   const availabilityIds = process.env.GOOGLE_CALENDAR_AVAILABILITY_IDS
-    ? process.env.GOOGLE_CALENDAR_AVAILABILITY_IDS.split(',').map((id) => id.trim()).filter(Boolean)
+    ? process.env.GOOGLE_CALENDAR_AVAILABILITY_IDS.split(',')
+        .map((id) => id.trim())
+        .filter(Boolean)
     : ['primary']
 
   const createCalendarId = process.env.GOOGLE_CALENDAR_CREATE_ID || 'primary'
 
   return {
     availabilityCalendarIds: availabilityIds,
-    createEventCalendarId: createCalendarId,
+    createEventCalendarId: createCalendarId
   }
 }
 
@@ -80,7 +80,7 @@ async function getOwnerGoogleAccount() {
       accessToken: account.accessToken,
       refreshToken: account.refreshToken,
       accessTokenExpiresAt: account.accessTokenExpiresAt,
-      scope: account.scope,
+      scope: account.scope
     })
     .from(account)
     .where(eq(account.providerId, 'google'))
@@ -93,7 +93,9 @@ async function getOwnerGoogleAccount() {
  * Refreshes the Google access token using the stored refresh token.
  * Updates the database with the new access token and expiry.
  */
-async function refreshAccessToken(refreshToken: string): Promise<{ accessToken: string; expiresAt: Date } | null> {
+async function refreshAccessToken(
+  refreshToken: string
+): Promise<{ accessToken: string; expiresAt: Date } | null> {
   const clientId = process.env.GOOGLE_CLIENT_ID
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET
 
@@ -106,13 +108,13 @@ async function refreshAccessToken(refreshToken: string): Promise<{ accessToken: 
       client_id: clientId,
       client_secret: clientSecret,
       refresh_token: refreshToken,
-      grant_type: 'refresh_token',
+      grant_type: 'refresh_token'
     })
 
     const res = await fetch(GOOGLE_OAUTH_TOKEN_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: params.toString(),
+      body: params.toString()
     })
 
     if (!res.ok) {
@@ -138,7 +140,7 @@ async function refreshAccessToken(refreshToken: string): Promise<{ accessToken: 
         accessToken: data.access_token,
         accessTokenExpiresAt: expiresAt,
         ...(data.refresh_token ? { refreshToken: data.refresh_token } : {}),
-        updatedAt: new Date(),
+        updatedAt: new Date()
       })
       .where(eq(account.providerId, 'google'))
 
@@ -194,13 +196,13 @@ export async function listCalendars(): Promise<CalendarListResult> {
     return {
       ok: false,
       statusCode: 400,
-      message: 'Token do Google não encontrado. Reconecte a agenda.',
+      message: 'Token do Google não encontrado. Reconecte a agenda.'
     }
   }
 
   try {
     const res = await fetch(`${GOOGLE_CALENDAR_API}/users/me/calendarList`, {
-      headers: { Authorization: `Bearer ${accessToken}` },
+      headers: { Authorization: `Bearer ${accessToken}` }
     })
 
     if (!res.ok) {
@@ -208,14 +210,14 @@ export async function listCalendars(): Promise<CalendarListResult> {
         return {
           ok: false,
           statusCode: 401,
-          message: 'Token do Google expirado. Reconecte a agenda.',
+          message: 'Token do Google expirado. Reconecte a agenda.'
         }
       }
       const text = await res.text()
       return {
         ok: false,
         statusCode: res.status,
-        message: `Erro ao listar calendários: ${text}`,
+        message: `Erro ao listar calendários: ${text}`
       }
     }
 
@@ -228,7 +230,7 @@ export async function listCalendars(): Promise<CalendarListResult> {
     return {
       ok: false,
       statusCode: 500,
-      message: `Erro de rede ao listar calendários: ${error instanceof Error ? error.message : 'unknown'}`,
+      message: `Erro de rede ao listar calendários: ${error instanceof Error ? error.message : 'unknown'}`
     }
   }
 }
@@ -248,7 +250,7 @@ export async function getEventsFromCalendars(
     return {
       ok: false,
       statusCode: 400,
-      message: 'Token do Google não encontrado. Reconecte a agenda.',
+      message: 'Token do Google não encontrado. Reconecte a agenda.'
     }
   }
 
@@ -256,7 +258,9 @@ export async function getEventsFromCalendars(
 
   for (const calendarId of calendarIds) {
     try {
-      const url = new URL(`${GOOGLE_CALENDAR_API}/calendars/${encodeURIComponent(calendarId)}/events`)
+      const url = new URL(
+        `${GOOGLE_CALENDAR_API}/calendars/${encodeURIComponent(calendarId)}/events`
+      )
       url.searchParams.set('timeMin', timeMin)
       url.searchParams.set('timeMax', timeMax)
       url.searchParams.set('singleEvents', 'true')
@@ -265,7 +269,7 @@ export async function getEventsFromCalendars(
       url.searchParams.set('showDeleted', 'false')
 
       const res = await fetch(url.toString(), {
-        headers: { Authorization: `Bearer ${accessToken}` },
+        headers: { Authorization: `Bearer ${accessToken}` }
       })
 
       if (!res.ok) {
@@ -273,7 +277,7 @@ export async function getEventsFromCalendars(
           return {
             ok: false,
             statusCode: 401,
-            message: 'Token do Google expirado. Reconecte a agenda.',
+            message: 'Token do Google expirado. Reconecte a agenda.'
           }
         }
         if (res.status === 404) {
@@ -281,7 +285,11 @@ export async function getEventsFromCalendars(
           continue // Skip calendars that don't exist or aren't accessible
         }
         const text = await res.text()
-        console.error(`[Google Calendar] Error fetching events from ${calendarId}:`, res.status, text)
+        console.error(
+          `[Google Calendar] Error fetching events from ${calendarId}:`,
+          res.status,
+          text
+        )
         continue
       }
 
@@ -321,7 +329,7 @@ export async function createGoogleCalendarEvent(
     return {
       ok: false,
       statusCode: 400,
-      message: 'Token do Google não encontrado. Reconecte a agenda.',
+      message: 'Token do Google não encontrado. Reconecte a agenda.'
     }
   }
 
@@ -340,21 +348,24 @@ export async function createGoogleCalendarEvent(
       useDefault: false,
       overrides: [
         { method: 'popup', minutes: 1440 }, // 1 dia antes (24h)
-        { method: 'popup', minutes: 120 },  // 2 horas antes
-        { method: 'popup', minutes: 60 }    // 1 hora antes
+        { method: 'popup', minutes: 120 }, // 2 horas antes
+        { method: 'popup', minutes: 60 } // 1 hora antes
       ]
     }
   }
 
   try {
-    const res = await fetch(`${GOOGLE_CALENDAR_API}/calendars/${encodeURIComponent(calendarId)}/events`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(eventPayload)
-    })
+    const res = await fetch(
+      `${GOOGLE_CALENDAR_API}/calendars/${encodeURIComponent(calendarId)}/events`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(eventPayload)
+      }
+    )
 
     if (!res.ok) {
       if (res.status === 401) {
@@ -420,14 +431,17 @@ export async function updateGoogleCalendarEvent(
   if (payload.attendees) eventPayload.attendees = payload.attendees.map((email) => ({ email }))
 
   try {
-    const res = await fetch(`${GOOGLE_CALENDAR_API}/calendars/${encodeURIComponent(calendarId)}/events/${googleEventId}`, {
-      method: 'PATCH',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(eventPayload)
-    })
+    const res = await fetch(
+      `${GOOGLE_CALENDAR_API}/calendars/${encodeURIComponent(calendarId)}/events/${googleEventId}`,
+      {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(eventPayload)
+      }
+    )
 
     if (!res.ok) {
       if (res.status === 401) {
@@ -488,10 +502,13 @@ export async function deleteGoogleCalendarEvent(
   const calendarId = config.createEventCalendarId
 
   try {
-    const res = await fetch(`${GOOGLE_CALENDAR_API}/calendars/${encodeURIComponent(calendarId)}/events/${googleEventId}`, {
-      method: 'DELETE',
-      headers: { Authorization: `Bearer ${accessToken}` }
-    })
+    const res = await fetch(
+      `${GOOGLE_CALENDAR_API}/calendars/${encodeURIComponent(calendarId)}/events/${googleEventId}`,
+      {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${accessToken}` }
+      }
+    )
 
     if (!res.ok) {
       if (res.status === 401) {

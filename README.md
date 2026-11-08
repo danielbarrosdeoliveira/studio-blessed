@@ -86,20 +86,20 @@ pnpm db:migrate
 
 ## Scripts
 
-| Script               | Descrição                                       |
-| -------------------- | ----------------------------------------------- |
-| `pnpm dev`           | Servidor de desenvolvimento                     |
-| `pnpm build`         | Build de produção                               |
-| `pnpm preview`       | Preview do build                                |
-| `pnpm lint`          | ESLint                                          |
-| `pnpm format`        | Prettier (escreve)                              |
-| `pnpm format:check`  | Prettier (verifica sem escrever)                |
-| `pnpm typecheck`     | Checagem de tipos                               |
-| `pnpm db:up`         | Sobe o PostgreSQL local (Docker Compose)        |
-| `pnpm db:down`       | Derruba o PostgreSQL local                      |
-| `pnpm db:generate`   | Geração de migration a partir do schema Drizzle |
-| `pnpm db:migrate`    | Aplica migrations                               |
-| `pnpm db:studio`     | Abre o Drizzle Studio                           |
+| Script              | Descrição                                       |
+| ------------------- | ----------------------------------------------- |
+| `pnpm dev`          | Servidor de desenvolvimento                     |
+| `pnpm build`        | Build de produção                               |
+| `pnpm preview`      | Preview do build                                |
+| `pnpm lint`         | ESLint                                          |
+| `pnpm format`       | Prettier (escreve)                              |
+| `pnpm format:check` | Prettier (verifica sem escrever)                |
+| `pnpm typecheck`    | Checagem de tipos                               |
+| `pnpm db:up`        | Sobe o PostgreSQL local (Docker Compose)        |
+| `pnpm db:down`      | Derruba o PostgreSQL local                      |
+| `pnpm db:generate`  | Geração de migration a partir do schema Drizzle |
+| `pnpm db:migrate`   | Aplica migrations                               |
+| `pnpm db:studio`    | Abre o Drizzle Studio                           |
 
 ## Driver do Drizzle ORM (híbrido)
 

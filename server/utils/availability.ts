@@ -13,7 +13,11 @@ import {
   localPartsOf,
   toMinuteInterval
 } from './time'
-import { getEventsFromCalendars, getGoogleCalendarConfig, type GoogleCalendarEvent } from './google-calendar'
+import {
+  getEventsFromCalendars,
+  getGoogleCalendarConfig,
+  type GoogleCalendarEvent
+} from './google-calendar'
 
 /** Maior buffer aceito no cadastro de serviço (`server/api/services/index.post.ts`). */
 const MAX_BUFFER_MIN = 240

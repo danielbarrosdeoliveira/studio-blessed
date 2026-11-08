@@ -34,10 +34,11 @@ async function onGoogleSignIn() {
   } catch (error: unknown) {
     loading.value = false
     const message = error instanceof Error ? error.message : 'Erro desconhecido'
-    
+
     // Erro comum: origin não autorizado no Google Cloud Console
     if (message.includes('Invalid origin') || message.includes('INVALID_ORIGIN')) {
-      errorMessage.value = 'Domínio não autorizado no Google. Configure o "Authorized JavaScript origins" no Google Cloud Console com https://studioblessed.com.br'
+      errorMessage.value =
+        'Domínio não autorizado no Google. Configure o "Authorized JavaScript origins" no Google Cloud Console com https://studioblessed.com.br'
     } else {
       errorMessage.value = `Erro ao iniciar login: ${message}`
     }
