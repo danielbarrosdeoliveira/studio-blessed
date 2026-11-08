@@ -12,6 +12,9 @@ export const serviceColumns = {
   bufferMin: service.bufferMin,
   priceCents: service.priceCents,
   active: service.active,
+  hasMaintenance: service.hasMaintenance,
+  maintenancePriceCents: service.maintenancePriceCents,
+  maintenanceDurationMin: service.maintenanceDurationMin,
   createdAt: service.createdAt
 }
 
@@ -41,7 +44,8 @@ export async function requireServiceAccess(event: H3Event, serviceId: string) {
     .select({
       id: service.id,
       name: service.name,
-      active: service.active
+      active: service.active,
+      hasMaintenance: service.hasMaintenance
     })
     .from(service)
     .where(eq(service.id, serviceId))

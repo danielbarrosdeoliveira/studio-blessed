@@ -14,7 +14,10 @@ export default defineEventHandler(async () => {
       name: service.name,
       durationMin: service.durationMin,
       bufferMin: service.bufferMin,
-      priceCents: service.priceCents
+      priceCents: service.priceCents,
+      hasMaintenance: service.hasMaintenance,
+      maintenancePriceCents: service.maintenancePriceCents,
+      maintenanceDurationMin: service.maintenanceDurationMin
     })
     .from(service)
     .where(eq(service.active, true))

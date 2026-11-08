@@ -27,9 +27,13 @@ export interface AppointmentDetails {
   serviceId: string
   status: Appointment['status']
   origin: Appointment['origin']
+  bookingType: Appointment['bookingType']
   serviceName: string
   durationMin: number
   priceCents: number
+  hasMaintenance: boolean
+  maintenancePriceCents: number | null
+  maintenanceDurationMin: number | null
   clientName: string
   clientPhone: string
   notes: string | null
@@ -38,6 +42,16 @@ export interface AppointmentDetails {
 
 /** Objeto público: sem o telefone da cliente; datas em ISO e `canChange` calculado. */
 export function serializeAppointment(row: AppointmentDetails, now = new Date()) {
+  const isMaintenance = row.bookingType === 'maintenance'
+  const durationMin =
+    isMaintenance && row.hasMaintenance
+      ? (row.maintenanceDurationMin ?? row.durationMin)
+      : row.durationMin
+  const priceCents =
+    isMaintenance && row.hasMaintenance
+      ? (row.maintenancePriceCents ?? row.priceCents)
+      : row.priceCents
+
   return {
     id: row.id,
     createdAt: row.createdAt,
@@ -46,11 +60,12 @@ export function serializeAppointment(row: AppointmentDetails, now = new Date()) 
     endsAt: row.endsAt.toISOString(),
     status: row.status,
     origin: row.origin,
+    bookingType: row.bookingType,
     serviceId: row.serviceId,
     clientId: row.clientId,
     serviceName: row.serviceName,
-    durationMin: row.durationMin,
-    priceCents: row.priceCents,
+    durationMin,
+    priceCents,
     clientName: row.clientName,
     canChange: row.status === 'scheduled' && canChangeAppointment(row.startsAt, now)
   }
@@ -58,16 +73,27 @@ export function serializeAppointment(row: AppointmentDetails, now = new Date()) 
 
 /** Objeto interno: inclui telefone, observações e o status cru. */
 export function serializeStaffAppointment(row: AppointmentDetails) {
+  const isMaintenance = row.bookingType === 'maintenance'
+  const durationMin =
+    isMaintenance && row.hasMaintenance
+      ? (row.maintenanceDurationMin ?? row.durationMin)
+      : row.durationMin
+  const priceCents =
+    isMaintenance && row.hasMaintenance
+      ? (row.maintenancePriceCents ?? row.priceCents)
+      : row.priceCents
+
   return {
     id: row.id,
     startsAt: row.startsAt.toISOString(),
     endsAt: row.endsAt.toISOString(),
     status: row.status,
     origin: row.origin,
+    bookingType: row.bookingType,
     serviceId: row.serviceId,
     serviceName: row.serviceName,
-    durationMin: row.durationMin,
-    priceCents: row.priceCents,
+    durationMin,
+    priceCents,
     clientName: row.clientName,
     clientPhone: row.clientPhone,
     notes: row.notes

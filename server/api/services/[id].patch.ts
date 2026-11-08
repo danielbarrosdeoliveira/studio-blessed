@@ -20,7 +20,22 @@ const bodySchema = z.object({
     .optional(),
   bufferMin: z.number().int().min(0).max(240).optional(),
   priceCents: z.number().int().min(0, 'Preço inválido').max(10_000_000).optional(),
-  active: z.boolean().optional()
+  active: z.boolean().optional(),
+  hasMaintenance: z.boolean().optional(),
+  maintenancePriceCents: z
+    .number()
+    .int()
+    .min(0, 'Preço inválido')
+    .max(10_000_000)
+    .optional()
+    .nullable(),
+  maintenanceDurationMin: z
+    .number()
+    .int()
+    .min(5, 'Duração mínima de 5 min')
+    .max(600, 'Duração máxima de 600 min')
+    .optional()
+    .nullable()
 })
 
 export default defineEventHandler(async (event) => {
@@ -60,9 +75,20 @@ export default defineEventHandler(async (event) => {
     }
   }
 
+  const updateData: Record<string, unknown> = {
+    ...parsed.data,
+    updatedAt: new Date()
+  }
+
+  // If maintenance is disabled, clear maintenance fields
+  if (parsed.data.hasMaintenance === false) {
+    updateData.maintenancePriceCents = null
+    updateData.maintenanceDurationMin = null
+  }
+
   const rows = await db
     .update(service)
-    .set({ ...parsed.data, updatedAt: new Date() })
+    .set(updateData)
     .where(eq(service.id, id))
     // @ts-expect-error - Drizzle returning type issue
     .returning(serviceColumns)

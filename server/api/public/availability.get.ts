@@ -7,7 +7,8 @@ const querySchema = z.object({
   date: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Data inválida')
-    .refine(isValidDate, 'Data inválida')
+    .refine(isValidDate, 'Data inválida'),
+  bookingType: z.enum(['application', 'maintenance']).optional()
 })
 
 /** Disponibilidade pública (cliente): aplica a antecedência mínima de 3 dias. */
@@ -27,6 +28,7 @@ export default defineEventHandler(async (event) => {
   return getAvailabilityForDay({
     serviceId: parsed.data.serviceId,
     date: parsed.data.date,
-    origin: 'client'
+    origin: 'client',
+    bookingType: parsed.data.bookingType
   })
 })

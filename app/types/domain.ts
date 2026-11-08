@@ -13,11 +13,15 @@ export interface Service {
   bufferMin: number
   priceCents: number
   active: boolean
+  hasMaintenance: boolean
+  maintenancePriceCents: number | null
+  maintenanceDurationMin: number | null
   createdAt: string
 }
 
 export type AppointmentStatus = 'scheduled' | 'completed' | 'cancelled' | 'no_show'
 export type AppointmentOrigin = 'client' | 'staff'
+export type BookingType = 'application' | 'maintenance'
 
 export interface PublicAvailabilitySlot {
   startsAt: string
@@ -45,6 +49,7 @@ export interface PublicAppointment {
   endsAt: string
   status: AppointmentStatus
   origin: AppointmentOrigin
+  bookingType: BookingType
   serviceId: string
   serviceName: string
   durationMin: number
@@ -70,6 +75,7 @@ export interface StaffAppointment {
   endsAt: string
   status: AppointmentStatus
   origin: AppointmentOrigin
+  bookingType: BookingType
   serviceId: string
   serviceName: string
   durationMin: number

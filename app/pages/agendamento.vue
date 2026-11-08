@@ -3,7 +3,8 @@ import type {
   PublicAppointment,
   PublicAppointmentResponse,
   PublicCancellationPolicy,
-  Service
+  Service,
+  BookingType
 } from '~/types/domain'
 import { addDaysToIsoDate, formatInstantLong, todayInTimeZone } from '~/utils/date'
 import { getApiErrorMessage } from '~/utils/error'
@@ -19,6 +20,7 @@ useHead({
 
 interface ServiceSelection {
   service: Service
+  bookingType: BookingType
 }
 
 const route = useRoute()
@@ -33,7 +35,7 @@ function findSelection(serviceId: string): ServiceSelection | null {
     return null
   }
 
-  return { service }
+  return { service, bookingType: 'application' }
 }
 
 const initialServiceId = typeof route.query.serviceId === 'string' ? route.query.serviceId : ''
@@ -41,7 +43,7 @@ const initialSelection = findSelection(initialServiceId)
 const hadInitialQuery = !!initialServiceId
 
 const selectedService = ref<ServiceSelection | null>(initialSelection)
-const step = ref(initialSelection ? 1 : 0)
+const step = ref(initialSelection ? (initialSelection.service.hasMaintenance ? 0.5 : 1) : 0)
 const selectedSlot = ref<string | null>(null)
 const pickerKey = ref(0)
 const form = reactive({ name: '', phone: '' })
@@ -81,10 +83,40 @@ function formatPrice(cents: number) {
   return brl.format(cents / 100)
 }
 
+function getCurrentDuration(): number {
+  if (!selectedService.value) return 0
+  const { service, bookingType } = selectedService.value
+  if (bookingType === 'maintenance' && service.hasMaintenance) {
+    return service.maintenanceDurationMin ?? service.durationMin
+  }
+  return service.durationMin
+}
+
+function getCurrentPrice(): number {
+  if (!selectedService.value) return 0
+  const { service, bookingType } = selectedService.value
+  if (bookingType === 'maintenance' && service.hasMaintenance) {
+    return service.maintenancePriceCents ?? service.priceCents
+  }
+  return service.priceCents
+}
+
+function getBookingTypeLabel(type: BookingType): string {
+  return type === 'application' ? 'Aplicação Completa' : 'Manutenção'
+}
+
 function selectService(service: Service) {
-  selectedService.value = { service }
+  selectedService.value = { service, bookingType: 'application' }
   selectedSlot.value = null
   formError.value = ''
+  pickerKey.value += 1
+  step.value = service.hasMaintenance ? 0.5 : 1
+}
+
+function selectBookingType(type: BookingType) {
+  if (!selectedService.value) return
+  selectedService.value.bookingType = type
+  selectedSlot.value = null
   pickerKey.value += 1
   step.value = 1
 }
@@ -111,7 +143,8 @@ async function submit() {
         serviceId: selectedService.value.service.id,
         startsAt: selectedSlot.value,
         clientName: form.name.trim(),
-        clientPhone: form.phone
+        clientPhone: form.phone,
+        bookingType: selectedService.value.bookingType
       }
     })
 
@@ -150,7 +183,7 @@ function bookAnother() {
   selectedSlot.value = null
   formError.value = ''
   pickerKey.value += 1
-  step.value = 1
+  step.value = selectedService.value?.service.hasMaintenance ? 0.5 : 1
 }
 </script>
 
@@ -223,9 +256,117 @@ function bookAnother() {
       </p>
 
       <div v-if="selectedService" class="mt-4 flex justify-end">
-        <UButton label="Continuar" trailing-icon="i-ri-arrow-right-line" @click="step = 1" />
+        <UButton
+          label="Continuar"
+          trailing-icon="i-ri-arrow-right-line"
+          @click="step = selectedService.service.hasMaintenance ? 0.5 : 1"
+        />
       </div>
     </UCard>
+
+    <template v-else-if="step === 0.5 && selectedService">
+      <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <UCard>
+          <template #header>
+            <div>
+              <h2 class="font-semibold text-highlighted">Tipo de atendimento</h2>
+              <p class="text-sm text-muted">
+                {{ selectedService.service.name }} oferece opção de manutenção.
+              </p>
+            </div>
+          </template>
+
+          <div class="grid gap-4">
+            <UCard
+              class="cursor-pointer transition-colors hover:bg-default/50"
+              :class="selectedService.bookingType === 'application' ? 'ring-2 ring-primary' : ''"
+              @click="selectBookingType('application')"
+            >
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="font-semibold text-highlighted">Aplicação Completa</h3>
+                  <p class="mt-1 text-sm text-muted">
+                    {{ getCurrentDuration() }} min · {{ formatPrice(getCurrentPrice()) }}
+                  </p>
+                </div>
+                <UBadge
+                  :color="selectedService.bookingType === 'application' ? 'primary' : 'neutral'"
+                  :variant="selectedService.bookingType === 'application' ? 'solid' : 'subtle'"
+                >
+                  {{ selectedService.bookingType === 'application' ? 'Selecionado' : 'Selecionar' }}
+                </UBadge>
+              </div>
+            </UCard>
+
+            <UCard
+              class="cursor-pointer transition-colors hover:bg-default/50"
+              :class="selectedService.bookingType === 'maintenance' ? 'ring-2 ring-primary' : ''"
+              @click="selectBookingType('maintenance')"
+            >
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="font-semibold text-highlighted">Manutenção</h3>
+                  <p class="mt-1 text-sm text-muted">
+                    {{ getCurrentDuration() }} min · {{ formatPrice(getCurrentPrice()) }}
+                  </p>
+                </div>
+                <UBadge
+                  :color="selectedService.bookingType === 'maintenance' ? 'primary' : 'neutral'"
+                  :variant="selectedService.bookingType === 'maintenance' ? 'solid' : 'subtle'"
+                >
+                  {{ selectedService.bookingType === 'maintenance' ? 'Selecionado' : 'Selecionar' }}
+                </UBadge>
+              </div>
+            </UCard>
+          </div>
+
+          <div class="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-between">
+            <UButton
+              label="Voltar"
+              icon="i-ri-arrow-left-line"
+              color="neutral"
+              variant="ghost"
+              @click="step = 0"
+            />
+            <UButton label="Continuar" trailing-icon="i-ri-arrow-right-line" @click="step = 1" />
+          </div>
+        </UCard>
+
+        <UCard>
+          <template #header>
+            <h2 class="font-semibold text-highlighted">Resumo</h2>
+          </template>
+
+          <dl class="space-y-3 text-sm">
+            <dt class="text-neutral-500 dark:text-neutral-400">Serviço</dt>
+            <dd class="text-right font-medium text-neutral-100">
+              {{ selectedService.service.name }}
+            </dd>
+            <dt class="text-neutral-500 dark:text-neutral-400">Tipo</dt>
+            <dd class="text-right font-medium text-neutral-100">
+              {{ getBookingTypeLabel(selectedService.bookingType) }}
+            </dd>
+            <dt class="text-neutral-500 dark:text-neutral-400">Duração</dt>
+            <dd class="text-right font-medium text-neutral-100">{{ getCurrentDuration() }} min</dd>
+            <dt class="text-neutral-500 dark:text-neutral-400">Preço</dt>
+            <dd class="text-right font-medium text-neutral-100">
+              {{ formatPrice(getCurrentPrice()) }}
+            </dd>
+          </dl>
+
+          <div class="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-between">
+            <UButton
+              label="Voltar"
+              icon="i-ri-arrow-left-line"
+              color="neutral"
+              variant="ghost"
+              @click="step = 0"
+            />
+            <UButton label="Continuar" trailing-icon="i-ri-arrow-right-line" @click="step = 1" />
+          </div>
+        </UCard>
+      </div>
+    </template>
 
     <template v-else-if="step === 1 && selectedService">
       <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
@@ -235,11 +376,13 @@ function bookAnother() {
               <div>
                 <h2 class="font-semibold text-highlighted">Escolha a data e o horário</h2>
                 <p class="text-sm text-muted">
-                  {{ selectedService.service.name }} · {{ selectedService.service.durationMin }} min
+                  {{ selectedService.service.name }} ·
+                  {{ getBookingTypeLabel(selectedService.bookingType) }} ·
+                  {{ getCurrentDuration() }} min
                 </p>
               </div>
               <span class="font-medium whitespace-nowrap text-highlighted">
-                {{ formatPrice(selectedService.service.priceCents) }}
+                {{ formatPrice(getCurrentPrice()) }}
               </span>
             </div>
           </template>
@@ -257,6 +400,7 @@ function bookAnother() {
             v-model="selectedSlot"
             :service-id="selectedService.service.id"
             :min-date="minDate"
+            :booking-type="selectedService.bookingType"
           />
 
           <div class="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-between">
@@ -265,7 +409,7 @@ function bookAnother() {
               icon="i-ri-arrow-left-line"
               color="neutral"
               variant="ghost"
-              @click="step = 0"
+              @click="step = selectedService.service.hasMaintenance ? 0.5 : 0"
             />
             <UButton
               label="Continuar"
@@ -286,13 +430,15 @@ function bookAnother() {
             <dd class="text-right font-medium text-neutral-100">
               {{ selectedService.service.name }}
             </dd>
-            <dt class="text-neutral-500 dark:text-neutral-400">Duração</dt>
+            <dt class="text-neutral-500 dark:text-neutral-400">Tipo</dt>
             <dd class="text-right font-medium text-neutral-100">
-              {{ selectedService.service.durationMin }} min
+              {{ getBookingTypeLabel(selectedService.bookingType) }}
             </dd>
+            <dt class="text-neutral-500 dark:text-neutral-400">Duração</dt>
+            <dd class="text-right font-medium text-neutral-100">{{ getCurrentDuration() }} min</dd>
             <dt class="text-neutral-500 dark:text-neutral-400">Preço</dt>
             <dd class="text-right font-medium text-neutral-100">
-              {{ formatPrice(selectedService.service.priceCents) }}
+              {{ formatPrice(getCurrentPrice()) }}
             </dd>
             <dt v-if="selectedSlot" class="text-neutral-500 dark:text-neutral-400">Horário</dt>
             <dd v-if="selectedSlot" class="text-right font-medium text-neutral-100">
@@ -306,7 +452,7 @@ function bookAnother() {
               icon="i-ri-arrow-left-line"
               color="neutral"
               variant="ghost"
-              @click="step = 0"
+              @click="step = selectedService.service.hasMaintenance ? 0.5 : 0"
             />
             <UButton
               label="Continuar"
@@ -402,13 +548,15 @@ function bookAnother() {
             <dd class="text-right font-medium text-highlighted">
               {{ selectedService.service.name }}
             </dd>
-            <dt class="text-neutral-500 dark:text-neutral-400">Duração</dt>
+            <dt class="text-neutral-500 dark:text-neutral-400">Tipo</dt>
             <dd class="text-right font-medium text-neutral-100">
-              {{ selectedService.service.durationMin }} min
+              {{ getBookingTypeLabel(selectedService.bookingType) }}
             </dd>
+            <dt class="text-neutral-500 dark:text-neutral-400">Duração</dt>
+            <dd class="text-right font-medium text-neutral-100">{{ getCurrentDuration() }} min</dd>
             <dt class="text-neutral-500 dark:text-neutral-400">Preço</dt>
             <dd class="text-right font-medium text-neutral-100">
-              {{ formatPrice(selectedService.service.priceCents) }}
+              {{ formatPrice(getCurrentPrice()) }}
             </dd>
             <dt class="text-neutral-500 dark:text-neutral-400">Horário</dt>
             <dd class="text-right font-medium text-neutral-100">
@@ -432,6 +580,10 @@ function bookAnother() {
         <dt class="text-neutral-500 dark:text-neutral-400">Serviço</dt>
         <dd class="text-right font-medium text-neutral-100">
           {{ created.serviceName }}
+        </dd>
+        <dt class="text-neutral-500 dark:text-neutral-400">Tipo</dt>
+        <dd class="text-right font-medium text-neutral-100">
+          {{ created.bookingType === 'maintenance' ? 'Manutenção' : 'Aplicação Completa' }}
         </dd>
         <dt class="text-neutral-500 dark:text-neutral-400">Data e horário</dt>
         <dd class="text-right font-medium text-neutral-100">

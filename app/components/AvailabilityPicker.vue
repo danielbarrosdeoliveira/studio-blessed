@@ -14,11 +14,14 @@ const props = withDefaults(
     endpoint?: string
     /** Aplica a antecedência mínima de 3 dias da cliente. */
     clientLead?: boolean
+    /** Tipo de agendamento: 'application' (padrão) ou 'maintenance'. */
+    bookingType?: 'application' | 'maintenance'
   }>(),
   {
     label: undefined,
     endpoint: '/api/public/availability',
-    clientLead: true
+    clientLead: true,
+    bookingType: 'application'
   }
 )
 
@@ -72,7 +75,8 @@ async function load() {
     const result = await $fetch<PublicAvailability>(props.endpoint, {
       query: {
         serviceId: props.serviceId,
-        date: selectedDate.value
+        date: selectedDate.value,
+        bookingType: props.bookingType
       }
     })
 
