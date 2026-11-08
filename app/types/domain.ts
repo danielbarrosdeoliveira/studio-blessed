@@ -13,7 +13,7 @@ export interface Service {
   bufferMin: number
   priceCents: number
   active: boolean
-  hasMaintenance: boolean
+  hasMaintenance: boolean | null
   maintenancePriceCents: number | null
   maintenanceDurationMin: number | null
   createdAt: string

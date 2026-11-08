@@ -43,7 +43,9 @@ const initialSelection = findSelection(initialServiceId)
 const hadInitialQuery = !!initialServiceId
 
 const selectedService = ref<ServiceSelection | null>(initialSelection)
-const step = ref(initialSelection ? (initialSelection.service.hasMaintenance ? 0.5 : 1) : 0)
+const step = ref(
+  initialSelection ? ((initialSelection.service.hasMaintenance ?? false) ? 0.5 : 1) : 0
+)
 const selectedSlot = ref<string | null>(null)
 const pickerKey = ref(0)
 const form = reactive({ name: '', phone: '' })
@@ -86,7 +88,7 @@ function formatPrice(cents: number) {
 function getCurrentDuration(): number {
   if (!selectedService.value) return 0
   const { service, bookingType } = selectedService.value
-  if (bookingType === 'maintenance' && service.hasMaintenance) {
+  if (bookingType === 'maintenance' && (service.hasMaintenance ?? false)) {
     return service.maintenanceDurationMin ?? service.durationMin
   }
   return service.durationMin
@@ -95,7 +97,7 @@ function getCurrentDuration(): number {
 function getCurrentPrice(): number {
   if (!selectedService.value) return 0
   const { service, bookingType } = selectedService.value
-  if (bookingType === 'maintenance' && service.hasMaintenance) {
+  if (bookingType === 'maintenance' && (service.hasMaintenance ?? false)) {
     return service.maintenancePriceCents ?? service.priceCents
   }
   return service.priceCents
@@ -110,7 +112,7 @@ function selectService(service: Service) {
   selectedSlot.value = null
   formError.value = ''
   pickerKey.value += 1
-  step.value = service.hasMaintenance ? 0.5 : 1
+  step.value = (service.hasMaintenance ?? false) ? 0.5 : 1
 }
 
 function selectBookingType(type: BookingType) {
@@ -183,7 +185,7 @@ function bookAnother() {
   selectedSlot.value = null
   formError.value = ''
   pickerKey.value += 1
-  step.value = selectedService.value?.service.hasMaintenance ? 0.5 : 1
+  step.value = (selectedService.value?.service.hasMaintenance ?? false) ? 0.5 : 1
 }
 </script>
 
@@ -259,7 +261,7 @@ function bookAnother() {
         <UButton
           label="Continuar"
           trailing-icon="i-ri-arrow-right-line"
-          @click="step = selectedService.service.hasMaintenance ? 0.5 : 1"
+          @click="step = (selectedService.service.hasMaintenance ?? false) ? 0.5 : 1"
         />
       </div>
     </UCard>
@@ -409,7 +411,7 @@ function bookAnother() {
               icon="i-ri-arrow-left-line"
               color="neutral"
               variant="ghost"
-              @click="step = selectedService.service.hasMaintenance ? 0.5 : 0"
+              @click="step = (selectedService.service.hasMaintenance ?? false) ? 0.5 : 0"
             />
             <UButton
               label="Continuar"
@@ -452,7 +454,7 @@ function bookAnother() {
               icon="i-ri-arrow-left-line"
               color="neutral"
               variant="ghost"
-              @click="step = selectedService.service.hasMaintenance ? 0.5 : 0"
+              @click="step = (selectedService.service.hasMaintenance ?? false) ? 0.5 : 0"
             />
             <UButton
               label="Continuar"

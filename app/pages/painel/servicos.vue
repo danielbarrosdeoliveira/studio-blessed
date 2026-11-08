@@ -26,7 +26,7 @@ const formSchema = z
     bufferMin: z.coerce.number().int().min(0).max(240),
     price: z.coerce.number().min(0, 'Preço inválido'),
     active: z.boolean(),
-    hasMaintenance: z.boolean(),
+    hasMaintenance: z.boolean().default(false),
     maintenancePrice: z.coerce.number().min(0, 'Preço inválido').optional(),
     maintenanceDurationMin: z.coerce
       .number()
@@ -92,7 +92,7 @@ function openEdit(row: Service) {
   state.bufferMin = String(row.bufferMin)
   state.price = String(row.priceCents / 100)
   state.active = row.active
-  state.hasMaintenance = row.hasMaintenance
+  state.hasMaintenance = row.hasMaintenance ?? false
   state.maintenancePrice =
     row.maintenancePriceCents !== null ? String(row.maintenancePriceCents / 100) : ''
   state.maintenanceDurationMin =
