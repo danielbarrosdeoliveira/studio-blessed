@@ -13,7 +13,6 @@ Sempre que o usuário solicitar uma das etapas abaixo, ative obrigatoriamente a 
 - **Para estruturar o banco de dados / migrations:** Use a skill `database-schema-designer`.
 - **Para escrever código Frontend (Nuxt 4 / Nuxt UI 4):** Use a skill `senior-frontend` combinada com `zero-hallucination-coder`.
 
-
 ## 3. Ciclo de Tarefas
 
 - Leia e atualize estritamente o arquivo `docs/tasks.md` seguindo o formato de checklist (`- [ ]`).
