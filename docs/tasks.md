@@ -13,7 +13,6 @@
 
 ## Próximos épicos
 
-- [x] E5 — Bloqueios de horário
 - [ ] E9 — Dashboard de métricas
 - [ ] E4 — Integração Google Calendar (fase final do MVP)
 

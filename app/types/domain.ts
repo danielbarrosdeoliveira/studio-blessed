@@ -18,29 +18,6 @@ export interface Service {
 
 export type AppointmentStatus = 'scheduled' | 'completed' | 'cancelled' | 'no_show'
 export type AppointmentOrigin = 'client' | 'staff'
-export type TimeBlockRecurrence = 'weekly'
-
-export interface TimeBlock {
-  id: string
-  startsAt: string
-  endsAt: string
-  reason: string | null
-  recurrence: TimeBlockRecurrence | null
-  createdAt: string
-}
-
-export interface TimeBlockConflict {
-  id: string
-  startsAt: string
-  endsAt: string
-  clientName: string
-  serviceName: string
-}
-
-export interface TimeBlockResponse {
-  block: TimeBlock
-  conflicts: TimeBlockConflict[]
-}
 
 export interface PublicAvailabilitySlot {
   startsAt: string

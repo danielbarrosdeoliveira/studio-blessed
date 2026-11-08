@@ -16,7 +16,7 @@ function formatCurrency(value: number): string {
 
 const baseStats = [
   {
-    title: 'Customers',
+    title: 'Clientes',
     icon: 'i-ri-group-line',
     minValue: 400,
     maxValue: 1000,
@@ -75,20 +75,14 @@ const { data: stats } = await useAsyncData<Stat[]>(
 <template>
   <UPageGrid class="gap-4 sm:gap-6 lg:grid-cols-4 lg:gap-px">
     <UPageCard
-      v-for="(stat, index) in stats"
-      :key="index"
-      :icon="stat.icon"
-      :title="stat.title"
-      to="/clientes"
-      variant="subtle"
-      :ui="{
+v-for="(stat, index) in stats" :key="index" :icon="stat.icon"
+:title="stat.title" to="/clientes"
+      variant="subtle" :ui="{
         container: 'gap-y-1.5',
         wrapper: 'items-start',
         leading: 'p-2.5 rounded-full bg-zinc-950/20 ring ring-inset ring-zinc-800/25 flex-col',
         title: 'font-normal text-zinc-400 text-xs uppercase'
-      }"
-      class="first:rounded-l-lg last:rounded-r-lg hover:z-1 lg:rounded-none"
-    >
+      }" class="first:rounded-l-lg last:rounded-r-lg hover:z-1 lg:rounded-none">
       <div class="flex items-center gap-2">
         <span class="text-2xl font-semibold text-zinc-100">
           {{ stat.value }}

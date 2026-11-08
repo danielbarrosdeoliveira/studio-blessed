@@ -29,7 +29,7 @@
 O modelo é **single-owner**: não existem papéis, `role` ou hierarquia de acesso.
 
 - **Dona do salão:** qualquer usuário autenticado tem acesso total. Cadastra
-  serviços, jornadas e bloqueios. Cria agendamentos para hoje/amanhã e encaixes.
+  serviços, jornadas. Cria agendamentos para hoje/amanhã e encaixes.
   Vê todas as métricas e corrige status.
 - **Profissional:** **não existe** como entidade ou papel. Todas as
   funcionalidades antes atribuídas a profissionais agora pertencem à dona única.
@@ -44,11 +44,7 @@ O modelo é **single-owner**: não existem papéis, `role` ou hierarquia de aces
 
 - **1 agenda única** para o salão, pertencente à dona.
 - **Sincronização:**
-  - Dona (agenda interna): apenas os registros do sistema contam.
-  - Quando Google Calendar for ativado: qualquer evento na agenda da dona conta como `busy`.
-- **Bloqueios manuais:** a dona pode criar bloqueios pontuais ou semanais.
-  Podem sobrepor agendamento `scheduled` somente com **confirmação explícita**; o
-  agendamento não é cancelado.
+  - Google Calendar: qualquer evento na agenda da dona conta como `busy`.
 
 ## 5. Funcionalidades do MVP
 
@@ -57,7 +53,7 @@ O modelo é **single-owner**: não existem papéis, `role` ou hierarquia de aces
   informação de que pertence à dona do salão. A rota antiga `/agendar` redireciona
   para `/agendamento`.
 - **Profissional:** **não existe** — não há profissionais no MVP.
-- **Dona:** gerencia jornadas, serviços, bloqueios e agenda; opera
+- **Dona:** gerencia jornadas, serviços e agenda; opera
   agendamentos de todos; dashboard de métricas.
 - **Pagamentos:** **nenhum**. Não há gateway, cobrança ou repasse no MVP.
 
@@ -81,9 +77,6 @@ O modelo é **single-owner**: não existem papéis, `role` ou hierarquia de aces
   gravar**; se ocupou, o cliente escolhe outro horário.
 - **Notificações:** **nenhuma** no MVP (só tela de sucesso). Automação futura
   (WAHA/WAWA + N8N) fica pós-MVP.
-- **Bloqueios:** a dona pode criar/remover bloqueios
-  pontuais ou semanais. Podem sobrepor agendamento `scheduled` somente com
-  **confirmação explícita**; o agendamento não é cancelado.
 - **Status do agendamento:** `scheduled` → `completed` | `cancelled` | `no_show`.
   A dona pode corrigir o status a qualquer momento.
 

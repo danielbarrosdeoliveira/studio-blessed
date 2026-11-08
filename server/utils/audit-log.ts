@@ -16,9 +16,6 @@ export type AuditAction =
   | 'working_hours.create'
   | 'working_hours.update'
   | 'working_hours.delete'
-  | 'time_block.create'
-  | 'time_block.update'
-  | 'time_block.delete'
   | 'user.delete'
 
 export async function writeAuditLog({
