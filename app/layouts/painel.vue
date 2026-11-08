@@ -11,6 +11,9 @@ if (import.meta.server && !session.value?.user) {
   await navigateTo('/login')
 }
 
+// Avisa a dona sobre novos agendamentos enquanto ela estiver no painel.
+useAppointmentsPolling()
+
 const open = ref(false)
 
 const links = computed<NavigationMenuItem[][]>(() => {

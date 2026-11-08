@@ -88,3 +88,20 @@ export interface StaffAgendaResponse {
 export interface StaffAppointmentResponse {
   appointment: StaffAppointment
 }
+
+/** Agendamento criado recentemente por uma cliente — usado pelo polling do painel. */
+export interface RecentClientAppointment {
+  id: string
+  createdAt: string
+  startsAt: string
+  endsAt: string
+  serviceName: string
+  clientName: string
+  clientPhone: string
+}
+
+export interface RecentAppointmentsResponse {
+  appointments: RecentClientAppointment[]
+  /** Horário do servidor, usado como baseline quando ainda não há agendamentos. */
+  serverTime: string
+}
