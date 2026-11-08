@@ -9,6 +9,9 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
 
   routeRules: {
+    '/painel/**': {
+      appLayout: 'painel'
+    },
     '/api/**': {
       cors: true
     }

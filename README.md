@@ -95,10 +95,6 @@ pnpm db:migrate
 | `pnpm format`        | Prettier (escreve)                              |
 | `pnpm format:check`  | Prettier (verifica sem escrever)                |
 | `pnpm typecheck`     | Checagem de tipos                               |
-| `pnpm test`          | Testes unitários + integração                   |
-| `pnpm test:e2e`      | Testes E2E com Playwright                       |
-| `pnpm test:coverage` | Cobertura completa (unit + integração + E2E)    |
-| `pnpm test:db:setup` | Recria o banco de teste e o seed                |
 | `pnpm db:up`         | Sobe o PostgreSQL local (Docker Compose)        |
 | `pnpm db:down`       | Derruba o PostgreSQL local                      |
 | `pnpm db:generate`   | Geração de migration a partir do schema Drizzle |
@@ -120,26 +116,6 @@ funcionando. `DB_DRIVER=neon|pg` força o driver explicitamente.
 
 A variável `DATABASE_URL` é a referência única para ambos os ambientes.
 
-## Testes
-
-O projeto usa Vitest 5 (unitário e integração) e Playwright + Chromium (E2E) em
-um banco PostgreSQL dedicado, `studio_blessed_test`.
-
-```bash
-pnpm db:up
-pnpm test              # unitários + integração
-pnpm test:e2e          # build de produção + fluxos críticos no browser
-pnpm test:coverage     # cobertura completa com os thresholds do MVP
-```
-
-O E2E roda contra o **build de produção** (`.output/server`), não contra
-`nuxt dev`: o otimizador de dependências do Vite dispara _full reloads_ no meio
-do teste e deixa a suíte instável.
-
-Metas: **75%** para unitário e integração, **50%** para os fluxos E2E. Veja
-[`docs/testing.md`](docs/testing.md) para escopos, comandos e solução de
-problemas.
-
 ## Estrutura
 
 ```
@@ -159,9 +135,8 @@ server/               # Backend (Nitro)
 ├── utils/db.ts            # Driver híbrido Drizzle (node-postgres / neon-http)
 └── lib/auth.ts            # Configuração do Better Auth
 
-tests/                # Integração e E2E
-scripts/              # Seed do banco de teste e runner de cobertura
-docs/                 # Discovery, spec, arquitetura, backlog e testes
+scripts/              # Scripts auxiliares
+docs/                 # Discovery, spec, arquitetura, backlog
 ```
 
 ## Faseamento
@@ -176,7 +151,6 @@ docs/                 # Discovery, spec, arquitetura, backlog e testes
 - [`docs/spec.md`](docs/spec.md) — especificação do MVP
 - [`docs/architecture.md`](docs/architecture.md) — arquitetura técnica
 - [`docs/backlog.md`](docs/backlog.md) — épicos e user stories
-- [`docs/testing.md`](docs/testing.md) — estratégia de testes e cobertura
 - [`docs/tasks.md`](docs/tasks.md) — checklist vivo do MVP
 
 ## Criar a dona do salão

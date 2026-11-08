@@ -1,8 +1,4 @@
 <script setup lang="ts">
-definePageMeta({
-  layout: 'default'
-})
-
 interface Metrics {
   revenue?: number
   completedCount?: number
