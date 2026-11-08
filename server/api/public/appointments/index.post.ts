@@ -12,7 +12,8 @@ const bodySchema = z.object({
   serviceId: z.string().min(1, 'Serviço não informado'),
   startsAt: z.string().refine((value) => !Number.isNaN(Date.parse(value)), 'Horário inválido'),
   clientName: z.string().trim().min(2, 'Informe seu nome').max(120),
-  clientPhone: z.string().trim().min(10, 'Informe seu WhatsApp').max(20)
+  clientPhone: z.string().trim().min(10, 'Informe seu WhatsApp').max(20),
+  bookingType: z.enum(['application', 'maintenance']).default('application')
 })
 
 /** Cria um agendamento público (origem `client`) com revalidação do horário. */
@@ -36,7 +37,12 @@ export default defineEventHandler(async (event) => {
   const startsAt = new Date(parsed.data.startsAt)
 
   const [found] = await db
-    .select({ durationMin: service.durationMin })
+    .select({
+      durationMin: service.durationMin,
+      hasMaintenance: service.hasMaintenance,
+      maintenancePriceCents: service.maintenancePriceCents,
+      maintenanceDurationMin: service.maintenanceDurationMin
+    })
     .from(service)
     .where(and(eq(service.id, parsed.data.serviceId), eq(service.active, true)))
     .limit(1)
@@ -45,11 +51,19 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, message: 'Serviço não encontrado' })
   }
 
+  // Determine duration and price based on booking type
+  const isMaintenance = parsed.data.bookingType === 'maintenance'
+  const durationMin =
+    isMaintenance && found.hasMaintenance
+      ? (found.maintenanceDurationMin ?? found.durationMin)
+      : found.durationMin
+
   // Revalida imediatamente antes de gravar (US6.3).
   const available = await isSlotAvailable({
     serviceId: parsed.data.serviceId,
     startsAt,
-    origin: 'client'
+    origin: 'client',
+    bookingType: parsed.data.bookingType
   })
 
   if (!available) {
@@ -67,9 +81,10 @@ export default defineEventHandler(async (event) => {
       clientId: clientRow.id,
       serviceId: parsed.data.serviceId,
       startsAt,
-      endsAt: new Date(startsAt.getTime() + found.durationMin * 60_000),
+      endsAt: new Date(startsAt.getTime() + durationMin * 60_000),
       status: 'scheduled',
-      origin: 'client'
+      origin: 'client',
+      bookingType: parsed.data.bookingType
     })
     // @ts-ignore - Drizzle returning type issue
     .returning({ id: appointment.id })
@@ -85,8 +100,9 @@ export default defineEventHandler(async (event) => {
   }
 
   // Sync with Google Calendar if connected
+  const bookingTypeLabel = row.bookingType === 'maintenance' ? '[Manutenção]' : '[Aplicação]'
   const googleResult = await createGoogleCalendarEvent({
-    summary: `${row.serviceName} — ${row.clientName}`,
+    summary: `${bookingTypeLabel} ${row.clientName} - ${row.serviceName}`,
     startsAt: row.startsAt.toISOString(),
     endsAt: row.endsAt.toISOString(),
     appointmentId: row.id

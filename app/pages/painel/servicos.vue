@@ -15,17 +15,41 @@ const {
   default: () => []
 })
 
-const formSchema = z.object({
-  name: z.string().min(2, 'Informe o nome'),
-  durationMin: z.coerce
-    .number()
-    .int()
-    .min(5, 'Duração mínima de 5 min')
-    .max(600, 'Duração máxima de 600 min'),
-  bufferMin: z.coerce.number().int().min(0).max(240),
-  price: z.coerce.number().min(0, 'Preço inválido'),
-  active: z.boolean()
-})
+const formSchema = z
+  .object({
+    name: z.string().min(2, 'Informe o nome'),
+    durationMin: z.coerce
+      .number()
+      .int()
+      .min(5, 'Duração mínima de 5 min')
+      .max(600, 'Duração máxima de 600 min'),
+    bufferMin: z.coerce.number().int().min(0).max(240),
+    price: z.coerce.number().min(0, 'Preço inválido'),
+    active: z.boolean(),
+    hasMaintenance: z.boolean(),
+    maintenancePrice: z.coerce.number().min(0, 'Preço inválido').optional(),
+    maintenanceDurationMin: z.coerce
+      .number()
+      .int()
+      .min(5, 'Duração mínima de 5 min')
+      .max(600, 'Duração máxima de 600 min')
+      .optional()
+  })
+  .refine(
+    (data) => {
+      if (!data.hasMaintenance) return true
+      return (
+        data.maintenancePrice !== undefined &&
+        data.maintenancePrice !== null &&
+        data.maintenanceDurationMin !== undefined &&
+        data.maintenanceDurationMin !== null
+      )
+    },
+    {
+      message: 'Preço e duração da manutenção são obrigatórios quando a opção está ativada',
+      path: ['maintenancePrice']
+    }
+  )
 
 type FormSchema = z.output<typeof formSchema>
 
@@ -38,7 +62,10 @@ const state = reactive({
   durationMin: '60',
   bufferMin: '0',
   price: '0',
-  active: true
+  active: true,
+  hasMaintenance: false,
+  maintenancePrice: '',
+  maintenanceDurationMin: ''
 })
 
 function resetState() {
@@ -47,6 +74,9 @@ function resetState() {
   state.bufferMin = '0'
   state.price = '0'
   state.active = true
+  state.hasMaintenance = false
+  state.maintenancePrice = ''
+  state.maintenanceDurationMin = ''
 }
 
 function openCreate() {
@@ -62,6 +92,11 @@ function openEdit(row: Service) {
   state.bufferMin = String(row.bufferMin)
   state.price = String(row.priceCents / 100)
   state.active = row.active
+  state.hasMaintenance = row.hasMaintenance
+  state.maintenancePrice =
+    row.maintenancePriceCents !== null ? String(row.maintenancePriceCents / 100) : ''
+  state.maintenanceDurationMin =
+    row.maintenanceDurationMin !== null ? String(row.maintenanceDurationMin) : ''
   formOpen.value = true
 }
 
@@ -71,7 +106,20 @@ async function onSubmit(event: FormSubmitEvent<FormSchema>) {
     durationMin: event.data.durationMin,
     bufferMin: event.data.bufferMin,
     priceCents: Math.round(event.data.price * 100),
-    active: event.data.active
+    active: event.data.active,
+    hasMaintenance: event.data.hasMaintenance,
+    maintenancePriceCents:
+      event.data.hasMaintenance &&
+      event.data.maintenancePrice !== undefined &&
+      event.data.maintenancePrice !== null
+        ? Math.round(event.data.maintenancePrice * 100)
+        : null,
+    maintenanceDurationMin:
+      event.data.hasMaintenance &&
+      event.data.maintenanceDurationMin !== undefined &&
+      event.data.maintenanceDurationMin !== null
+        ? event.data.maintenanceDurationMin
+        : null
   }
 
   saving.value = true
@@ -273,6 +321,35 @@ const columns = computed<TableColumn<Service>[]>(() => [
         <UFormField label="Ativo" name="active">
           <USwitch v-model="state.active" />
         </UFormField>
+
+        <UFormField label="Ativar opção de Manutenção?" name="hasMaintenance">
+          <USwitch v-model="state.hasMaintenance" />
+        </UFormField>
+
+        <template v-if="state.hasMaintenance">
+          <div class="grid grid-cols-2 gap-4">
+            <UFormField label="Preço de Manutenção (R$)" name="maintenancePrice" required>
+              <UInput
+                v-model="state.maintenancePrice"
+                type="number"
+                min="0"
+                step="0.01"
+                class="w-full"
+              />
+            </UFormField>
+
+            <UFormField label="Duração da Manutenção (min)" name="maintenanceDurationMin" required>
+              <UInput
+                v-model="state.maintenanceDurationMin"
+                type="number"
+                min="5"
+                max="600"
+                step="5"
+                class="w-full"
+              />
+            </UFormField>
+          </div>
+        </template>
 
         <UButton
           type="submit"

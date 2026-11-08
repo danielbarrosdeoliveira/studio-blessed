@@ -96,6 +96,8 @@ export const appointmentStatus = pgEnum('appointment_status', [
   'no_show'
 ])
 
+export const bookingType = pgEnum('booking_type', ['application', 'maintenance'])
+
 export const appointmentOrigin = pgEnum('appointment_origin', ['client', 'staff'])
 
 /** Cliente do salão — única por telefone. */
@@ -121,6 +123,9 @@ export const service = pgTable(
     bufferMin: integer('buffer_min').notNull().default(0),
     priceCents: integer('price_cents').notNull().default(0),
     active: boolean('active').notNull().default(true),
+    hasMaintenance: boolean('has_maintenance').notNull().default(false),
+    maintenancePriceCents: integer('maintenance_price_cents'),
+    maintenanceDurationMin: integer('maintenance_duration_min'),
     createdAt: createdAt(),
     updatedAt: updatedAt()
   },
@@ -160,6 +165,7 @@ export const appointment = pgTable(
     endsAt: timestamp('ends_at', { withTimezone: true }).notNull(),
     status: appointmentStatus('status').notNull().default('scheduled'),
     origin: appointmentOrigin('origin').notNull().default('client'),
+    bookingType: bookingType('booking_type').notNull().default('application'),
     notes: text('notes'),
     googleEventId: text('google_event_id'),
     createdAt: createdAt(),

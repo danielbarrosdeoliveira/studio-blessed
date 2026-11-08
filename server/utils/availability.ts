@@ -30,6 +30,8 @@ export interface AvailabilityParams {
   /** Data local `YYYY-MM-DD`. */
   date: string
   origin: AvailabilityOrigin
+  /** Tipo de agendamento: 'application' (padrão) ou 'maintenance'. */
+  bookingType?: 'application' | 'maintenance'
   /** Injetável para testes; padrão: agora. */
   now?: Date
 }
@@ -53,7 +55,9 @@ export async function getAvailabilityForDay(params: AvailabilityParams): Promise
   const [found] = await db
     .select({
       durationMin: service.durationMin,
-      bufferMin: service.bufferMin
+      bufferMin: service.bufferMin,
+      hasMaintenance: service.hasMaintenance,
+      maintenanceDurationMin: service.maintenanceDurationMin
     })
     .from(service)
     .where(and(eq(service.id, params.serviceId), eq(service.active, true)))
@@ -62,6 +66,13 @@ export async function getAvailabilityForDay(params: AvailabilityParams): Promise
   if (!found) {
     throw createError({ statusCode: 404, message: 'Serviço não encontrado' })
   }
+
+  // Determine duration based on booking type
+  const isMaintenance = params.bookingType === 'maintenance'
+  const durationMin =
+    isMaintenance && found.hasMaintenance
+      ? (found.maintenanceDurationMin ?? found.durationMin)
+      : found.durationMin
 
   const bounds = dayBounds(params.date)
 
@@ -161,7 +172,7 @@ export async function getAvailabilityForDay(params: AvailabilityParams): Promise
   const slots = computeAvailability({
     workingIntervals,
     busyIntervals,
-    durationMin: found.durationMin,
+    durationMin,
     bufferMin: found.bufferMin,
     earliestStart,
     toInstant: (minute) => new Date(bounds.start.getTime() + minute * 60_000)
@@ -213,6 +224,7 @@ export async function isSlotAvailable(params: {
   serviceId: string
   startsAt: Date
   origin: AvailabilityOrigin
+  bookingType?: 'application' | 'maintenance'
   now?: Date
 }): Promise<boolean> {
   if (
@@ -227,6 +239,7 @@ export async function isSlotAvailable(params: {
     serviceId: params.serviceId,
     date: localDateOf(params.startsAt),
     origin: params.origin,
+    bookingType: params.bookingType,
     now: params.now
   })
 

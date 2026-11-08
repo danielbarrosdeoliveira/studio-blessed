@@ -15,7 +15,22 @@ const bodySchema = z.object({
     .max(600, 'Duração máxima de 600 min'),
   bufferMin: z.number().int().min(0).max(240).default(0),
   priceCents: z.number().int().min(0, 'Preço inválido').max(10_000_000).default(0),
-  active: z.boolean().default(true)
+  active: z.boolean().default(true),
+  hasMaintenance: z.boolean().default(false),
+  maintenancePriceCents: z
+    .number()
+    .int()
+    .min(0, 'Preço inválido')
+    .max(10_000_000)
+    .optional()
+    .nullable(),
+  maintenanceDurationMin: z
+    .number()
+    .int()
+    .min(5, 'Duração mínima de 5 min')
+    .max(600, 'Duração máxima de 600 min')
+    .optional()
+    .nullable()
 })
 
 export default defineEventHandler(async (event) => {
@@ -52,7 +67,10 @@ export default defineEventHandler(async (event) => {
       durationMin: parsed.data.durationMin,
       bufferMin: parsed.data.bufferMin,
       priceCents: parsed.data.priceCents,
-      active: parsed.data.active
+      active: parsed.data.active,
+      hasMaintenance: parsed.data.hasMaintenance,
+      maintenancePriceCents: parsed.data.hasMaintenance ? parsed.data.maintenancePriceCents : null,
+      maintenanceDurationMin: parsed.data.hasMaintenance ? parsed.data.maintenanceDurationMin : null
     })
     // @ts-expect-error - Drizzle returning type issue
     .returning(serviceColumns)
