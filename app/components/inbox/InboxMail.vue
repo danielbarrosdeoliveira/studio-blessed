@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 import type { Mail } from '~/types'
 
 defineProps<{
@@ -99,7 +100,7 @@ function onSubmit() {
       </div>
 
       <p class="text-sm text-muted max-sm:pl-16 sm:mt-2">
-        {{ format(new Date(mail.date), 'dd MMM HH:mm') }}
+        {{ format(new Date(mail.date), 'dd MMM HH:mm', { locale: ptBR }) }}
       </p>
     </div>
 

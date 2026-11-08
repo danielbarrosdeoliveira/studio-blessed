@@ -103,9 +103,15 @@ async function cancel() {
           <UBadge :color="statusMeta.color" variant="subtle">
             {{ statusMeta.label }}
           </UBadge>
-          <UBadge color="neutral" variant="outline">
-            {{ appointment.origin === 'staff' ? 'Staff' : 'Cliente' }}
-          </UBadge>
+          <UTooltip
+            text="Origem do agendamento: feito pela equipe do salão ou pela própria cliente."
+          >
+            <template #trigger>
+              <UBadge color="neutral" variant="outline" class="cursor-help">
+                {{ appointment.origin === 'staff' ? 'Equipe' : 'Cliente' }}
+              </UBadge>
+            </template>
+          </UTooltip>
         </div>
 
         <div>
@@ -149,7 +155,7 @@ async function cancel() {
             @click="setStatus('completed')"
           />
           <UButton
-            label="No-show"
+            label="Não compareceu"
             icon="i-ri-user-unfollow-line"
             size="sm"
             color="warning"
@@ -162,7 +168,7 @@ async function cancel() {
         <template v-else>
           <UButton
             v-if="appointment.status === 'completed'"
-            label="Corrigir para no-show"
+            label="Corrigir para não compareceu"
             icon="i-ri-arrow-go-back-line"
             size="sm"
             color="warning"

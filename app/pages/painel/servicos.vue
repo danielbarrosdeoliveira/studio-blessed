@@ -4,6 +4,7 @@ import * as z from 'zod'
 
 const UBadge = resolveComponent('UBadge')
 const UButton = resolveComponent('UButton')
+const UTooltip = resolveComponent('UTooltip')
 
 const toast = useToast()
 
@@ -266,15 +267,7 @@ const columns = computed<TableColumn<Service>[]>(() => [
     </template>
   </UDashboardPanel>
 
-  <UModal
-    v-model:open="formOpen"
-    :title="editing ? 'Editar serviço' : 'Novo serviço'"
-    :description="
-      editing
-        ? undefined
-        : 'O serviço pertence à dona do salão. Combos são serviços de duração maior.'
-    "
-  >
+  <UModal v-model:open="formOpen" :title="editing ? 'Editar serviço' : 'Novo serviço'">
     <template #body>
       <UForm :schema="formSchema" :state="state" class="space-y-4" @submit="onSubmit">
         <UFormField
@@ -302,7 +295,18 @@ const columns = computed<TableColumn<Service>[]>(() => [
             />
           </UFormField>
 
-          <UFormField label="Buffer (min)" name="bufferMin" description="Tempo após o atendimento.">
+          <UFormField label="Buffer (min)" name="bufferMin">
+            <template #label>
+              Buffer (min)
+              <UTooltip text="Tempo de intervalo após o atendimento para preparação do próximo.">
+                <template #trigger>
+                  <UIcon
+                    name="i-ri-information-line"
+                    class="ml-1 size-4 cursor-help text-dimmed hover:text-highlighted"
+                  />
+                </template>
+              </UTooltip>
+            </template>
             <UInput
               v-model="state.bufferMin"
               type="number"
@@ -329,6 +333,17 @@ const columns = computed<TableColumn<Service>[]>(() => [
         <template v-if="state.hasMaintenance">
           <div class="grid grid-cols-2 gap-4">
             <UFormField label="Preço de Manutenção (R$)" name="maintenancePrice" required>
+              <template #label>
+                Preço de Manutenção (R$)
+                <UTooltip text="Valor cobrado para o serviço de manutenção (revisão/retorno).">
+                  <template #trigger>
+                    <UIcon
+                      name="i-ri-information-line"
+                      class="ml-1 size-4 cursor-help text-dimmed hover:text-highlighted"
+                    />
+                  </template>
+                </UTooltip>
+              </template>
               <UInput
                 v-model="state.maintenancePrice"
                 type="number"
@@ -339,6 +354,17 @@ const columns = computed<TableColumn<Service>[]>(() => [
             </UFormField>
 
             <UFormField label="Duração da Manutenção (min)" name="maintenanceDurationMin" required>
+              <template #label>
+                Duração da Manutenção (min)
+                <UTooltip text="Tempo estimado para o serviço de manutenção.">
+                  <template #trigger>
+                    <UIcon
+                      name="i-ri-information-line"
+                      class="ml-1 size-4 cursor-help text-dimmed hover:text-highlighted"
+                    />
+                  </template>
+                </UTooltip>
+              </template>
               <UInput
                 v-model="state.maintenanceDurationMin"
                 type="number"

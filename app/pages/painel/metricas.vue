@@ -54,7 +54,7 @@ const formatCurrency = (cents: number) =>
 
             <UCard>
               <div class="flex flex-col gap-1">
-                <span class="text-xs font-semibold text-muted uppercase">No-show</span>
+                <span class="text-xs font-semibold text-muted uppercase">Não compareceu</span>
                 <p class="text-2xl font-bold text-error">{{ metrics.noShowCount || 0 }}</p>
               </div>
             </UCard>

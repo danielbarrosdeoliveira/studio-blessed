@@ -300,7 +300,6 @@ async function submit() {
   <UModal
     v-model:open="createOpen"
     title="Novo agendamento"
-    description="Hoje, amanhã ou encaixe. A antecedência de 3 dias vale apenas para a cliente."
     :ui="{ body: 'max-h-[75vh] overflow-y-auto' }"
   >
     <template #body>
