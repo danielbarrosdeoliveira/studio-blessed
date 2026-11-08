@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from '@nuxt/ui'
-import { authClient } from '~/lib/auth-client'
+import { authClient, useSession } from '~/lib/auth-client'
 
 defineProps<{
   collapsed?: boolean
@@ -8,7 +8,8 @@ defineProps<{
 
 const colorMode = useColorMode()
 const appConfig = useAppConfig()
-const { user } = await useUserSession()
+const { data: session } = await useSession()
+const user = computed(() => session.value?.user)
 
 const colors = [
   'red',
