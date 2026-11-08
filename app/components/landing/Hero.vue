@@ -56,7 +56,7 @@
             class="flex size-10 items-center justify-center overflow-hidden rounded-full border-2 border-zinc-800 bg-zinc-800"
           >
             <img
-              :src="`https://i.pravatar.cc/80?img=${i + 10}`"
+              :src="`https://randomuser.me/api/portraits/women/${i}.jpg`"
               alt=""
               class="size-full object-cover"
               loading="lazy"
