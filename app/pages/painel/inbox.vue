@@ -5,11 +5,11 @@ import type { Mail } from '~/types'
 
 const tabItems = [
   {
-    label: 'All',
+    label: 'Todos',
     value: 'all'
   },
   {
-    label: 'Unread',
+    label: 'Não lidas',
     value: 'unread'
   }
 ]
@@ -52,7 +52,7 @@ const isMobile = breakpoints.smaller('lg')
 
 <template>
   <UDashboardPanel id="inbox-1" :default-size="25" :min-size="20" :max-size="30" resizable>
-    <UDashboardNavbar title="Inbox">
+    <UDashboardNavbar title="Caixa de entrada">
       <template #leading>
         <UDashboardSidebarCollapse />
       </template>

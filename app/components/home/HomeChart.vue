@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { eachDayOfInterval, eachWeekOfInterval, eachMonthOfInterval, format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 import type { Period, Range } from '~/types'
 
 const props = defineProps<{
@@ -12,17 +13,17 @@ type DataRecord = {
   amount: number
 }
 
-const formatNumber = new Intl.NumberFormat('en', {
+const formatNumber = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
-  currency: 'USD',
+  currency: 'BRL',
   maximumFractionDigits: 0
 }).format
 
 const formatDate = (date: Date): string => {
   return {
-    daily: format(date, 'd MMM'),
-    weekly: format(date, 'd MMM yyyy'),
-    monthly: format(date, 'MMM yyy')
+    daily: format(date, 'd MMM', { locale: ptBR }),
+    weekly: format(date, 'd MMM yyyy', { locale: ptBR }),
+    monthly: format(date, 'MMM yyyy', { locale: ptBR })
   }[props.period]
 }
 
@@ -56,7 +57,7 @@ const total = computed(() => data.value.reduce((acc: number, { amount }) => acc 
   <UCard :ui="{ root: 'overflow-visible', body: 'p-0! overflow-hidden rounded-b-[inherit]' }">
     <template #header>
       <div>
-        <p class="mb-1.5 text-xs text-muted uppercase">Revenue</p>
+        <p class="mb-1.5 text-xs text-muted uppercase">Faturamento</p>
         <p class="text-3xl font-semibold text-highlighted">
           {{ formatNumber(total) }}
         </p>
@@ -68,7 +69,7 @@ const total = computed(() => data.value.reduce((acc: number, { amount }) => acc 
       curve="monotone"
       :data="data"
       index="date"
-      :categories="[{ key: 'amount', label: 'Revenue' }]"
+      :categories="[{ key: 'amount', label: 'Faturamento' }]"
       :x-axis="false"
       :y-axis="false"
       :grid="true"
@@ -76,7 +77,7 @@ const total = computed(() => data.value.reduce((acc: number, { amount }) => acc 
       :aspect-ratio="3"
       :initial-width="1152"
       class="-my-px"
-      aria-label="Revenue"
+      aria-label="Faturamento"
     />
   </UCard>
 </template>

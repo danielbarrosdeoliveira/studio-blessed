@@ -7,9 +7,9 @@ const props = defineProps<{
 }>()
 
 function formatCurrency(value: number): string {
-  return value.toLocaleString('en-US', {
+  return value.toLocaleString('pt-BR', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'BRL',
     maximumFractionDigits: 0
   })
 }
@@ -24,7 +24,7 @@ const baseStats = [
     maxVariation: 25
   },
   {
-    title: 'Conversions',
+    title: 'Conversões',
     icon: 'i-ri-pie-chart-line',
     minValue: 1000,
     maxValue: 2000,
@@ -32,7 +32,7 @@ const baseStats = [
     maxVariation: 20
   },
   {
-    title: 'Revenue',
+    title: 'Faturamento',
     icon: 'i-ri-money-dollar-circle-line',
     minValue: 200000,
     maxValue: 500000,
@@ -41,7 +41,7 @@ const baseStats = [
     formatter: formatCurrency
   },
   {
-    title: 'Orders',
+    title: 'Pedidos',
     icon: 'i-ri-shopping-cart-line',
     minValue: 100,
     maxValue: 300,

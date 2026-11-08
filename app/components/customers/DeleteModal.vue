@@ -26,8 +26,8 @@ async function onSubmit() {
 
     <template #body>
       <div class="flex justify-end gap-2">
-        <UButton label="Cancel" color="neutral" variant="subtle" @click="open = false" />
-        <UButton label="Delete" color="error" variant="solid" loading-auto @click="onSubmit" />
+        <UButton label="Cancelar" color="neutral" variant="subtle" @click="open = false" />
+        <UButton label="Excluir" color="error" variant="solid" loading-auto @click="onSubmit" />
       </div>
     </template>
   </UModal>
