@@ -78,7 +78,40 @@ const items = computed<DropdownMenuItem[][]>(() => [
             collisionPadding: 16
           },
           children: colors.map((color) => ({
-            label: color === 'rose' ? 'Rosa' : color === 'fuchsia' ? 'Fúcsia' : color === 'purple' ? 'Roxo' : color === 'violet' ? 'Violeta' : color === 'indigo' ? 'Índigo' : color === 'blue' ? 'Azul' : color === 'sky' ? 'Céu' : color === 'cyan' ? 'Ciano' : color === 'teal' ? 'Teal' : color === 'emerald' ? 'Esmeralda' : color === 'green' ? 'Verde' : color === 'lime' ? 'Limão' : color === 'yellow' ? 'Amarelo' : color === 'amber' ? 'Âmbar' : color === 'orange' ? 'Laranja' : color === 'red' ? 'Vermelho' : color,
+            label:
+              color === 'rose'
+                ? 'Rosa'
+                : color === 'fuchsia'
+                  ? 'Fúcsia'
+                  : color === 'purple'
+                    ? 'Roxo'
+                    : color === 'violet'
+                      ? 'Violeta'
+                      : color === 'indigo'
+                        ? 'Índigo'
+                        : color === 'blue'
+                          ? 'Azul'
+                          : color === 'sky'
+                            ? 'Céu'
+                            : color === 'cyan'
+                              ? 'Ciano'
+                              : color === 'teal'
+                                ? 'Teal'
+                                : color === 'emerald'
+                                  ? 'Esmeralda'
+                                  : color === 'green'
+                                    ? 'Verde'
+                                    : color === 'lime'
+                                      ? 'Limão'
+                                      : color === 'yellow'
+                                        ? 'Amarelo'
+                                        : color === 'amber'
+                                          ? 'Âmbar'
+                                          : color === 'orange'
+                                            ? 'Laranja'
+                                            : color === 'red'
+                                              ? 'Vermelho'
+                                              : color,
             chip: color,
             slot: 'chip',
             checked: appConfig.ui.colors.primary === color,
@@ -99,7 +132,26 @@ const items = computed<DropdownMenuItem[][]>(() => [
             collisionPadding: 16
           },
           children: neutrals.map((color) => ({
-            label: color === 'slate' ? 'Ardósia' : color === 'gray' ? 'Cinza' : color === 'zinc' ? 'Zinco' : color === 'neutral' ? 'Neutro' : color === 'stone' ? 'Pedra' : color === 'taupe' ? 'Taupe' : color === 'mauve' ? 'Malva' : color === 'mist' ? 'Neblina' : color === 'olive' ? 'Azeitona' : color,
+            label:
+              color === 'slate'
+                ? 'Ardósia'
+                : color === 'gray'
+                  ? 'Cinza'
+                  : color === 'zinc'
+                    ? 'Zinco'
+                    : color === 'neutral'
+                      ? 'Neutro'
+                      : color === 'stone'
+                        ? 'Pedra'
+                        : color === 'taupe'
+                          ? 'Taupe'
+                          : color === 'mauve'
+                            ? 'Malva'
+                            : color === 'mist'
+                              ? 'Neblina'
+                              : color === 'olive'
+                                ? 'Azeitona'
+                                : color,
             chip: color === 'neutral' ? 'old-neutral' : color,
             slot: 'chip',
             type: 'checkbox' as const,

@@ -4,13 +4,7 @@ import { appointment, service, workingHours } from '../database/schema'
 import { computeAvailability } from './availability-engine'
 import type { AvailabilitySlot } from './availability-engine'
 import type { MinuteInterval } from './time'
-import {
-  TIME_ZONE,
-  addDaysToIsoDate,
-  dayBounds,
-  localDateOf,
-  toMinuteInterval
-} from './time'
+import { TIME_ZONE, addDaysToIsoDate, dayBounds, localDateOf, toMinuteInterval } from './time'
 import {
   getEventsFromCalendars,
   getGoogleCalendarConfig,

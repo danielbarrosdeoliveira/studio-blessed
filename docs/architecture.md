@@ -28,12 +28,12 @@
 
 O sistema **não possui múltiplas agendas**. Apenas **uma agenda única** para o salão, pertencente à dona.
 
-| Item                 | Detalhe                                                                                                                                                 |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Fonte da verdade** | Google Calendar — evento em qualquer calendário configurado invalida o slot                                                                             |
-| **WorkingHours**     | `weekday`, `startMinute`, `endMinute` (sem `professionalId`)                                                                                            |
-| **Disponibilidade**  | `WorkingHours` − agendamentos − eventos do Google Calendar                                                                                              |
-| **Antecedência**     | Cliente: **3 dias** mínimos, por **data local** (no 3º dia, o primeiro horário já vale). Dona: pode agendar hoje/amanhã e encaixes.                     |
+| Item                 | Detalhe                                                                                                                             |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| **Fonte da verdade** | Google Calendar — evento em qualquer calendário configurado invalida o slot                                                         |
+| **WorkingHours**     | `weekday`, `startMinute`, `endMinute` (sem `professionalId`)                                                                        |
+| **Disponibilidade**  | `WorkingHours` − agendamentos − eventos do Google Calendar                                                                          |
+| **Antecedência**     | Cliente: **3 dias** mínimos, por **data local** (no 3º dia, o primeiro horário já vale). Dona: pode agendar hoje/amanhã e encaixes. |
 
 ### Mapeamento do agendamento
 
