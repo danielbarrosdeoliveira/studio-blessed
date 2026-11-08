@@ -11,21 +11,21 @@ const emits = defineEmits(['close'])
 const dropdownItems = [
   [
     {
-      label: 'Mark as unread',
+      label: 'Marcar como não lida',
       icon: 'i-ri-checkbox-circle-line'
     },
     {
-      label: 'Mark as important',
+      label: 'Marcar como importante',
       icon: 'i-ri-alert-line'
     }
   ],
   [
     {
-      label: 'Star thread',
+      label: 'Fixar tópico',
       icon: 'i-ri-star-line'
     },
     {
-      label: 'Mute thread',
+      label: 'Silenciar tópico',
       icon: 'i-ri-pause-circle-line'
     }
   ]
@@ -43,8 +43,8 @@ function onSubmit() {
     reply.value = ''
 
     toast.add({
-      title: 'Email sent',
-      description: 'Your email has been sent successfully',
+      title: 'E-mail enviado',
+      description: 'Seu e-mail foi enviado com sucesso',
       icon: 'i-ri-checkbox-circle-line',
       color: 'success'
     })
@@ -68,11 +68,11 @@ function onSubmit() {
       </template>
 
       <template #right>
-        <UTooltip text="Archive">
+        <UTooltip text="Arquivar">
           <UButton icon="i-ri-inbox-line" color="neutral" variant="ghost" />
         </UTooltip>
 
-        <UTooltip text="Reply">
+        <UTooltip text="Responder">
           <UButton icon="i-ri-reply-line" color="neutral" variant="ghost" />
         </UTooltip>
 
@@ -119,7 +119,7 @@ function onSubmit() {
           <UIcon name="i-ri-reply-line" class="size-5" />
 
           <span class="truncate text-sm">
-            Reply to {{ mail.from.name }} ({{ mail.from.email }})
+            Responder para {{ mail.from.name }} ({{ mail.from.email }})
           </span>
         </template>
 
@@ -130,7 +130,7 @@ function onSubmit() {
             variant="none"
             required
             autoresize
-            placeholder="Write your reply..."
+            placeholder="Escreva sua resposta..."
             :rows="4"
             :disabled="loading"
             class="w-full"
@@ -138,17 +138,17 @@ function onSubmit() {
           />
 
           <div class="flex items-center justify-between">
-            <UTooltip text="Attach file">
+            <UTooltip text="Anexar arquivo">
               <UButton color="neutral" variant="ghost" icon="i-ri-attachment-line" />
             </UTooltip>
 
             <div class="flex items-center justify-end gap-2">
-              <UButton color="neutral" variant="ghost" label="Save draft" />
+              <UButton color="neutral" variant="ghost" label="Salvar rascunho" />
               <UButton
                 type="submit"
                 color="neutral"
                 :loading="loading"
-                label="Send"
+                label="Enviar"
                 icon="i-ri-send-plane-line"
               />
             </div>

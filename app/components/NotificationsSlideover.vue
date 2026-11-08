@@ -8,7 +8,7 @@ const { data: notifications } = await useFetch<Notification[]>('/api/notificatio
 </script>
 
 <template>
-  <USlideover v-model:open="isNotificationsSlideoverOpen" title="Notifications">
+  <USlideover v-model:open="isNotificationsSlideoverOpen" title="Notificações">
     <template #body>
       <NuxtLink
         v-for="notification in notifications"

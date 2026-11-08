@@ -3,8 +3,8 @@ import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
 
 const schema = z.object({
-  name: z.string().min(2, 'Too short'),
-  email: z.string().email('Invalid email')
+  name: z.string().min(2, 'Muito curto'),
+  email: z.string().email('E-mail inválido')
 })
 const open = ref(false)
 
@@ -18,7 +18,7 @@ const state = reactive<Partial<Schema>>({
 const toast = useToast()
 async function onSubmit(event: FormSubmitEvent<Schema>) {
   toast.add({
-    title: 'Success',
+    title: 'Sucesso',
     description: `Novo Cliente ${event.data.name} cadastrado com sucesso!`,
     color: 'success'
   })
@@ -27,20 +27,20 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 </script>
 
 <template>
-  <UModal v-model:open="open" title="Novo Cliente" description="Add a New Client to the database">
+  <UModal v-model:open="open" title="Novo Cliente" description="Adicionar um novo cliente ao banco de dados">
     <UButton label="Novo Cliente" icon="i-ri-add-line" />
 
     <template #body>
       <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
-        <UFormField label="Name" placeholder="John Doe" name="name">
+        <UFormField label="Nome" placeholder="João Silva" name="name">
           <UInput v-model="state.name" class="w-full" />
         </UFormField>
-        <UFormField label="Email" placeholder="john.doe@example.com" name="email">
+        <UFormField label="E-mail" placeholder="joao.silva@exemplo.com" name="email">
           <UInput v-model="state.email" class="w-full" />
         </UFormField>
         <div class="flex justify-end gap-2">
-          <UButton label="Cancel" color="neutral" variant="subtle" @click="open = false" />
-          <UButton label="Create" color="primary" variant="solid" type="submit" />
+          <UButton label="Cancelar" color="neutral" variant="subtle" @click="open = false" />
+          <UButton label="Criar" color="primary" variant="solid" type="submit" />
         </div>
       </UForm>
     </template>
