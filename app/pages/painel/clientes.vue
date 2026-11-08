@@ -139,13 +139,22 @@ const columns: TableColumn<User>[] = [
     accessorKey: 'status',
     header: 'Status',
     cell: ({ row }) => {
+      const statusLabels: Record<string, string> = {
+        subscribed: 'Inscrito',
+        unsubscribed: 'Não inscrito',
+        bounced: 'Rejeitado'
+      }
       const color = {
         subscribed: 'success' as const,
         unsubscribed: 'error' as const,
         bounced: 'warning' as const
       }[row.original.status]
 
-      return h(UBadge, { class: 'capitalize', variant: 'subtle', color }, () => row.original.status)
+      return h(
+        UBadge,
+        { class: 'capitalize', variant: 'subtle', color },
+        () => statusLabels[row.original.status] || row.original.status
+      )
     }
   },
   {

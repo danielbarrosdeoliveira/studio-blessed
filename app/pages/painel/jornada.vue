@@ -7,6 +7,7 @@ useHead({
 })
 
 const toast = useToast()
+const UTooltip = resolveComponent('UTooltip')
 
 const {
   data: workingHours,
@@ -213,10 +214,16 @@ async function save() {
           <p v-else class="mt-2 text-sm text-muted">Sem atendimento neste dia.</p>
         </UCard>
 
-        <p class="text-xs text-muted">
-          Os intervalos definem quando o salão atende. Qualquer evento ou bloqueio na agenda do
-          Google Calendar automaticamente invalida aquele slot na listagem de horários disponíveis.
-        </p>
+        <UTooltip
+          text="Os intervalos definem quando o salão atende. Qualquer evento ou bloqueio na agenda do Google Calendar automaticamente invalida aquele horário na listagem de disponíveis."
+        >
+          <template #trigger>
+            <p class="flex cursor-help items-center gap-1 text-xs text-muted">
+              <UIcon name="i-ri-information-line" class="size-3" />
+              Entenda como funcionam os intervalos
+            </p>
+          </template>
+        </UTooltip>
       </div>
     </template>
   </UDashboardPanel>
