@@ -9,6 +9,19 @@ useHead({
   title: 'Entrar · Studio Blessed'
 })
 
+const route = useRoute()
+
+// Se já estiver autenticado no servidor, redireciona para o painel imediatamente
+const headers = useRequestHeaders(['cookie'])
+const { data: session } = await useFetch<{ user: unknown | null }>('/api/auth/session', {
+  headers
+})
+
+if (import.meta.server && session.value?.user) {
+  const redirect = route.query.redirect as string | undefined
+  await navigateTo(redirect ?? '/painel/metricas')
+}
+
 const loading = ref(false)
 const errorMessage = ref('')
 

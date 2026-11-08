@@ -8,8 +8,8 @@ defineProps<{
 
 const colorMode = useColorMode()
 const appConfig = useAppConfig()
-const { data: session } = await useSession()
-const user = computed(() => session.value?.user)
+const session = useSession()
+const user = computed(() => session.value?.data?.user)
 
 const colors = [
   'red',
