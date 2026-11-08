@@ -2,7 +2,10 @@
 import type { NavigationMenuItem } from '@nuxt/ui'
 
 /** Valida a sessão do Better Auth no servidor/SSR. Sem sessão → redireciona para /login. */
-const { data: session } = await useFetch<{ user: unknown | null }>('/api/auth/session')
+const headers = useRequestHeaders(['cookie'])
+const { data: session } = await useFetch<{ user: unknown | null }>('/api/auth/session', {
+  headers
+})
 
 if (import.meta.server && !session.value?.user) {
   await navigateTo('/login')
