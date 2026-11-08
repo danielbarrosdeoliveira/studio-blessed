@@ -31,7 +31,7 @@ export interface AppointmentDetails {
   serviceName: string
   durationMin: number
   priceCents: number
-  hasMaintenance: boolean
+  hasMaintenance: boolean | null
   maintenancePriceCents: number | null
   maintenanceDurationMin: number | null
   clientName: string
@@ -43,14 +43,13 @@ export interface AppointmentDetails {
 /** Objeto público: sem o telefone da cliente; datas em ISO e `canChange` calculado. */
 export function serializeAppointment(row: AppointmentDetails, now = new Date()) {
   const isMaintenance = row.bookingType === 'maintenance'
+  const hasMaintenance = row.hasMaintenance ?? false
   const durationMin =
-    isMaintenance && row.hasMaintenance
+    isMaintenance && hasMaintenance
       ? (row.maintenanceDurationMin ?? row.durationMin)
       : row.durationMin
   const priceCents =
-    isMaintenance && row.hasMaintenance
-      ? (row.maintenancePriceCents ?? row.priceCents)
-      : row.priceCents
+    isMaintenance && hasMaintenance ? (row.maintenancePriceCents ?? row.priceCents) : row.priceCents
 
   return {
     id: row.id,
@@ -74,14 +73,13 @@ export function serializeAppointment(row: AppointmentDetails, now = new Date()) 
 /** Objeto interno: inclui telefone, observações e o status cru. */
 export function serializeStaffAppointment(row: AppointmentDetails) {
   const isMaintenance = row.bookingType === 'maintenance'
+  const hasMaintenance = row.hasMaintenance ?? false
   const durationMin =
-    isMaintenance && row.hasMaintenance
+    isMaintenance && hasMaintenance
       ? (row.maintenanceDurationMin ?? row.durationMin)
       : row.durationMin
   const priceCents =
-    isMaintenance && row.hasMaintenance
-      ? (row.maintenancePriceCents ?? row.priceCents)
-      : row.priceCents
+    isMaintenance && hasMaintenance ? (row.maintenancePriceCents ?? row.priceCents) : row.priceCents
 
   return {
     id: row.id,

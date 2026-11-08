@@ -69,8 +69,9 @@ export async function getAvailabilityForDay(params: AvailabilityParams): Promise
 
   // Determine duration based on booking type
   const isMaintenance = params.bookingType === 'maintenance'
+  const hasMaintenance = found.hasMaintenance ?? false
   const durationMin =
-    isMaintenance && found.hasMaintenance
+    isMaintenance && hasMaintenance
       ? (found.maintenanceDurationMin ?? found.durationMin)
       : found.durationMin
 

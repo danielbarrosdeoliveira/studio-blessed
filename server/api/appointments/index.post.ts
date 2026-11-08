@@ -57,8 +57,9 @@ export default defineEventHandler(async (event) => {
 
   // Determine duration based on booking type
   const isMaintenance = parsed.data.bookingType === 'maintenance'
+  const hasMaintenance = found.hasMaintenance ?? false
   const durationMin =
-    isMaintenance && found.hasMaintenance
+    isMaintenance && hasMaintenance
       ? (found.maintenanceDurationMin ?? found.durationMin)
       : found.durationMin
 
