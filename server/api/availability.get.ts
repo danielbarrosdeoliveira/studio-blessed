@@ -8,7 +8,8 @@ const querySchema = z.object({
   date: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Data inválida')
-    .refine(isValidDate, 'Data inválida')
+    .refine(isValidDate, 'Data inválida'),
+  bookingType: z.enum(['application', 'maintenance']).optional()
 })
 
 /** Disponibilidade para o staff: hoje/amanhã e encaixes, sem os 3 dias da cliente. */
@@ -30,6 +31,7 @@ export default defineEventHandler(async (event) => {
   return getAvailabilityForDay({
     serviceId: parsed.data.serviceId,
     date: parsed.data.date,
-    origin: 'staff'
+    origin: 'staff',
+    bookingType: parsed.data.bookingType
   })
 })

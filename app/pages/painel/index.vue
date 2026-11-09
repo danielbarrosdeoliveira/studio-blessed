@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import type { Service, StaffAgendaResponse, StaffAppointmentResponse } from '~/types/domain'
+import type {
+  BookingType,
+  Service,
+  StaffAgendaResponse,
+  StaffAppointmentResponse
+} from '~/types/domain'
 import { CalendarDate } from '@internationalized/date'
 import { formatIsoDateLong, isoDateOfInstant, todayInTimeZone } from '~/utils/date'
 import { getApiErrorMessage } from '~/utils/error'
@@ -107,7 +112,8 @@ const form = reactive({
   startsAt: null as string | null,
   name: '',
   phone: '',
-  notes: ''
+  notes: '',
+  bookingType: 'application' as BookingType
 })
 
 const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
@@ -117,6 +123,40 @@ const serviceItems = computed(() =>
     label: `${service.name} · ${service.durationMin} min · ${brl.format(service.priceCents / 100)}`,
     value: service.id
   }))
+)
+
+const selectedService = computed(
+  () => services.value.find((service) => service.id === form.serviceId) ?? null
+)
+
+const bookingTypeItems = computed(() => {
+  const service = selectedService.value
+
+  if (!service) {
+    return []
+  }
+
+  return [
+    {
+      label: `Aplicação · ${service.durationMin} min · ${brl.format(service.priceCents / 100)}`,
+      value: 'application'
+    },
+    {
+      label: `Manutenção · ${service.maintenanceDurationMin ?? service.durationMin} min · ${brl.format(
+        (service.maintenancePriceCents ?? service.priceCents) / 100
+      )}`,
+      value: 'maintenance'
+    }
+  ]
+})
+
+watch(
+  () => form.serviceId,
+  () => {
+    form.bookingType = 'application'
+    form.startsAt = null
+    formError.value = ''
+  }
 )
 
 const phoneValid = computed(() => normalizePhoneDigits(form.phone) !== null)
@@ -158,6 +198,7 @@ function openCreate() {
   form.name = ''
   form.phone = ''
   form.notes = ''
+  form.bookingType = 'application'
   formError.value = ''
   pickerKey.value += 1
 
@@ -182,7 +223,8 @@ async function submit() {
         startsAt: form.startsAt,
         clientName: form.name.trim(),
         clientPhone: form.phone,
-        notes: form.notes.trim() || undefined
+        notes: form.notes.trim() || undefined,
+        bookingType: form.bookingType
       }
     })
 
@@ -315,6 +357,10 @@ async function submit() {
           />
         </UFormField>
 
+        <UFormField v-if="selectedService?.hasMaintenance" label="Tipo de atendimento" required>
+          <USelect v-model="form.bookingType" :items="bookingTypeItems" class="w-full" />
+        </UFormField>
+
         <div v-if="form.serviceId" class="rounded-lg border border-default p-3">
           <AvailabilityPicker
             :key="pickerKey"
@@ -323,6 +369,7 @@ async function submit() {
             :min-date="date"
             endpoint="/api/availability"
             :client-lead="false"
+            :booking-type="form.bookingType"
           />
         </div>
 

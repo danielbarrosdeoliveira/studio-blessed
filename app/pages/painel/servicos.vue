@@ -199,6 +199,20 @@ const columns = computed<TableColumn<Service>[]>(() => [
     cell: ({ row }) => formatPrice(row.original.priceCents)
   },
   {
+    id: 'maintenance',
+    header: 'Manutenção',
+    cell: ({ row }) => {
+      if (!row.original.hasMaintenance) {
+        return '—'
+      }
+
+      const price = formatPrice(row.original.maintenancePriceCents ?? row.original.priceCents)
+      const duration = row.original.maintenanceDurationMin ?? row.original.durationMin
+
+      return `${price} · ${duration} min`
+    }
+  },
+  {
     accessorKey: 'active',
     header: 'Status',
     cell: ({ row }) =>
