@@ -3,44 +3,57 @@ import type { TableColumn } from '@nuxt/ui'
 import { upperFirst } from 'scule'
 import { getPaginationRowModel } from '@tanstack/table-core'
 import type { Row } from '@tanstack/table-core'
-import type { User } from '~/types'
+import { formatPhone } from '~/utils/phone'
+import { formatIsoDateLong } from '~/utils/date'
 
-const UAvatar = resolveComponent('UAvatar')
 const UButton = resolveComponent('UButton')
-const UBadge = resolveComponent('UBadge')
 const UDropdownMenu = resolveComponent('UDropdownMenu')
 const UCheckbox = resolveComponent('UCheckbox')
 
 const toast = useToast()
-const table = useTemplateRef('table')
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const table = ref<any>(null)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const addModal = ref<any>(null)
 
 const columnFilters = ref([
   {
-    id: 'email',
+    id: 'name',
+    value: ''
+  },
+  {
+    id: 'phone',
     value: ''
   }
 ])
 const columnVisibility = ref()
-const rowSelection = ref({ 1: true })
+const rowSelection = ref({})
 
-const { data, status } = await useFetch<User[]>('/api/clientes', {
+interface Client {
+  id: string
+  name: string
+  phone: string
+  createdAt: string
+}
+
+const { data, status } = await useFetch<Client[]>('/api/clientes', {
   lazy: true
 })
 
-function getRowItems(row: Row<User>) {
+function getRowItems(row: Row<Client>) {
   return [
     {
       type: 'label',
       label: 'Ações'
     },
     {
-      label: 'Copiar ID do cliente',
+      label: 'Copiar ID da cliente',
       icon: 'i-ri-file-copy-line',
       onSelect() {
         navigator.clipboard.writeText(row.original.id.toString())
         toast.add({
           title: 'Copiado para a área de transferência',
-          description: 'ID do cliente copiado para a área de transferência'
+          description: 'ID da cliente copiado para a área de transferência'
         })
       }
     },
@@ -48,12 +61,8 @@ function getRowItems(row: Row<User>) {
       type: 'separator'
     },
     {
-      label: 'Ver detalhes do cliente',
-      icon: 'i-ri-list-unordered'
-    },
-    {
-      label: 'Ver pagamentos do cliente',
-      icon: 'i-ri-wallet-line'
+      label: 'Ver agendamentos da cliente',
+      icon: 'i-ri-calendar-line'
     },
     {
       type: 'separator'
@@ -64,15 +73,15 @@ function getRowItems(row: Row<User>) {
       color: 'error',
       onSelect() {
         toast.add({
-          title: 'Cliente excluído',
-          description: 'O cliente foi excluído.'
+          title: 'Cliente excluída',
+          description: 'A cliente foi excluída.'
         })
       }
     }
   ]
 }
 
-const columns: TableColumn<User>[] = [
+const columns: TableColumn<Client>[] = [
   {
     id: 'select',
     header: ({ table }) =>
@@ -98,77 +107,28 @@ const columns: TableColumn<User>[] = [
   {
     accessorKey: 'name',
     header: 'Nome',
-    cell: ({ row }) => {
-      return h('div', { class: 'flex items-center gap-3' }, [
-        h(UAvatar, {
-          ...row.original.avatar,
-          size: 'lg'
-        }),
-        h('div', undefined, [
-          h('p', { class: 'font-medium text-highlighted' }, row.original.name),
-          h('p', { class: '' }, `@${row.original.name}`)
-        ])
-      ])
-    }
+    cell: ({ row }) => h('p', { class: 'font-medium text-highlighted' }, row.original.name)
   },
   {
-    accessorKey: 'email',
-    header: ({ column }) => {
-      const isSorted = column.getIsSorted()
-
-      return h(UButton, {
-        color: 'neutral',
-        variant: 'ghost',
-        label: 'E-mail',
-        icon: isSorted
-          ? isSorted === 'asc'
-            ? 'i-ri-sort-asc'
-            : 'i-ri-sort-desc'
-          : 'i-ri-arrow-up-down-line',
-        class: '-mx-2.5',
-        onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
-      })
-    }
+    accessorKey: 'phone',
+    header: 'WhatsApp',
+    cell: ({ row }) =>
+      h('p', { class: 'font-medium text-highlighted' }, formatPhone(row.original.phone))
   },
   {
-    accessorKey: 'location',
-    header: 'Localização',
-    cell: ({ row }) => row.original.location
-  },
-  {
-    accessorKey: 'status',
-    header: 'Status',
-    cell: ({ row }) => {
-      const statusLabels: Record<string, string> = {
-        subscribed: 'Inscrito',
-        unsubscribed: 'Não inscrito',
-        bounced: 'Rejeitado'
-      }
-      const color = {
-        subscribed: 'success' as const,
-        unsubscribed: 'error' as const,
-        bounced: 'warning' as const
-      }[row.original.status]
-
-      return h(
-        UBadge,
-        { class: 'capitalize', variant: 'subtle', color },
-        () => statusLabels[row.original.status] || row.original.status
-      )
-    }
+    accessorKey: 'createdAt',
+    header: 'Cadastrada em',
+    cell: ({ row }) =>
+      h('p', { class: 'text-sm text-muted' }, formatIsoDateLong(row.original.createdAt))
   },
   {
     id: 'actions',
-    cell: ({ row }) => {
-      return h(
-        'div',
-        { class: 'text-right' },
+    cell: ({ row }) =>
+      h('div', { class: 'text-right' }, [
         h(
           UDropdownMenu,
           {
-            content: {
-              align: 'end'
-            },
+            content: { align: 'end' },
             items: getRowItems(row)
           },
           () =>
@@ -179,36 +139,20 @@ const columns: TableColumn<User>[] = [
               class: 'ml-auto'
             })
         )
-      )
-    }
+      ])
   }
 ]
 
-const statusFilter = ref('all')
+const nameFilter = computed({
+  get: (): string => (table.value?.tableApi?.getColumn('name')?.getFilterValue() as string) || '',
+  set: (value: string) =>
+    table.value?.tableApi?.getColumn('name')?.setFilterValue(value || undefined)
+})
 
-watch(
-  () => statusFilter.value,
-  (newVal) => {
-    if (!table?.value?.tableApi) return
-
-    const statusColumn = table.value.tableApi.getColumn('status')
-    if (!statusColumn) return
-
-    if (newVal === 'all') {
-      statusColumn.setFilterValue(undefined)
-    } else {
-      statusColumn.setFilterValue(newVal)
-    }
-  }
-)
-
-const email = computed({
-  get: (): string => {
-    return (table.value?.tableApi?.getColumn('email')?.getFilterValue() as string) || ''
-  },
-  set: (value: string) => {
-    table.value?.tableApi?.getColumn('email')?.setFilterValue(value || undefined)
-  }
+const phoneFilter = computed({
+  get: (): string => (table.value?.tableApi?.getColumn('phone')?.getFilterValue() as string) || '',
+  set: (value: string) =>
+    table.value?.tableApi?.getColumn('phone')?.setFilterValue(value || undefined)
 })
 
 const pagination = ref({
@@ -234,10 +178,16 @@ const pagination = ref({
     <template #body>
       <div class="flex flex-wrap items-center justify-between gap-1.5">
         <UInput
-          v-model="email"
+          v-model="nameFilter"
           class="max-w-sm"
           icon="i-ri-search-line"
-          placeholder="Filtrar e-mails..."
+          placeholder="Filtrar por nome..."
+        />
+        <UInput
+          v-model="phoneFilter"
+          class="max-w-sm"
+          icon="i-ri-phone-line"
+          placeholder="Filtrar por WhatsApp..."
         />
 
         <div class="flex flex-wrap items-center gap-1.5">
@@ -257,20 +207,6 @@ const pagination = ref({
             </UButton>
           </CustomersDeleteModal>
 
-          <USelect
-            v-model="statusFilter"
-            :items="[
-              { label: 'Todos', value: 'all' },
-              { label: 'Inscrito', value: 'subscribed' },
-              { label: 'Não inscrito', value: 'unsubscribed' },
-              { label: 'Rejeitado', value: 'bounced' }
-            ]"
-            :ui="{
-              trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200'
-            }"
-            placeholder="Filtrar status"
-            class="min-w-28"
-          />
           <UDropdownMenu
             :items="
               table?.tableApi
@@ -323,6 +259,28 @@ const pagination = ref({
         }"
       />
 
+      <UCard v-if="status === 'success' && !data?.length" class="mt-4">
+        <div class="flex flex-col items-center gap-3 py-8 text-center">
+          <div class="flex size-12 items-center justify-center rounded-full bg-elevated">
+            <UIcon name="i-ri-user-line" class="size-6 text-muted" />
+          </div>
+          <div>
+            <p class="font-medium text-highlighted">Nenhuma cliente cadastrada</p>
+            <p class="text-sm text-muted">Clique em "Nova Cliente" para adicionar.</p>
+          </div>
+          <UButton
+            label="Nova Cliente"
+            icon="i-ri-add-line"
+            size="sm"
+            @click="
+              () => {
+                if (addModal.value) addModal.value.open = true
+              }
+            "
+          />
+        </div>
+      </UCard>
+
       <div class="mt-auto flex items-center justify-between gap-3 border-t border-default pt-4">
         <div class="text-sm text-muted">
           {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length || 0 }} de
@@ -340,4 +298,6 @@ const pagination = ref({
       </div>
     </template>
   </UDashboardPanel>
+
+  <CustomersAddModal ref="addModal" />
 </template>
