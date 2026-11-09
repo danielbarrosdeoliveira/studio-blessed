@@ -112,6 +112,13 @@ watch(
     void load()
   }
 )
+watch(
+  () => props.bookingType,
+  () => {
+    selected.value = null
+    void load()
+  }
+)
 </script>
 
 <template>

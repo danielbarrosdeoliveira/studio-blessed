@@ -103,6 +103,9 @@ async function cancel() {
           <UBadge :color="statusMeta.color" variant="subtle">
             {{ statusMeta.label }}
           </UBadge>
+          <UBadge v-if="appointment.bookingType === 'maintenance'" color="primary" variant="subtle">
+            Manutenção
+          </UBadge>
           <UTooltip
             text="Origem do agendamento: feito pela equipe do salão ou pela própria cliente."
           >

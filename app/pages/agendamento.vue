@@ -85,22 +85,30 @@ function formatPrice(cents: number) {
   return brl.format(cents / 100)
 }
 
-function getCurrentDuration(): number {
+function getDurationFor(type: BookingType): number {
   if (!selectedService.value) return 0
-  const { service, bookingType } = selectedService.value
-  if (bookingType === 'maintenance' && (service.hasMaintenance ?? false)) {
+  const { service } = selectedService.value
+  if (type === 'maintenance' && (service.hasMaintenance ?? false)) {
     return service.maintenanceDurationMin ?? service.durationMin
   }
   return service.durationMin
 }
 
-function getCurrentPrice(): number {
+function getPriceFor(type: BookingType): number {
   if (!selectedService.value) return 0
-  const { service, bookingType } = selectedService.value
-  if (bookingType === 'maintenance' && (service.hasMaintenance ?? false)) {
+  const { service } = selectedService.value
+  if (type === 'maintenance' && (service.hasMaintenance ?? false)) {
     return service.maintenancePriceCents ?? service.priceCents
   }
   return service.priceCents
+}
+
+function getCurrentDuration(): number {
+  return getDurationFor(selectedService.value?.bookingType ?? 'application')
+}
+
+function getCurrentPrice(): number {
+  return getPriceFor(selectedService.value?.bookingType ?? 'application')
 }
 
 function getBookingTypeLabel(type: BookingType, hasMaintenance: boolean): string {
@@ -246,6 +254,13 @@ function bookAnother() {
             </UBadge>
           </div>
 
+          <p v-if="service.hasMaintenance" class="mt-3 text-xs text-muted">
+            Também disponível em
+            <span class="font-medium text-highlighted">manutenção</span>:
+            {{ service.maintenanceDurationMin ?? service.durationMin }} min ·
+            {{ formatPrice(service.maintenancePriceCents ?? service.priceCents) }}
+          </p>
+
           <UButton
             class="mt-4"
             :label="selectedService?.service.id === service.id ? 'Selecionado' : 'Selecionar'"
@@ -292,7 +307,8 @@ function bookAnother() {
                 <div>
                   <h3 class="font-semibold text-highlighted">Aplicação Completa</h3>
                   <p class="mt-1 text-sm text-muted">
-                    {{ getCurrentDuration() }} min · {{ formatPrice(getCurrentPrice()) }}
+                    {{ getDurationFor('application') }} min ·
+                    {{ formatPrice(getPriceFor('application')) }}
                   </p>
                 </div>
                 <UBadge
@@ -313,7 +329,8 @@ function bookAnother() {
                 <div>
                   <h3 class="font-semibold text-highlighted">Manutenção</h3>
                   <p class="mt-1 text-sm text-muted">
-                    {{ getCurrentDuration() }} min · {{ formatPrice(getCurrentPrice()) }}
+                    {{ getDurationFor('maintenance') }} min ·
+                    {{ formatPrice(getPriceFor('maintenance')) }}
                   </p>
                 </div>
                 <UBadge
