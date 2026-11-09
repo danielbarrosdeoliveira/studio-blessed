@@ -103,8 +103,12 @@ function getCurrentPrice(): number {
   return service.priceCents
 }
 
-function getBookingTypeLabel(type: BookingType): string {
-  return type === 'application' ? 'Aplicação Completa' : 'Manutenção'
+function getBookingTypeLabel(type: BookingType, hasMaintenance: boolean): string {
+  if (type === 'maintenance') {
+    return 'Manutenção'
+  }
+
+  return hasMaintenance ? 'Aplicação Completa' : 'Procedimento'
 }
 
 function selectService(service: Service) {
@@ -346,7 +350,12 @@ function bookAnother() {
             </dd>
             <dt class="text-neutral-500 dark:text-neutral-400">Tipo</dt>
             <dd class="text-right font-medium text-neutral-100">
-              {{ getBookingTypeLabel(selectedService.bookingType) }}
+              {{
+                getBookingTypeLabel(
+                  selectedService.bookingType,
+                  selectedService.service.hasMaintenance ?? false
+                )
+              }}
             </dd>
             <dt class="text-neutral-500 dark:text-neutral-400">Duração</dt>
             <dd class="text-right font-medium text-neutral-100">{{ getCurrentDuration() }} min</dd>
@@ -379,8 +388,13 @@ function bookAnother() {
                 <h2 class="font-semibold text-highlighted">Escolha a data e o horário</h2>
                 <p class="text-sm text-muted">
                   {{ selectedService.service.name }} ·
-                  {{ getBookingTypeLabel(selectedService.bookingType) }} ·
-                  {{ getCurrentDuration() }} min
+                  {{
+                    getBookingTypeLabel(
+                      selectedService.bookingType,
+                      selectedService.service.hasMaintenance ?? false
+                    )
+                  }}
+                  · {{ getCurrentDuration() }} min
                 </p>
               </div>
               <span class="font-medium whitespace-nowrap text-highlighted">
@@ -434,7 +448,12 @@ function bookAnother() {
             </dd>
             <dt class="text-neutral-500 dark:text-neutral-400">Tipo</dt>
             <dd class="text-right font-medium text-neutral-100">
-              {{ getBookingTypeLabel(selectedService.bookingType) }}
+              {{
+                getBookingTypeLabel(
+                  selectedService.bookingType,
+                  selectedService.service.hasMaintenance ?? false
+                )
+              }}
             </dd>
             <dt class="text-neutral-500 dark:text-neutral-400">Duração</dt>
             <dd class="text-right font-medium text-neutral-100">{{ getCurrentDuration() }} min</dd>
@@ -552,7 +571,12 @@ function bookAnother() {
             </dd>
             <dt class="text-neutral-500 dark:text-neutral-400">Tipo</dt>
             <dd class="text-right font-medium text-neutral-100">
-              {{ getBookingTypeLabel(selectedService.bookingType) }}
+              {{
+                getBookingTypeLabel(
+                  selectedService.bookingType,
+                  selectedService.service.hasMaintenance ?? false
+                )
+              }}
             </dd>
             <dt class="text-neutral-500 dark:text-neutral-400">Duração</dt>
             <dd class="text-right font-medium text-neutral-100">{{ getCurrentDuration() }} min</dd>
@@ -585,7 +609,12 @@ function bookAnother() {
         </dd>
         <dt class="text-neutral-500 dark:text-neutral-400">Tipo</dt>
         <dd class="text-right font-medium text-neutral-100">
-          {{ created.bookingType === 'maintenance' ? 'Manutenção' : 'Aplicação Completa' }}
+          {{
+            getBookingTypeLabel(
+              created.bookingType,
+              selectedService?.service.hasMaintenance ?? false
+            )
+          }}
         </dd>
         <dt class="text-neutral-500 dark:text-neutral-400">Data e horário</dt>
         <dd class="text-right font-medium text-neutral-100">

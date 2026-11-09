@@ -40,6 +40,29 @@ export interface AppointmentDetails {
   googleEventId: string | null
 }
 
+/** Prefixo do evento no Google Calendar: manutenção, aplicação ou nenhum (procedimento). */
+export function bookingTypeLabel(
+  bookingType: Appointment['bookingType'],
+  hasMaintenance: boolean | null
+): string {
+  if (bookingType === 'maintenance') {
+    return '[Manutenção]'
+  }
+
+  return hasMaintenance ? '[Aplicação]' : ''
+}
+
+/** Título do evento no Google Calendar; procedimentos avulsos não recebem prefixo. */
+export function googleCalendarSummary(
+  row: Pick<AppointmentDetails, 'bookingType' | 'hasMaintenance' | 'clientName' | 'serviceName'>
+): string {
+  const prefix = bookingTypeLabel(row.bookingType, row.hasMaintenance)
+
+  return prefix
+    ? `${prefix} ${row.clientName} - ${row.serviceName}`
+    : `${row.clientName} - ${row.serviceName}`
+}
+
 /** Objeto público: sem o telefone da cliente; datas em ISO e `canChange` calculado. */
 export function serializeAppointment(row: AppointmentDetails, now = new Date()) {
   const isMaintenance = row.bookingType === 'maintenance'
