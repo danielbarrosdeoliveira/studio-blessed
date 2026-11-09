@@ -3,7 +3,10 @@ import * as z from 'zod'
 import { db } from '../../database'
 import { appointment, service } from '../../database/schema'
 import { writeAuditLog } from '../../utils/audit-log'
-import { serializeStaffAppointment } from '../../utils/appointment-serialization'
+import {
+  serializeStaffAppointment,
+  googleCalendarSummary
+} from '../../utils/appointment-serialization'
 import { findOrCreateClient, getAppointmentById } from '../../utils/appointments'
 import { isSlotAvailable } from '../../utils/availability'
 import { normalizePhone } from '../../utils/phone'
@@ -58,6 +61,11 @@ export default defineEventHandler(async (event) => {
   // Determine duration based on booking type
   const isMaintenance = parsed.data.bookingType === 'maintenance'
   const hasMaintenance = found.hasMaintenance ?? false
+
+  if (isMaintenance && !hasMaintenance) {
+    throw createError({ statusCode: 400, message: 'Este serviço não oferece manutenção' })
+  }
+
   const durationMin =
     isMaintenance && hasMaintenance
       ? (found.maintenanceDurationMin ?? found.durationMin)
@@ -106,9 +114,8 @@ export default defineEventHandler(async (event) => {
   }
 
   // Sync with Google Calendar if connected
-  const bookingTypeLabel = row.bookingType === 'maintenance' ? '[Manutenção]' : '[Aplicação]'
   const googleResult = await createGoogleCalendarEvent({
-    summary: `${bookingTypeLabel} ${row.clientName} - ${row.serviceName}`,
+    summary: googleCalendarSummary(row),
     startsAt: row.startsAt.toISOString(),
     endsAt: row.endsAt.toISOString(),
     appointmentId: row.id
