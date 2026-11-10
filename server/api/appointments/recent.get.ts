@@ -4,9 +4,9 @@ import { appointment, client, service } from '../../database/schema'
 import { appointmentColumns } from '../../utils/appointments'
 import { requireUser } from '../../utils/auth-guard'
 
-/** Janela de criação considerada "recente" para o polling do painel. */
-const LOOKBACK_MS = 24 * 60 * 60 * 1000
-const MAX_RESULTS = 20
+/** Janela de criação considerada "recente" para as notificações do painel. */
+const LOOKBACK_MS = 7 * 24 * 60 * 60 * 1000
+const MAX_RESULTS = 50
 
 /**
  * Retorna os agendamentos criados recentemente por clientes (origem `client`).
