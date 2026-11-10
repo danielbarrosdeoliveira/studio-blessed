@@ -18,6 +18,8 @@ export type AuditAction =
   | 'working_hours.delete'
   | 'user.delete'
   | 'client.create'
+  | 'client.block'
+  | 'client.unblock'
 
 export async function writeAuditLog({
   action,

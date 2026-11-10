@@ -9,6 +9,7 @@ import {
 } from '../../utils/appointment-serialization'
 import { findOrCreateClient, getAppointmentById } from '../../utils/appointments'
 import { isSlotAvailable } from '../../utils/availability'
+import { BLOCKED_CLIENT_STAFF_MESSAGE, isClientBlockedByPhone } from '../../utils/client-blocking'
 import { normalizePhone } from '../../utils/phone'
 import { requireUser } from '../../utils/auth-guard'
 import { createGoogleCalendarEvent } from '../../utils/google-calendar'
@@ -39,6 +40,10 @@ export default defineEventHandler(async (event) => {
 
   if (!phone) {
     throw createError({ statusCode: 400, message: 'WhatsApp inválido' })
+  }
+
+  if (await isClientBlockedByPhone(phone)) {
+    throw createError({ statusCode: 409, message: BLOCKED_CLIENT_STAFF_MESSAGE })
   }
 
   const startsAt = new Date(parsed.data.startsAt)

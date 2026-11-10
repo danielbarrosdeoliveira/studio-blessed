@@ -6,6 +6,7 @@
 ## Regras de negócio
 
 - [x] Nome de serviço único entre os serviços ativos do salão (todos pertencem à dona única)
+- [x] Bloqueio de cliente: impede novos agendamentos (público e dona), preserva histórico e mensagem neutra à cliente
 
 ## Experiência pública
 
