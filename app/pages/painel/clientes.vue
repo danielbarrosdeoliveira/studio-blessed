@@ -101,10 +101,6 @@ const columns: TableColumn<Client>[] = [
       })
   },
   {
-    accessorKey: 'id',
-    header: 'ID'
-  },
-  {
     accessorKey: 'name',
     header: 'Nome',
     cell: ({ row }) => h('p', { class: 'font-medium text-highlighted' }, row.original.name)
