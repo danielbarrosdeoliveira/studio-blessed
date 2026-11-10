@@ -13,6 +13,8 @@ main
  └── refactor/<slug>          ← refatoração sem mudança de comportamento
 ```
 
+**Regra de ouro:** o prefixo da branch deve bater exatamente com o tipo do commit Conventional Commits. Exemplo: se o commit será `refactor(clientes): ...`, a branch deve ser `refactor/clientes-...`. Nunca use `feat/` para `refactor`, `fix`, `docs` ou `chore`.
+
 ### Passo a passo
 
 1. Atualize a `main`:
