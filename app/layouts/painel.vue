@@ -12,7 +12,7 @@ if (import.meta.server && !session.value?.user) {
 }
 
 // Avisa a dona sobre novos agendamentos enquanto ela estiver no painel.
-useAppointmentsPolling()
+const { appointments, unreadCount, markAllAsRead } = useAppointmentsPolling()
 
 const open = ref(false)
 
@@ -66,7 +66,15 @@ const links = computed<NavigationMenuItem[][]>(() => {
       </template>
 
       <template #footer="{ collapsed }">
-        <UserMenu :collapsed="collapsed" />
+        <div class="flex flex-col gap-1">
+          <AppointmentsBell
+            :collapsed="collapsed"
+            :appointments="appointments"
+            :unread-count="unreadCount"
+            @mark-read="markAllAsRead"
+          />
+          <UserMenu :collapsed="collapsed" />
+        </div>
       </template>
     </UDashboardSidebar>
 
