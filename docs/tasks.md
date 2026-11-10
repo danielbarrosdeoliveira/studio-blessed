@@ -19,7 +19,7 @@
 ## Dívidas conhecidas
 
 - [ ] E1 — Restringir o cadastro público de contas (apenas a dona do salão entra)
-- [ ] E9 — Remover páginas de template sem uso (`/inbox`, `/customers`, `/settings/*`)
+- [x] E9 — Remover páginas e componentes de template sem uso (`/painel/inbox`, `components/home`, `components/inbox`, `TeamsMenu`, `NotificationsSlideover`)
 - [ ] E9 — Substituir o dashboard de demonstração da rota `/`
 
 ## Observabilidade (produção / PRD)
