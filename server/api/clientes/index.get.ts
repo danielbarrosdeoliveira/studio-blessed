@@ -11,6 +11,7 @@ export default defineEventHandler(async (event) => {
       id: client.id,
       name: client.name,
       phone: client.phone,
+      blocked: client.blocked,
       createdAt: client.createdAt
     })
     .from(client)

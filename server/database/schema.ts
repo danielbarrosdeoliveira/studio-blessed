@@ -107,6 +107,8 @@ export const client = pgTable(
     id: id(),
     name: text('name').notNull(),
     phone: text('phone').notNull(),
+    /** Bloqueio impede novos agendamentos; o histórico é preservado. */
+    blocked: boolean('blocked').notNull().default(false),
     createdAt: createdAt(),
     updatedAt: updatedAt()
   },

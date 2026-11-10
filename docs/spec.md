@@ -75,6 +75,12 @@ O modelo é **single-owner**: não existem papéis, `role` ou hierarquia de aces
   como política — não calculada nem registrada.
 - **Concorrência:** sem lock distribuído. **Revalidar a disponibilidade antes de
   gravar**; se ocupou, o cliente escolhe outro horário.
+- **Cliente bloqueada:** a dona pode **bloquear** uma cliente na página de
+  Clientes. A cliente bloqueada **não consegue criar novos agendamentos** pelo
+  site (a API pública responde com uma **mensagem neutra**, que não revela o
+  bloqueio), e a dona também é impedida de agendar para ela no painel até
+  desbloqueá-la. O **histórico é preservado** — bloquear não apaga nada.
+  Bloqueio em massa pela seleção da tabela também é suportado.
 - **Notificações:** **nenhuma** no MVP (só tela de sucesso). Automação futura
   (WAHA/WAWA + N8N) fica pós-MVP.
 - **Status do agendamento:** `scheduled` → `completed` | `cancelled` | `no_show`.

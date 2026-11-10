@@ -95,6 +95,21 @@ export interface StaffAppointmentResponse {
   appointment: StaffAppointment
 }
 
+/** Cliente resumida, como devolvida pelas rotas de clientes. */
+export interface ClientSummary {
+  id: string
+  name: string
+  phone: string
+  blocked: boolean
+  createdAt: string
+}
+
+/** Histórico de agendamentos de uma cliente, usado pelo painel. */
+export interface ClientAppointmentsResponse {
+  client: Pick<ClientSummary, 'id' | 'name' | 'phone' | 'blocked'>
+  appointments: StaffAppointment[]
+}
+
 /** Agendamento criado recentemente por uma cliente — usado pelo polling do painel. */
 export interface RecentClientAppointment {
   id: string
