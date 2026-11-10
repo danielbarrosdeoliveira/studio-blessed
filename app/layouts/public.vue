@@ -44,25 +44,6 @@
             square
             class="sm:hidden"
           />
-          <UButton
-            label="Área da dona"
-            icon="i-ri-login-box-line"
-            color="neutral"
-            variant="outline"
-            size="sm"
-            to="/login"
-            class="hidden sm:inline-flex"
-          />
-          <UButton
-            to="/login"
-            icon="i-ri-login-box-line"
-            aria-label="Área da dona"
-            color="neutral"
-            variant="outline"
-            size="sm"
-            square
-            class="sm:hidden"
-          />
         </div>
       </div>
     </header>
