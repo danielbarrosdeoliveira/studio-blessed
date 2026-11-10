@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
-import { upperFirst } from 'scule'
 import { getPaginationRowModel } from '@tanstack/table-core'
 import type { Row } from '@tanstack/table-core'
 import { formatPhone } from '~/utils/phone'
@@ -16,17 +15,7 @@ const table = ref<any>(null)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const addModal = ref<any>(null)
 
-const columnFilters = ref([
-  {
-    id: 'name',
-    value: ''
-  },
-  {
-    id: 'phone',
-    value: ''
-  }
-])
-const columnVisibility = ref()
+const searchFilter = ref('')
 const rowSelection = ref({})
 
 interface Client {
@@ -39,6 +28,16 @@ interface Client {
 
 const { data, status, refresh } = await useFetch<Client[]>('/api/clientes', {
   lazy: true
+})
+
+const filteredClients = computed(() => {
+  const value = searchFilter.value.trim().toLowerCase()
+  if (!value) {
+    return data.value ?? []
+  }
+  return (data.value ?? []).filter(
+    (item) => item.name.toLowerCase().includes(value) || item.phone.toLowerCase().includes(value)
+  )
 })
 
 /* --------------------------- Ações por linha --------------------------- */
@@ -183,18 +182,6 @@ const columns: TableColumn<Client>[] = [
   }
 ]
 
-const nameFilter = computed({
-  get: (): string => (table.value?.tableApi?.getColumn('name')?.getFilterValue() as string) || '',
-  set: (value: string) =>
-    table.value?.tableApi?.getColumn('name')?.setFilterValue(value || undefined)
-})
-
-const phoneFilter = computed({
-  get: (): string => (table.value?.tableApi?.getColumn('phone')?.getFilterValue() as string) || '',
-  set: (value: string) =>
-    table.value?.tableApi?.getColumn('phone')?.setFilterValue(value || undefined)
-})
-
 const pagination = ref({
   pageIndex: 0,
   pageSize: 10
@@ -218,16 +205,10 @@ const pagination = ref({
     <template #body>
       <div class="flex flex-wrap items-center justify-between gap-1.5">
         <UInput
-          v-model="nameFilter"
+          v-model="searchFilter"
           class="max-w-sm"
           icon="i-ri-search-line"
-          placeholder="Filtrar por nome..."
-        />
-        <UInput
-          v-model="phoneFilter"
-          class="max-w-sm"
-          icon="i-ri-phone-line"
-          placeholder="Filtrar por WhatsApp..."
+          placeholder="Buscar por nome ou WhatsApp..."
         />
 
         <div class="flex flex-wrap items-center gap-1.5">
@@ -251,47 +232,18 @@ const pagination = ref({
               </template>
             </UButton>
           </CustomersBlockModal>
-
-          <UDropdownMenu
-            :items="
-              table?.tableApi
-                ?.getAllColumns()
-                .filter((column: any) => column.getCanHide())
-                .map((column: any) => ({
-                  label: upperFirst(column.id),
-                  type: 'checkbox' as const,
-                  checked: column.getIsVisible(),
-                  onUpdateChecked(checked: boolean) {
-                    table?.tableApi?.getColumn(column.id)?.toggleVisibility(!!checked)
-                  },
-                  onSelect(e?: Event) {
-                    e?.preventDefault()
-                  }
-                }))
-            "
-            :content="{ align: 'end' }"
-          >
-            <UButton
-              label="Exibir"
-              color="neutral"
-              variant="outline"
-              trailing-icon="i-ri-settings-3-line"
-            />
-          </UDropdownMenu>
         </div>
       </div>
 
       <UTable
         ref="table"
-        v-model:column-filters="columnFilters"
-        v-model:column-visibility="columnVisibility"
         v-model:row-selection="rowSelection"
         v-model:pagination="pagination"
         :pagination-options="{
           getPaginationRowModel: getPaginationRowModel()
         }"
         class="shrink-0"
-        :data="data"
+        :data="filteredClients"
         :columns="columns"
         :loading="status === 'pending'"
         :ui="{
@@ -311,18 +263,8 @@ const pagination = ref({
           </div>
           <div>
             <p class="font-medium text-highlighted">Nenhuma cliente cadastrada</p>
-            <p class="text-sm text-muted">Clique em "Nova Cliente" para adicionar.</p>
+            <p class="text-sm text-muted">Clique em "Nova Cliente" no cabeçalho para adicionar.</p>
           </div>
-          <UButton
-            label="Nova Cliente"
-            icon="i-ri-add-line"
-            size="sm"
-            @click="
-              () => {
-                if (addModal.value) addModal.value.open = true
-              }
-            "
-          />
         </div>
       </UCard>
 
